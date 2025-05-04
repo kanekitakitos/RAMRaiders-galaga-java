@@ -31,7 +31,7 @@ import java.util.ArrayList;
  public class GameEngine implements IGameEngine
  {
      // Stores game objects organized by layers
-     private HashMap<Integer, ArrayList<GameObject>> layeredGameObjects;
+     private HashMap<Integer, ArrayList<IGameObject>> layeredGameObjects;
      private ArrayList<IGameObject> disabledGameObjects;
 
      // Tracks the total number of game objects
@@ -57,7 +57,7 @@ import java.util.ArrayList;
       *
       * @param go The GameObject to add.
       */
-     public void add(GameObject go)
+     public void add(IGameObject go)
      {
          int layer = go.transform().layer();
          if (!layeredGameObjects.containsKey(layer))
@@ -92,12 +92,12 @@ import java.util.ArrayList;
       * @param indexGameObject The index of the GameObject within the layer.
       * @return The GameObject if found, otherwise null.
       */
-     public GameObject get(int layer, int indexGameObject)
+     public IGameObject get(int layer, int indexGameObject)
      {
          if (!layeredGameObjects.containsKey(layer) || indexGameObject < 0 || indexGameObject > this.totalObjects)
              return null;
 
-         ArrayList<GameObject> layerObjects = layeredGameObjects.get(layer);
+         ArrayList<IGameObject> layerObjects = layeredGameObjects.get(layer);
          return layerObjects.get(indexGameObject);
      }
 
@@ -122,15 +122,16 @@ import java.util.ArrayList;
      public void onUpdate()
      {
          // List for objects that need to change layers
-         ArrayList<GameObject> objectsToMove = new ArrayList<>();
+         ArrayList<IGameObject> objectsToMove = new ArrayList<>();
 
          // Iterate through each layer in the map
-         for (Map.Entry<Integer, ArrayList<GameObject>> entry : layeredGameObjects.entrySet()) {
-             ArrayList<GameObject> layerObjects = entry.getValue();
+         for (Map.Entry<Integer, ArrayList<IGameObject>> entry : layeredGameObjects.entrySet())
+         {
+             ArrayList<IGameObject> layerObjects = entry.getValue();
              if (layerObjects == null) continue;
 
              // Iterate through each GameObject in the layer
-             for (GameObject go : layerObjects)
+             for (IGameObject go : layerObjects)
              {
                  int originalLayer = entry.getKey();
 
@@ -147,7 +148,7 @@ import java.util.ArrayList;
          }
 
          // Reposition objects that changed layers
-         for (GameObject go : objectsToMove)
+         for (IGameObject go : objectsToMove)
          {
              destroy(go);
              add(go);
@@ -163,10 +164,10 @@ import java.util.ArrayList;
      public void checkCollision()
      {
          ArrayList<IGameObject> output = new ArrayList<>();
-         GameObject currentObject = null;
+         IGameObject currentObject = null;
 
          // Iterate through each layer in the map
-         for (ArrayList<GameObject> layerObjects : layeredGameObjects.values())
+         for (ArrayList<IGameObject> layerObjects : layeredGameObjects.values())
          {
              if (layerObjects == null || layerObjects.isEmpty()) continue;
 
@@ -178,12 +179,15 @@ import java.util.ArrayList;
                  {
                      if (i == j) continue;
 
-                     GameObject other = layerObjects.get(j);
+                     IGameObject other = layerObjects.get(j);
                      // Check for collision
                      if (currentObject.collider().colision(other.collider()))
                          output.add(other);
                  }
-                 currentObject.behavior().onCollision(output);
+
+                 if(!output.isEmpty())
+                    currentObject.behavior().onCollision(output);
+
                  output.clear();
              }
          }
@@ -262,10 +266,10 @@ import java.util.ArrayList;
      @Override
      public void destroyAll()
      {
-         for (ArrayList<GameObject> layerObjects : layeredGameObjects.values())
+         for (ArrayList<IGameObject> layerObjects : layeredGameObjects.values())
          {
              if (layerObjects == null || layerObjects.isEmpty()) continue;
-             for (GameObject go : layerObjects) {
+             for (IGameObject go : layerObjects) {
                  destroy(go);
              }
          }
@@ -289,6 +293,28 @@ import java.util.ArrayList;
              // Sends the list of collisions to all enabled IGameObjects
 
              // Sends the list of IGameObjects in enabled to the GUI
+         }
+     }
+
+
+     /**
+      * Devuelve una copia segura de los objetos habilitados (activos) para renderizar.
+      * Es thread-safe usando synchronized sobre layeredGameObjects.
+      */
+     public ArrayList<IGameObject> getEnabledObjectsSnapshot()
+     {
+         ArrayList<IGameObject> snapshot = new ArrayList<>();
+         synchronized (layeredGameObjects)
+         {
+             for (ArrayList<IGameObject> layer : layeredGameObjects.values())
+             {
+                 for (IGameObject go : layer)
+                 {
+                     if (isEnabled(go))
+                         snapshot.add(go);
+                 }
+             }
+             return snapshot;
          }
      }
  }
