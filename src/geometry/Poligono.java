@@ -2,6 +2,7 @@ package geometry;
 import core.Collider;
 import core.objectsInterface.ICollider;
 import core.Transform;
+import java.awt.Graphics2D;
 
 /**
  * Represents a polygon in a 2D space.
@@ -384,6 +385,7 @@ public class Poligono extends Collider implements FiguraGeometrica
 	 */
 	public Poligono escalar(double factor)
 	{
+
 		Ponto centro = this.centro();
 		Ponto[] pontos = new Ponto[this.vertices.length];
 		double x, y,newX,newY;
@@ -405,21 +407,7 @@ public class Poligono extends Collider implements FiguraGeometrica
 
 
 
-	/**
-	 * Updates the collider's state based on its transform.
-	 * This method calls the specific update methods in sequence:
-	 * 1. updateRotacao() - Updates rotation
-	 * 2. updateEscalar() - Updates scaling
-	 * 3. updatePosicao() - Updates position
-	 */
-	@Override
-	public void onUpdateCollider()
-	{
-		this.updateRotacao();
-		this.updateEscalar();
-		this.updatePosicao();
-	}
-
+	
 	/**
 	* Updates the position of the polygon based on the current transform.
 	* Translates the polygon to the new position and updates its vertices and sides.
@@ -476,6 +464,53 @@ public class Poligono extends Collider implements FiguraGeometrica
 			return this.intersecta(f);
 	}
 
+
+	/**
+     * Draws the collider's visual representation for debugging purposes.
+     * This method is used to render the collider's shape and boundaries
+     * on the screen, which can be helpful during development and testing.
+     *
+     * @param g2d The Graphics2D context used for drawing
+     * @param panelWidth The width of the panel where the collider is drawn
+     * @param panelHeight The height of the panel where the collider is drawn
+     */
+	@Override
+    public void draw(Graphics2D g2d, int panelWidth, int panelHeight)
+    {
+        // Salva o estado original
+        java.awt.Stroke oldStroke = g2d.getStroke();
+        java.awt.Color oldColor = g2d.getColor();
+
+        // Define cor e espessura para depuração
+        g2d.setColor(java.awt.Color.RED);
+        g2d.setStroke(new java.awt.BasicStroke(2));
+
+        Ponto[] verticesEscalados = this.vertices();
+        int n = verticesEscalados.length;
+        for (int i = 0; i < n; i++)
+        {
+            Ponto p1 = verticesEscalados[i];
+            Ponto p2 = verticesEscalados[(i + 1) % n];
+
+            // Converte para coordenadas de tela (origem no centro do painel, Y invertido)
+            double screenX1 = panelWidth / 2.0 + p1.x();
+            double screenY1 = panelHeight / 2.0 - p1.y();
+            double screenX2 = panelWidth / 2.0 + p2.x();
+            double screenY2 = panelHeight / 2.0 - p2.y();
+
+            // Desenha a aresta
+            g2d.drawLine(
+                (int) Math.round(screenX1),
+                (int) Math.round(screenY1),
+                (int) Math.round(screenX2),
+                (int) Math.round(screenY2)
+            );
+        }
+
+        // Restaura o estado original
+        g2d.setStroke(oldStroke);
+        g2d.setColor(oldColor);
+    }
 
 
 

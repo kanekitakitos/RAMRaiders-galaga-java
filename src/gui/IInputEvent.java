@@ -1,4 +1,4 @@
-package core.objectsInterface;
+package gui;
 
 public interface IInputEvent
 {

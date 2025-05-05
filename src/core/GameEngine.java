@@ -2,7 +2,6 @@ package core;
 
  import core.objectsInterface.IGameEngine;
  import core.objectsInterface.IGameObject;
- import core.objectsInterface.IInputEvent;
 import gui.*;
 
 import java.util.ArrayList;

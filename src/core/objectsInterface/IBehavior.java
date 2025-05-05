@@ -2,6 +2,7 @@ package core.objectsInterface;
 
     import java.util.ArrayList;
 
+import gui.IInputEvent;
 import gui.InputEvent;
 
     /**

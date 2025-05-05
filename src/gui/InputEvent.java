@@ -1,8 +1,5 @@
 package gui;
 
-import core.objectsInterface.IInputEvent;
-
-
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;

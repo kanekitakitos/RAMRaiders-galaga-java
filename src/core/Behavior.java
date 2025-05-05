@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import core.objectsInterface.IBehavior;
 import core.objectsInterface.IGameObject;
-import core.objectsInterface.IInputEvent;
+import gui.IInputEvent;
 import gui.InputEvent;
 
 /**
@@ -187,8 +187,11 @@ public class Behavior implements IBehavior
     */
    public void scale()
    {
-       go.transform().scale(go.scaleDiff);
-       go.collider().updateEscalar();
+    if(go.scaleDiff() != 0)
+       {
+        go.transform().scale(go.scaleDiff);
+        go.collider().updateEscalar();
+       }
    }
 
    /**

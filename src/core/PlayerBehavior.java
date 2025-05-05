@@ -2,8 +2,8 @@ package core;
 import core.behaviorItems.IAttackStrategy;
 import core.behaviorItems.LinearShootAttack;
 import core.objectsInterface.IGameObject;
-import core.objectsInterface.IInputEvent;
 import geometry.Ponto;
+import gui.IInputEvent;
 import gui.InputEvent;
 
 import java.util.ArrayList;

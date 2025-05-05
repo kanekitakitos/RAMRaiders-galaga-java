@@ -6,10 +6,9 @@ import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList; // Importar ArrayList
-import java.util.Iterator;  // Importar Iterator
-import java.util.List;     // Importar List
-import core.Shape; // Importar a classe Shape
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class AssetLoader
 {
@@ -65,7 +64,7 @@ public class AssetLoader
             ImageReader reader = readers.next();
             reader.setInput(iis);
 
-            int numFrames = reader.getNumImages(true); 
+            int numFrames = reader.getNumImages(true);
 
             for (int i = 0; i < numFrames; i++) {
                 BufferedImage frame = reader.read(i);

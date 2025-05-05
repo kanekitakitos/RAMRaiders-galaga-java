@@ -32,6 +32,7 @@ public class Transform implements ITransform
     private int layer;
     private double angle; // 0 <= angle < 360
     private double previousAngle;
+
     private double scale;
 
 
@@ -147,12 +148,11 @@ public class Transform implements ITransform
         return this.angle;
     }
 
-
-
     public double previousAngle()
     {
         return this.previousAngle;
     }
+
     public void previousAngle(double angle)
     {
          this.previousAngle = angle;

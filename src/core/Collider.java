@@ -2,6 +2,7 @@ package core;
 
  import core.objectsInterface.ICollider;
  import geometry.Ponto;
+ import java.awt.Graphics2D;
 
  /**
   * The Collider class represents a collider in the game world.
@@ -112,4 +113,17 @@ package core;
       */
      @Override
      public abstract String toString();
+
+
+
+     /**
+     * Draws the collider's visual representation for debugging purposes.
+     * This method is used to render the collider's shape and boundaries
+     * on the screen, which can be helpful during development and testing.
+     *
+     * @param g2d The Graphics2D context used for drawing
+     * @param panelWidth The width of the panel where the collider is drawn
+     * @param panelHeight The height of the panel where the collider is drawn
+     */
+     public abstract void draw(Graphics2D g2d, int panelWidth, int panelHeight);
  }

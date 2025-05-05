@@ -1,5 +1,7 @@
 package geometry;
 
+import java.awt.Graphics2D;
+
 import core.Collider;
 import core.objectsInterface.ICollider;
 import core.Transform;
@@ -250,6 +252,50 @@ public class Circulo extends Collider implements FiguraGeometrica
     {
             FiguraGeometrica f = (FiguraGeometrica) other;
             return this.intersecta(f);
+    }
+
+
+    /**
+     * Draws the collider's visual representation for debugging purposes.
+     * This method is used to render the collider's shape and boundaries
+     * on the screen, which can be helpful during development and testing.
+     *
+     * @param g2d The Graphics2D context used for drawing
+     * @param panelWidth The width of the panel where the collider is drawn
+     * @param panelHeight The height of the panel where the collider is drawn
+     */
+    @Override
+    public void draw(Graphics2D g2d, int panelWidth, int panelHeight)
+    {
+        // Parâmetros de conversão mundo -> tela (deve ser igual ao usado no GamePanel)
+
+        // Centro do círculo em coordenadas do mundo
+        double worldX = this.centro.x();
+        double worldY = this.centro.y();
+
+        // Converte para coordenadas de tela (origem no centro do painel, Y invertido)
+        double screenX = panelWidth / 2.0 + worldX ;
+        double screenY = panelHeight / 2.0 - worldY ;
+
+        // Salva o estado original
+        java.awt.Stroke oldStroke = g2d.getStroke();
+        java.awt.Color oldColor = g2d.getColor();
+
+        // Define cor e espessura para depuração
+        g2d.setColor(java.awt.Color.RED);
+        g2d.setStroke(new java.awt.BasicStroke(2));
+
+        // Desenha a circunferência centralizada
+        g2d.drawOval(
+            (int) Math.round(screenX - this.r),
+            (int) Math.round(screenY - this.r),
+            (int) Math.round(2 * this.r),
+            (int) Math.round(2 * this.r)
+        );
+
+        // Restaura o estado original
+        g2d.setStroke(oldStroke);
+        g2d.setColor(oldColor);
     }
 
 

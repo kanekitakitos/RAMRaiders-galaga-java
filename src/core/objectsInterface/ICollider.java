@@ -2,6 +2,7 @@ package core.objectsInterface;
 import core.Transform;
 
 import geometry.Ponto;
+import java.awt.Graphics2D;
 
 /**
  * The ICollider interface defines the contract for collider components in the game.
@@ -59,5 +60,14 @@ public interface ICollider
      */
     void updateEscalar();
 
-    
+    /**
+     * Draws the collider's visual representation for debugging purposes.
+     * This method is used to render the collider's shape and boundaries
+     * on the screen, which can be helpful during development and testing.
+     *
+     * @param g2d The Graphics2D context used for drawing
+     * @param panelWidth The width of the panel where the collider is drawn
+     * @param panelHeight The height of the panel where the collider is drawn
+     */
+    void draw(Graphics2D g2d, int panelWidth, int panelHeight);
 }
