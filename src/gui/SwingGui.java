@@ -13,13 +13,17 @@ public class SwingGui implements IGuiBridge
 
     public SwingGui(int width, int height)
     {
-        frame = new JFrame("Galaga");
+        this.frame = new JFrame("Galaga");
         panel = new GamePanel(width, height);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(panel);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+        this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.frame.add(panel);
+        this.frame.pack();
+        this.frame.setLocationRelativeTo(null);
+        this.frame.setVisible(true);
+
+        this.inputState = new InputEvent();
+        this.inputState.registerInputHandlers(this.frame);
+        this.frame.setFocusable(true);
     }
 
     @Override
@@ -33,6 +37,8 @@ public class SwingGui implements IGuiBridge
     {
         return this.inputState;
     }
+
+
 
 
 }

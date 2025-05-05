@@ -94,7 +94,6 @@ package core;
      public void onInit()
      {
          this.behaviour.gameObject(this);
-         this.behaviour.onInit();
      }
 
      /**

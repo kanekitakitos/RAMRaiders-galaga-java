@@ -41,7 +41,7 @@ public class GamePanel extends JPanel
 
         for (IGameObject go : objectsToRender)
         {
-            if (go == null || go.transform() == null || go.shape() == null) continue;
+            if ( go.transform() == null || go.shape() == null) continue;
             drawGameObject(g2d, go, panelWidth, panelHeight);
         }
 
@@ -58,7 +58,6 @@ public class GamePanel extends JPanel
 
         // Origem no centro, Y para cima
         g2d.translate(panelWidth / 2, panelHeight / 2);
-        g2d.scale(1, -1);
 
         g2d.translate(position.x(), position.y());
         g2d.rotate(Math.toRadians(angle));

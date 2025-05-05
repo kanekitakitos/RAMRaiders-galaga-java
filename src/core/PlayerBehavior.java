@@ -75,7 +75,7 @@ public class PlayerBehavior extends Behavior
     @Override
     public void onUpdate(double dT, IInputEvent ie)
     {
-        this.go.onUpdate();
+        super.onUpdate(dT, ie);
         this.evasiveManeuver(ie);
     }
 

@@ -3,7 +3,7 @@ package core;
  import core.objectsInterface.IGameEngine;
  import core.objectsInterface.IGameObject;
  import core.objectsInterface.IInputEvent;
-import gui.InputEvent;
+import gui.*;
 
 import java.util.ArrayList;
  import java.util.HashMap;
@@ -38,17 +38,20 @@ import java.util.ArrayList;
      private int totalObjects;
 
      // Input event handler
-     private IInputEvent ie;
+     private InputEvent inputStatus;
+     private IGuiBridge gui;
 
      /**
       * Constructs a new GameEngine instance.
       * Initializes the layered game objects map and sets the total object count to zero.
       */
-     public GameEngine()
+     public GameEngine(IGuiBridge gui)
      {
          this.layeredGameObjects = new HashMap<>();
          this.disabledGameObjects = new ArrayList<>();
          this.totalObjects = 0;
+         this.gui = gui;
+         this.inputStatus = this.gui.getInputState();
      }
 
      /**
@@ -119,7 +122,7 @@ import java.util.ArrayList;
       * using the update method of each GameObject. If a GameObject changes its layer,
       * it is moved to the appropriate layer.
       */
-     public void onUpdate()
+     public void onUpdate(double dt)
      {
          // List for objects that need to change layers
          ArrayList<IGameObject> objectsToMove = new ArrayList<>();
@@ -139,7 +142,7 @@ import java.util.ArrayList;
                      originalLayer = go.transform().layer();
 
                  // Update the GameObject
-                 go.onUpdate();
+                 go.behavior().onUpdate(dt,this.inputStatus);
 
                  int newLayer = go.transform().layer();
                  if (originalLayer != newLayer)
@@ -223,7 +226,8 @@ import java.util.ArrayList;
       * @param go The GameObject to enable.
       */
      @Override
-     public void enable(IGameObject go) {
+     public void enable(IGameObject go)
+     {
          go.behavior().onEnabled();
      }
 
@@ -233,7 +237,8 @@ import java.util.ArrayList;
       * @param go The GameObject to disable.
       */
      @Override
-     public void disable(IGameObject go) {
+     public void disable(IGameObject go)
+     {
          go.behavior().onDisabled();
      }
 
@@ -244,7 +249,8 @@ import java.util.ArrayList;
       * @return True if the GameObject is enabled, false otherwise.
       */
      @Override
-     public boolean isEnabled(IGameObject go) {
+     public boolean isEnabled(IGameObject go)
+     {
          return ((Behavior) go.behavior()).isEnabled() == true;
      }
 
@@ -255,7 +261,8 @@ import java.util.ArrayList;
       * @return True if the GameObject is disabled, false otherwise.
       */
      @Override
-     public boolean isDisabled(IGameObject go) {
+     public boolean isDisabled(IGameObject go)
+     {
          return ((Behavior) go.behavior()).isEnabled() == false;
      }
 
@@ -282,20 +289,40 @@ import java.util.ArrayList;
      @Override
      public void run()
      {
+         final int FPS = 60;
+         final long frameTime = 1000 / FPS; // em milissegundos
+
          while (true)
          {
-             // ie = getUserInput();
-             // for (IGameObject go : enabled) {
-             //     go.behavior().onUpdate(dt, ie);
-             //     go.collider().onUpdate();
-             // }
+             long startTime = System.currentTimeMillis();
 
-             // Sends the list of collisions to all enabled IGameObjects
 
-             // Sends the list of IGameObjects in enabled to the GUI
+             // Atualiza lógica do jogo
+             this.onUpdate(FPS);
+
+             // Checa colisões
+             this.checkCollision();
+
+             // Renderiza objetos ativos
+             this.gui.draw(getEnabledObjectsSnapshot());
+
+             // Controle de FPS
+             long elapsed = System.currentTimeMillis() - startTime;
+             long sleepTime = frameTime - elapsed;
+             if (sleepTime > 0)
+             {
+                 try
+                 {
+                     Thread.sleep(sleepTime);
+                 }
+                 catch (InterruptedException e)
+                 {
+                     Thread.currentThread().interrupt();
+                     break;
+                 }
+             }
          }
      }
-
 
      /**
       * Devuelve una copia segura de los objetos habilitados (activos) para renderizar.

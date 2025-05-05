@@ -49,7 +49,6 @@ public class SimpleGroupAttack implements IGroupAttackStrategy
                 }
             }
         }
-        return positions;
     }
 
     public int getNumberOfEnemies()

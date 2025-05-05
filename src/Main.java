@@ -1,77 +1,61 @@
-import java.util.Scanner;
 
 import core.*;
+import core.objectsInterface.*;
 import geometry.*;
-import test.GameVisualizer;
+import java.util.ArrayList;
+
+import assets.*;
+import gui.*;
 
 public class Main
 {
-    public static void moonshak()
+    public static ArrayList<IGameObject> createSampleObjects()
     {
-        Scanner sc = new Scanner(System.in);
+        ArrayList<IGameObject> objects = new ArrayList<>();
 
-        int frame = Integer.parseInt(sc.nextLine());
-        int numberOfGameObjects = Integer.parseInt(sc.nextLine());
+        // Create player at (2, 2)
 
-        GameEngine ge = new GameEngine();
-        for (int i = 0; i < numberOfGameObjects; i++)
-            ge.add(geraGameObjects(sc));
+        Transform t1 = new Transform(new Ponto(5,0) ,0, 0.0, 1.0);
+        Ponto[] points1 = {new Ponto(-0.5, 0.5), new Ponto(0.5, 0.5), new Ponto(0.5, -0.5), new Ponto(-0.5, -0.5)};
+        Retangulo collider1 = new Retangulo(points1, t1);
+        Shape shape1 = new Shape(AssetLoader.loadImage("nave.gif"));
+        Behavior behavior1 = new PlayerBehavior();
+        GameObject player = new GameObject("Player", t1, collider1, behavior1, shape1);
+        player.onInit();
+        objects.add(player);
 
-        for (int i = 0; i < frame; i++) // atualiza X frames os gameObjects
-            ge.onUpdate();
+        // Create 40 enemies (minimum required for the Galaga pattern)
+//        ArrayList<IGameObject> enemies = new ArrayList<>();
+//        for (int i = 0; i < 40; i++)
+//        {
+//            Transform t = new Transform(new Ponto(0, 0), 0, 0.0, 1.0);
+//            Ponto[] points = {new Ponto(-0.3, 0.3), new Ponto(0.3, 0.3), new Ponto(0.3, -0.3), new Ponto(-0.3, -0.3)};
+//            Retangulo collider = new Retangulo(points, t);
+//            Shape shape = new Shape();
+//            Behavior behavior = new EnemyBehavior(); // Using EnemyBehavior instead of basic Behavior
+//            GameObject enemy = new GameObject("Enemy " + i, t, collider, behavior, shape);
+//            enemies.add(enemy);
+//        }
 
+        // Position enemies using SimpleGroupAttack
+        //SimpleGroupAttack groupAttack = new SimpleGroupAttack();
+        //groupAttack.onInit(enemies, player);
+        //groupAttack.execute(enemies, player);
 
-        //System.out.print(ge.checkCollision());
+        //objects.addAll(enemies);
 
-        sc.close();
-        }
-
-    public static GameObject geraGameObjects(Scanner sc)
-    {
-        try
-        {
-
-            String nome = sc.nextLine(); // Nome do objeto
-            //--- Transform -------------------------------------------------
-
-            String line = sc.nextLine(); // Transform
-
-            String[] parts = line.split(" ");
-            Ponto p = new Ponto(Double.parseDouble(parts[0]), Double.parseDouble(parts[1]));
-            int layer = Integer.parseInt(parts[2]);
-            double angle = Double.parseDouble(parts[3]);
-            double scale = Double.parseDouble(parts[4]);
-
-            Transform t = new Transform(p, layer, angle, scale);
-            //---------------------------------------------------------------
-
-            line = sc.nextLine();
-
-            parts = line.split(" ");
-            Collider c = (parts.length <= 3) ? new Circulo(Double.parseDouble(parts[2]), t) : new Poligono(line, t);
-
-            //---------------------------------------------------------------
-            line = sc.nextLine();
-            parts = line.split(" ");
-            Ponto velocidade = new Ponto(Double.parseDouble(parts[0]), Double.parseDouble(parts[1]));
-            int moveLayer = Integer.parseInt(parts[2]);
-            int rotateLayer = Integer.parseInt(parts[3]);
-            int scaleLayer = Integer.parseInt(parts[4]);
-
-           //return new GameObjects(nome, t, c, velocidade, moveLayer, rotateLayer, scaleLayer);
-        }
-        catch (Exception e)
-        {
-            System.out.println("Error: " + e.getMessage());
-        }
-        return null;
+        return objects;
     }
-
-
     public static void main(String[] args)
     {
-        GameVisualizer visualizer = new GameVisualizer(10, 10); // 60 e 80
-        visualizer.showGameObjects(GameVisualizer.createSampleObjects());
+        SwingGui gui = new SwingGui(800, 600);
+        ArrayList<IGameObject> objects = createSampleObjects();
+        GameEngine engine = new GameEngine(gui);
+
+        for (IGameObject obj : objects)
+            engine.addEnable(obj);
+
+        engine.run(); // Start the game loop
     }
 
 }
