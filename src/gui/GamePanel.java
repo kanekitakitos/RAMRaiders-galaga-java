@@ -54,14 +54,19 @@ public class GamePanel extends JPanel
         double angle = go.transform().angle();
         double scale = go.transform().scale();
 
+
         AffineTransform oldTransform = g2d.getTransform();
+
 
         // Origem no centro, Y para cima
         g2d.translate(panelWidth / 2, panelHeight / 2);
 
+
         g2d.translate(position.x(), position.y());
-        g2d.rotate(Math.toRadians(angle));
+        // Modificação: Negar o ângulo para inverter a direção da rotação (sentido horário)
+        g2d.rotate(Math.toRadians(-angle));
         g2d.scale(scale, scale);
+
 
         core.Shape shape = go.shape();
         java.awt.image.BufferedImage img = shape.getImagem();
@@ -71,6 +76,7 @@ public class GamePanel extends JPanel
             int imgH = img.getHeight();
             g2d.drawImage(img, -imgW/2, -imgH/2, null);
         }
+
 
         g2d.setTransform(oldTransform);
     }

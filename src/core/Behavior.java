@@ -90,6 +90,7 @@ public class Behavior implements IBehavior
    public void onUpdate(double dT, IInputEvent ie)
    {
        this.update();
+       this.go.shape().updateAnimation();
    }
 
    /**

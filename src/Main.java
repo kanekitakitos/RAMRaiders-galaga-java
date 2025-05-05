@@ -15,10 +15,10 @@ public class Main
 
         // Create player at (2, 2)
 
-        Transform t1 = new Transform(new Ponto(5,0) ,0, 0.0, 1.0);
+        Transform t1 = new Transform(new Ponto(5,0) ,0, 90.0, 0.09);
         Ponto[] points1 = {new Ponto(-0.5, 0.5), new Ponto(0.5, 0.5), new Ponto(0.5, -0.5), new Ponto(-0.5, -0.5)};
         Retangulo collider1 = new Retangulo(points1, t1);
-        Shape shape1 = new Shape(AssetLoader.loadImage("nave.gif"));
+        Shape shape1 = new Shape(AssetLoader.loadAnimationFrames("enemy.gif"),550);
         Behavior behavior1 = new PlayerBehavior();
         GameObject player = new GameObject("Player", t1, collider1, behavior1, shape1);
         player.onInit();
