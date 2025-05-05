@@ -475,7 +475,7 @@ public class Poligono extends Collider implements FiguraGeometrica
      * @param panelHeight The height of the panel where the collider is drawn
      */
 	@Override
-    public void draw(Graphics2D g2d, int panelWidth, int panelHeight)
+    public void draw(Graphics2D g2d, double panelWidth, double panelHeight)
     {
         // Salva o estado original
         java.awt.Stroke oldStroke = g2d.getStroke();
@@ -493,10 +493,10 @@ public class Poligono extends Collider implements FiguraGeometrica
             Ponto p2 = verticesEscalados[(i + 1) % n];
 
             // Converte para coordenadas de tela (origem no centro do painel, Y invertido)
-            double screenX1 = panelWidth / 2.0 + p1.x();
-            double screenY1 = panelHeight / 2.0 - p1.y();
-            double screenX2 = panelWidth / 2.0 + p2.x();
-            double screenY2 = panelHeight / 2.0 - p2.y();
+            double screenX1 = panelWidth  + p1.x();
+            double screenY1 = panelHeight  - p1.y();
+            double screenX2 = panelWidth  + p2.x();
+            double screenY2 = panelHeight  - p2.y();
 
             // Desenha a aresta
             g2d.drawLine(

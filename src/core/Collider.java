@@ -125,5 +125,5 @@ package core;
      * @param panelWidth The width of the panel where the collider is drawn
      * @param panelHeight The height of the panel where the collider is drawn
      */
-     public abstract void draw(Graphics2D g2d, int panelWidth, int panelHeight);
+     public abstract void draw(Graphics2D g2d, double panelWidth, double panelHeight);
  }

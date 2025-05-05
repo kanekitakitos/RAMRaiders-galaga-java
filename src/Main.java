@@ -14,12 +14,8 @@ public class Main
         ArrayList<IGameObject> objects = new ArrayList<>();
         double scale = 6;
 
-        // Create player at (2, 2)
 
-        Transform t1 = new Transform(new Ponto(0,-10) ,0, 0.0, scale);
-        //Ponto[] points = {new Ponto(0,4), new Ponto(2,2) , new Ponto(4,2), new Ponto(5.54,3.99), new Ponto(6,4),new Ponto(6,0),new Ponto(-6,0),new Ponto(-6,4), new Ponto(-5.6,3.99), new Ponto(-4,2) , new Ponto(-2,2)};
-        //Ponto[] points = {new Ponto(0, 0), new Ponto(0, 6), new Ponto(6, 6), new Ponto(6, 0)};
-        
+        Transform t1 = new Transform(new Ponto(0,-250) ,0, 0.0, scale);
         Ponto[] points1 = {new Ponto(-5, 5), new Ponto(5, 5), new Ponto(5, -5), new Ponto(-5, -5)};
         Poligono collider1 = new Poligono(points1, t1);
         Shape shape1 = new Shape(AssetLoader.loadAnimationFrames("nave-HanSolo.png"),550);
@@ -62,9 +58,9 @@ public class Main
     public static void main(String[] args)
     {
 
-        Shape backGroundShape = new Shape(AssetLoader.loadAnimationFrames("background.gif"), 1000);
+        Shape backGroundShape = new Shape(AssetLoader.loadAnimationFrames("background2.gif"), 1000);
 
-        SwingGui gui = new SwingGui(800, 600, backGroundShape);
+        SwingGui gui = new SwingGui(1100, 800, backGroundShape);
         gui.setHitbox(true);
 
 

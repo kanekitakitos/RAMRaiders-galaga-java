@@ -21,6 +21,7 @@ public class GamePanel extends JPanel
     {
         setPreferredSize(new Dimension(width, height));
         setFocusable(true);
+        setBackground(Color.BLACK);
 
     }
 
@@ -28,7 +29,9 @@ public class GamePanel extends JPanel
     {
         setPreferredSize(new Dimension(width, height));
         setFocusable(true);
+        setBackground(Color.BLACK);
         this.backgroundShape = backgroundShape;
+
     }
 
 
@@ -60,39 +63,35 @@ public class GamePanel extends JPanel
             if ( go.transform() == null || go.shape() == null) continue;
                 drawGameObject(g2d, go, getWidth(), getHeight());
         }
-        
-        
 
+
+
+        drawInfo(g2d);
     }
 
-   
+
     private void drawBackground(Graphics2D g2d)
     {
         if (this.backgroundShape != null) {
-            this.backgroundShape.updateAnimation(); 
-            BufferedImage currentBgFrame = this.backgroundShape.getImagem(); 
+            this.backgroundShape.updateAnimation();
+            BufferedImage currentBgFrame = this.backgroundShape.getImagem();
             if (currentBgFrame != null)
             {
-                
-                g2d.drawImage(currentBgFrame, 0, 0, getWidth(), getHeight(), this);
+                g2d.drawImage(currentBgFrame, 0, 0, getWidth()-getWidth()/3,getHeight(), this);
                 return;
             }
             else
             {
-                
                 System.err.println("Frame atual do background é null. Desenhando fundo branco.");
             }
         }
-        // Se backgroundShape for null ou o frame atual for null, desenha fundo branco
-        g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, getWidth(), getHeight());
+
     }
 
     private void drawGameObject(Graphics2D g2d, IGameObject go, int panelWidth, int panelHeight)
     {
         Ponto position = go.transform().position();
         double angle = go.transform().angle();
-        double objectScale = go.transform().scale();
 
         core.Shape shape = go.shape();
         java.awt.image.BufferedImage img = shape.getImagem();
@@ -100,7 +99,11 @@ public class GamePanel extends JPanel
 
         AffineTransform oldTransform = g2d.getTransform();
 
-        double screenX = panelWidth / 2.0 + position.x() ;
+        // this is the center of the plane
+        // for X is panelWidth / 2.0 -panelWidth/6.0
+        // for Y is panelHeight / 2.0
+
+        double screenX = panelWidth / 2.0 -panelWidth/6.0 + position.x() ;
         double screenY = panelHeight / 2.0 - position.y() ;
 
         g2d.translate(screenX, screenY);
@@ -118,19 +121,23 @@ public class GamePanel extends JPanel
                 if (v.y() < minY) minY = v.y();
                 if (v.y() > maxY) maxY = v.y();
             }
-            double logicalWidth = (maxX - minX) *1.35;
-            double logicalHeight = (maxY - minY) *1.35;
+            double logicalWidth = (maxX - minX) *1.35;// its a bit bigger than the collider
+            double logicalHeight = (maxY - minY) *1.35; // its a bit bigger than the collider
 
 
-        // Desenhe a imagem ajustada ao tamanho lógico do Collider
         g2d.drawImage(img, (int)(-logicalWidth/2), (int)(-logicalHeight/2), (int)logicalWidth, (int)logicalHeight, null);
 
         g2d.setTransform(oldTransform);
 
         if(hitbox)
-            go.collider().draw(g2d, panelWidth, panelHeight);
+            go.collider().draw(g2d, panelWidth / 2.0 -panelWidth/6.0, panelHeight / 2.0);
 
     }
 
+   public void drawInfo(Graphics g2d)
+    {
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(getWidth() - getWidth()/3, 0, getWidth()/3, getHeight());
+    }
 
 }

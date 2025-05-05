@@ -265,7 +265,7 @@ public class Circulo extends Collider implements FiguraGeometrica
      * @param panelHeight The height of the panel where the collider is drawn
      */
     @Override
-    public void draw(Graphics2D g2d, int panelWidth, int panelHeight)
+    public void draw(Graphics2D g2d, double panelWidth, double panelHeight)
     {
         // Parâmetros de conversão mundo -> tela (deve ser igual ao usado no GamePanel)
 
