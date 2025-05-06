@@ -299,5 +299,16 @@ public class Circulo extends Collider implements FiguraGeometrica
     }
 
 
+	public double getLogicalWidth()
+	{
+		return (2 * this.r) ;
+	}
+
+	public double getLogicalHeight()
+	{
+		return (2 * this.r) ;
+	}
+
+
 
 }

@@ -513,6 +513,31 @@ public class Poligono extends Collider implements FiguraGeometrica
     }
 
 
+	public double getLogicalWidth()
+	{
+		double minX = Double.POSITIVE_INFINITY;
+		double maxX = Double.NEGATIVE_INFINITY;
+		
+		for (Ponto v : vertices) {
+			if (v.x() < minX) minX = v.x();
+			if (v.x() > maxX) maxX = v.x();
+		}
+		
+		return (maxX - minX);
+	}
+
+	public double getLogicalHeight()
+	{
+		double minY = Double.POSITIVE_INFINITY;
+		double maxY = Double.NEGATIVE_INFINITY;
+		
+		for (Ponto v : vertices) {
+			if (v.y() < minY) minY = v.y();
+			if (v.y() > maxY) maxY = v.y();
+		}
+		
+		return (maxY - minY);
+	}
 
 
 

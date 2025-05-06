@@ -63,15 +63,15 @@ public class LinearShootAttack implements IAttackStrategy
         if(angle > 180 )
         {
             transform = this.enemyTransform(attacker);
-            SPEED = -1.0;
+            SPEED = -1.0*SPEED;
         }
         else
             transform = this.playerTransform(attacker);
 
         // Define the shape of the bullet as a rectangle
         Ponto[] rPoints = {
-            new Ponto(0, 3),
-            new Ponto(7, 3),
+            new Ponto(0, 2),
+            new Ponto(7, 2),
             new Ponto(7, 0),
             new Ponto(0, 0)
         };
@@ -95,7 +95,7 @@ public class LinearShootAttack implements IAttackStrategy
         Ponto p = attacker.transform().position();
 
         // Add an offset to spawn the bullet slightly in front of the attacker.
-        double offsetDistance = -2.0;
+        double offsetDistance = -35.0;
         Ponto bulletStart = new Ponto(p.x(), p.y() + offsetDistance);
 
         // Create a new transform for the bullet using the offset position

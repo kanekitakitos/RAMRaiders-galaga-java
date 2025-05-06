@@ -6,7 +6,7 @@ import core.Shape;
 import core.Transform;
 import core.objectsInterface.IGameObject;
 import geometry.Ponto;
-import geometry.Retangulo;
+import geometry.Poligono;
 
 /**
  * The `HomingShootAttack` class implements the `IAttackStrategy` interface.
@@ -152,7 +152,7 @@ public class HomingShootAttack implements IAttackStrategy
             attacker.transform().scale()
         );
 
-        Retangulo rectangle = new Retangulo(rPoints, transform);
+        Poligono rectangle = new Poligono(rPoints, transform);
         Ponto velocity = new Ponto(Math.cos(theta) * speed, Math.sin(theta) * speed);
 
         Shape shape = new Shape();

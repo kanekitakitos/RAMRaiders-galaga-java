@@ -28,7 +28,7 @@ package core;
  * @author Miguel Correia
  * @version 2025-03-25
  */
-        public class Shape implements IShape
+public class Shape implements IShape
 {
 
             private List<BufferedImage> frames; // List of frames for the animation
@@ -36,6 +36,9 @@ package core;
 
             private long lastFrameTime; // Timestamp of the last frame update
             private int frameDelayMillis; // Delay between frames in milliseconds
+
+            private double logicalWidth;
+            private double logicalHeight;
 
             /**
              * Constructs a `Shape` with a list of frames and a frame delay.
@@ -79,6 +82,13 @@ package core;
                 this.lastFrameTime = System.currentTimeMillis();
             }
 
+
+            public void setlogicalWidthAndHeight(double width, double height)
+            {
+                this.logicalWidth = width;
+                this.logicalHeight = height;
+            }
+
             /**
              * Retrieves the current frame of the animation.
              *
@@ -94,10 +104,10 @@ package core;
             /**
              * Updates the animation logic. This method should be called during each game loop cycle.
              */
-            public void updateAnimation() {
-                if (frames.size() <= 1 || frameDelayMillis <= 0) {
+            public void updateAnimation()
+            {
+                if (frames.size() <= 1 || frameDelayMillis <= 0)
                     return;
-                }
 
                 long currentTime = System.currentTimeMillis();
                 if (currentTime - lastFrameTime >= frameDelayMillis) {
@@ -136,7 +146,19 @@ package core;
              * @return The current `BufferedImage` frame of the shape.
              */
             @Override
-            public BufferedImage getImagem() {
+            public BufferedImage getImagem()
+            {
                 return getCurrentFrame();
             }
+
+            public double getLogicalWidth()
+            {
+                return logicalWidth;
+            }
+
+            public double getLogicalHeight()
+            {
+                return logicalHeight;
+            }
+
         }

@@ -88,50 +88,33 @@ public class GamePanel extends JPanel
 
     }
 
-    private void drawGameObject(Graphics2D g2d, IGameObject go, int panelWidth, int panelHeight)
-    {
+    private void drawGameObject(Graphics2D g2d, IGameObject go, int panelWidth, int panelHeight) {
         Ponto position = go.transform().position();
         double angle = go.transform().angle();
-
+    
         core.Shape shape = go.shape();
         java.awt.image.BufferedImage img = shape.getImagem();
         if (img == null) return;
-
+    
         AffineTransform oldTransform = g2d.getTransform();
-
-        // this is the center of the plane
-        // for X is panelWidth / 2.0 -panelWidth/6.0
-        // for Y is panelHeight / 2.0
-
-        double screenX = panelWidth / 2.0 -panelWidth/6.0 + position.x() ;
-        double screenY = panelHeight / 2.0 - position.y() ;
-
+    
+        double screenX = panelWidth / 2.0 -panelWidth/6.0 + position.x();
+        double screenY = panelHeight / 2.0 - position.y();
+    
         g2d.translate(screenX, screenY);
         g2d.rotate(Math.toRadians(-angle));
-
-        double minX = Double.POSITIVE_INFINITY, maxX = Double.NEGATIVE_INFINITY;
-        double minY = Double.POSITIVE_INFINITY, maxY = Double.NEGATIVE_INFINITY;
-        geometry.Poligono poligono = null;
-            poligono = (geometry.Poligono) go.collider();
-            geometry.Ponto[] vertices = poligono.vertices();
-            for (geometry.Ponto v : vertices)
-            {
-                if (v.x() < minX) minX = v.x();
-                if (v.x() > maxX) maxX = v.x();
-                if (v.y() < minY) minY = v.y();
-                if (v.y() > maxY) maxY = v.y();
-            }
-            double logicalWidth = (maxX - minX) *1.35;// its a bit bigger than the collider
-            double logicalHeight = (maxY - minY) *1.35; // its a bit bigger than the collider
-
-
-        g2d.drawImage(img, (int)(-logicalWidth/2), (int)(-logicalHeight/2), (int)logicalWidth, (int)logicalHeight, null);
-
+    
+        // Usar as dimensões pré-calculadas do Shape
+        double logicalWidth = shape.getLogicalWidth()*2;
+        double logicalHeight = shape.getLogicalHeight()*2;
+    
+        g2d.drawImage(img, (int)(-logicalWidth/2), (int)(-logicalHeight/2),
+                      (int)logicalWidth, (int)logicalHeight, null);
+    
         g2d.setTransform(oldTransform);
-
+    
         if(hitbox)
             go.collider().draw(g2d, panelWidth / 2.0 -panelWidth/6.0, panelHeight / 2.0);
-
     }
 
    public void drawInfo(Graphics g2d)

@@ -46,12 +46,12 @@ public class FlySideMovement implements IEnemyMovement
     private final double scale = 2; // Global scale factor for the movement
     private final double tIncrement = 0.018; // Time increment for each movement step
 
-    private final double t1 = 3.2; // Duration of the entry and lasso phases
+    private final double t1 = 2.0; // Duration of the entry and lasso phases
     private final double t2 = 1.5; // Duration of the final approach phase
 
     // Base distances (in units before applying the scale)
     private final double baseHorizontalDistance = 140.0; // Horizontal distance for entry
-    private final double baseCircleRadius = 65; // Radius of the circular lasso
+    private final double baseCircleRadius = 40; // Radius of the circular lasso
 
     /**
      * Sets the direction of the movement.
@@ -118,13 +118,20 @@ public class FlySideMovement implements IEnemyMovement
         Ponto next = getPositionAtTime(t + tIncrement);
         Ponto velocity = new Ponto(next.x() - current.x(), next.y() - current.y());
         enemy.velocity(velocity);
+        enemy.rotateSpeed(this.calculateAngle(enemy, next));
 
         t += tIncrement;
 
         if (t > t1 + t2)
             {
+                if(enemy.transform().angle() != 90)
+                    {
+                        rotateToVertical(enemy);
+                        enemy.velocity(new Ponto(0,0));
+                        return;
+                    }
+
                 setActive(false);
-                enemy.velocity(new Ponto(0,0));
             }
     }
 
@@ -222,5 +229,47 @@ public class FlySideMovement implements IEnemyMovement
         double y = (1 - smoothT) * startY + smoothT * finalTarget.y();
 
         return new Ponto(x, y);
+    }
+
+    public double calculateAngle(GameObject enemy, Ponto nextPoint)
+    {
+        // Calcula o vetor diferença
+        Ponto shipCenter = enemy.transform().position();
+        double dx = nextPoint.x() - shipCenter.x();
+        double dy = nextPoint.y() - shipCenter.y();
+
+        // Calcula o ângulo desejado
+        double desiredAngle = new Ponto(dx, dy).theta();
+        
+        // Obtém o ângulo atual do inimigo
+        double currentAngle = enemy.transform().angle();
+        
+        // Calcula a diferença entre o ângulo desejado e o atual
+        double nextAngle = (desiredAngle + 360) - currentAngle;
+        
+        // Normaliza o ângulo para estar entre -180 e 180 graus
+        while (nextAngle > 180) nextAngle -= 360;
+        while (nextAngle < -180) nextAngle += 360;
+        
+        return nextAngle;
+    }
+
+    private void rotateToVertical(GameObject enemy)
+    {
+        double currentAngle = enemy.transform().angle();
+        double targetAngle = 90.0;
+
+        double angleDiff = (targetAngle + 360) - currentAngle;
+
+        while (angleDiff > 180) angleDiff -= 360;
+        while (angleDiff < -180) angleDiff += 360;
+
+        double rotationSpeed = angleDiff * 0.1;
+
+        if (Math.abs(rotationSpeed) > 5.0) {
+            rotationSpeed = Math.signum(rotationSpeed) * 5.0;
+        }
+        
+        enemy.rotateSpeed(rotationSpeed);
     }
 }

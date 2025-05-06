@@ -14,10 +14,10 @@ public class Main
     public static IGameObject createPlayer()
     {
         
-        double scale = 6;
+        double scale = 5;
         int layer = 0;
         double angle = 90;
-        Ponto position = new Ponto(0,-350);
+        Ponto position = new Ponto(0,-330);
         Ponto[] points = {new Ponto(-5, 5), new Ponto(5, 5), new Ponto(5, -5), new Ponto(-5, -5)};
 
 

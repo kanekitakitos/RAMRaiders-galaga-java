@@ -76,7 +76,7 @@ public class PlayerBehavior extends Behavior
     public void onUpdate(double dT, IInputEvent ie)
     {
         super.onUpdate(dT, ie);
-        this.evasiveManeuver(ie);
+        this.moveAndEvasiveManeuver(ie);
     }
 
     public IGameObject attack(InputEvent ie)
@@ -141,7 +141,7 @@ public class PlayerBehavior extends Behavior
      *
      * @param Iie The input event triggering the evasive maneuver.
      */
-    public void evasiveManeuver(IInputEvent Iie)
+    public void moveAndEvasiveManeuver(IInputEvent Iie)
     {
         if(Iie == null)
             return;
@@ -152,7 +152,7 @@ public class PlayerBehavior extends Behavior
         double deltaY = 0;
 
         // Define move step.
-        double moveStep = 1.0;
+        double moveStep = 2.5;
 
         if (ie.isRight())
             deltaX += moveStep;
@@ -172,4 +172,5 @@ public class PlayerBehavior extends Behavior
             this.isInvincible = false;
         }, invincibilityDuration, TimeUnit.MILLISECONDS);
     }
+
 }

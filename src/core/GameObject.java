@@ -67,7 +67,7 @@ package core;
       */
      public GameObject(String name, Transform transform, Collider collider, Behavior behaviour, Shape shape)
      {
-         if (name == null || transform == null || collider == null)
+         if (name == null || transform == null || collider == null || shape == null || behaviour == null)
          {
              throw new IllegalArgumentException("Parameters cannot be null");
          }
@@ -81,8 +81,6 @@ package core;
          this.velocityLayer = 0;
          this.rotateSpeed = 0;
          this.scaleDiff = 0;
-
-         this.collider.onUpdateCollider();
      }
 
      /**
@@ -93,7 +91,9 @@ package core;
       */
      public void onInit()
      {
+        this.collider.onUpdateCollider();
          this.behaviour.gameObject(this);
+         this.shape.setlogicalWidthAndHeight(this.collider.getLogicalWidth(), this.collider.getLogicalHeight());
      }
 
      /**

@@ -70,4 +70,22 @@ public interface ICollider
      * @param centerCartesianPlaneY
      */
     void draw(Graphics2D g2d, double centerCartesianPlaneX, double centerCartesianPlaneY);
+
+    /**
+     * Gets the logical width of the collider.
+     * The logical width represents the effective width used for rendering and collision detection,
+     * typically scaled by a factor to match the visual representation of the game object.
+     *
+     * @return The logical width of the collider
+     */
+    public double getLogicalWidth();
+     
+    /**
+     * Gets the logical height of the collider.
+     * The logical height represents the effective height used for rendering and collision detection,
+     * typically scaled by a factor to match the visual representation of the game object.
+     *
+     * @return The logical height of the collider
+     */
+    public double getLogicalHeight();
 }

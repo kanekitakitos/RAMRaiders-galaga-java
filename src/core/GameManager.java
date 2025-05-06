@@ -35,14 +35,14 @@ public class GameManager
 
         this.generateEnemies(new SimpleGroupAttack().getNumberOfEnemies());
 
-        this.positions = calculateEnemyPositions(player.transform().position(), this.pattern, 90);
+        this.positions = calculateEnemyPositions(player.transform().position(), this.pattern, 70);
     }
 
     public void generateEnemies(int count)
     {
         double angleLeft = 0.0;
         double angleRight = 180.0;
-        double scale = 5.5;
+        double scale = 4;
         int layer = 1;
         int spawnRight = 400;
         int spawnLeft = -spawnRight;
@@ -72,20 +72,22 @@ public class GameManager
 
     private int currentGroup = 0;
     // Puedes definir el tamaño de cada grupo en este array
-    private int[] groupSizes = {3, 4, 2, 5}; // Ejemplo: 4 grupos de tamaños diferentes
+    private int[] groupSizes = {8, 8, 8, 8, 8, 8}; // Ejemplo: 4 grupos de tamaños diferentes
     private int groupDelayFrames = 60; // X tiempo en frames (ajusta según tu motor)
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     public void startRelocateEnemies()
     {
-        scheduler.scheduleAtFixedRate(() -> {
+        scheduler.scheduleAtFixedRate(() ->
+        {
             relocateEnemies();
-        }, 0, groupDelayFrames * 16, TimeUnit.MILLISECONDS); // 16ms ~ 1 frame a 60fps
+        }, 1000, groupDelayFrames * 50, TimeUnit.MILLISECONDS); // 16ms ~ 1 frame a 60fps
     }
 
-    public void relocateEnemies()
+    private void relocateEnemies()
     {
-        if (currentGroup >= groupSizes.length) {
+        if (currentGroup >= groupSizes.length)
+        {
             scheduler.shutdown(); // Para o agendamento quando acabar
             return;
         }
@@ -112,8 +114,6 @@ public class GameManager
 
         currentGroup++;
     }
-
-
 
     public void assignMovementPatterns(int[][] pattern, IEnemyMovement movementStrategy)
     {
@@ -164,40 +164,6 @@ public class GameManager
     }
 
 
-    public void enterEnemyFormation()
-    {
-        // Tamanho do grupo configurável
-        int groupSize = 4;
-        int totalEnemies = Math.min(enemies.size(), positions.size());
-        int numGroups = (int) Math.ceil((double) totalEnemies / groupSize);
-
-
-        int groupDelay = 30;
-
-        for (int group = 0; group < numGroups; group++)
-        {
-            for (int i = 0; i < groupSize; i++) {
-                int enemyIndex = group * groupSize + i;
-                if (enemyIndex >= totalEnemies) break;
-
-                GameObject enemy = (GameObject) enemies.get(enemyIndex);
-                Ponto targetPosition = positions.get(enemyIndex);
-
-
-                double entryX = targetPosition.x();
-                double entryY = -100;
-
-                //enemy.transform().setPosition(new Ponto(entryX, entryY));
-
-
-                EnemyBehavior behavior = (EnemyBehavior) enemy.behavior();
-                
-                //behavior.setMovement(new MoveToPositionMovement(targetPosition, group * groupDelay));
-
-            }
-        }
-    }
-
     /**
      * Calcula as posições dos inimigos com base na posição do jogador e no padrão de formação.
      * @param playerPosition Ponto inicial do jogador
@@ -213,7 +179,7 @@ public class GameManager
 
         // Centraliza a formação em relação ao jogador
         double startX = playerPosition.x() - ((cols - 1) * spacing) / 2.0;
-        double startY = playerPosition.y() + 500; // Exemplo: formação acima do jogador
+        double startY = playerPosition.y() + 660; // Posição inicial mais alta
 
         for (int row = 0; row < rows; row++)
         {
@@ -222,7 +188,7 @@ public class GameManager
                 if (pattern[row][col] != 0)
                 {
                     double x = startX + col * spacing;
-                    double y = startY + row * spacing;
+                    double y = startY - row * spacing;
                     positions.add(new Ponto(x, y));
                 }
             }

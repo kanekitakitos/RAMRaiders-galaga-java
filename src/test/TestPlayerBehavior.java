@@ -129,7 +129,7 @@ public class TestPlayerBehavior
         inputEvent.setPlayerMove("RIGHT", true);
         Ponto initialPosition = gameObject0.transform().position();
 
-        playerBehavior0.evasiveManeuver(inputEvent);
+        playerBehavior0.moveAndEvasiveManeuver(inputEvent);
 
         Ponto newPosition = gameObject0.transform().position();
         assertTrue(newPosition.x() > initialPosition.x());
@@ -142,7 +142,7 @@ public class TestPlayerBehavior
         inputEvent.setPlayerMove("LEFT", true);
         Ponto initialPosition = gameObject0.transform().position();
 
-        playerBehavior0.evasiveManeuver(inputEvent);
+        playerBehavior0.moveAndEvasiveManeuver(inputEvent);
         assertTrue(playerBehavior0.isInvincible());
 
         Ponto newPosition = gameObject0.transform().position();
