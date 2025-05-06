@@ -2,7 +2,7 @@ package test;
 
 import core.*;
 import core.Shape;
-import core.behaviorItems.SimpleGroupAttack;
+import core.behaviorItems.EnterGameGroup;
 import core.objectsInterface.IGameObject;
 
 import javax.swing.*;
@@ -148,7 +148,7 @@ public class GameVisualizer {
         }
 
         // Position enemies using SimpleGroupAttack
-        SimpleGroupAttack groupAttack = new SimpleGroupAttack();
+        EnterGameGroup groupAttack = new EnterGameGroup();
         groupAttack.onInit(enemies, player);
         groupAttack.execute(enemies, player);
 

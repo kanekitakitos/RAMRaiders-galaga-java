@@ -35,7 +35,7 @@ public class Main
 
         Shape backGroundShape = new Shape(AssetLoader.loadAnimationFrames("background2.gif"), 1000);
         SwingGui gui = new SwingGui(1100, 800, backGroundShape);
-        gui.setHitbox(true);
+        gui.setHitbox(false);
 
         GameEngine engine = new GameEngine(gui);
 

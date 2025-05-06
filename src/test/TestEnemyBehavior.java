@@ -196,7 +196,7 @@ public class TestEnemyBehavior
     @Test
     void testFlySideLassoMovementBehaviorLeft()
     {
-        FlySideMovement fly = new FlySideMovement();
+        EnterSideMovement fly = new EnterSideMovement();
         enemyBehavior.setMovement(fly);
         assertFalse(fly.isActive(), "Movement should not be active");
         fly.setActive(true);

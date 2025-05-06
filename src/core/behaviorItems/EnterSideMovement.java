@@ -34,7 +34,7 @@ import geometry.Ponto;
  * @version 2025-04-24
  *
  */
-public class FlySideMovement implements IEnemyMovement
+public class EnterSideMovement implements IEnemyMovement
 {
 
     private boolean active = false; // Indicates whether the movement is active
