@@ -6,7 +6,7 @@ import geometry.Ponto;
 
 public class SimpleGroupAttack implements IGroupAttackStrategy 
 {
-    final double SPACING = 0.5; // Smaller space between enemies
+    final double SPACING = 20;// Smaller space between enemies
 
     @Override
     public void execute(List<IGameObject> enemies, IGameObject target)

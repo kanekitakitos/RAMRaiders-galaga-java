@@ -43,15 +43,15 @@ public class FlySideMovement implements IEnemyMovement
     private Ponto finalTarget; // Final target position for the movement
     private boolean fromRight = false; // Direction of the movement (true if from right)
 
-    private final double scale = 0.2; // Global scale factor for the movement
+    private final double scale = 2; // Global scale factor for the movement
     private final double tIncrement = 0.018; // Time increment for each movement step
 
-    private final double t1 = 1.2; // Duration of the entry and lasso phases
-    private final double t2 = 2; // Duration of the final approach phase
+    private final double t1 = 3.2; // Duration of the entry and lasso phases
+    private final double t2 = 1.5; // Duration of the final approach phase
 
     // Base distances (in units before applying the scale)
-    private final double baseHorizontalDistance = 8.0; // Horizontal distance for entry
-    private final double baseCircleRadius = 3; // Radius of the circular lasso
+    private final double baseHorizontalDistance = 140.0; // Horizontal distance for entry
+    private final double baseCircleRadius = 65; // Radius of the circular lasso
 
     /**
      * Sets the direction of the movement.
@@ -122,7 +122,10 @@ public class FlySideMovement implements IEnemyMovement
         t += tIncrement;
 
         if (t > t1 + t2)
-            setActive(false);
+            {
+                setActive(false);
+                enemy.velocity(new Ponto(0,0));
+            }
     }
 
     /**

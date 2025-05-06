@@ -11,5 +11,11 @@ public interface IShape
 
     List<BufferedImage> getFrames();
 
-    void setFrames(List<BufferedImage> frames);
+    /**
+     * Sets the list of animation frames and resets the current frame index.
+     *
+     * @param frames A list of `BufferedImage` objects representing the animation frames.
+     * @param frameDelayMillis The delay between frames in milliseconds.
+     */
+    public void setFrames(List<BufferedImage> frames, int frameDelayMillis);
 }

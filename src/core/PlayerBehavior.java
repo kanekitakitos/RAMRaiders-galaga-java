@@ -40,7 +40,7 @@ public class PlayerBehavior extends Behavior
 
     private int life = 3;
     private boolean isInvincible = false;
-    private final long invincibilityDuration = 1000; // milliseconds
+    private final long invincibilityDuration = 2000; // milliseconds
 
     private final ScheduledExecutorService localScheduler;
 

@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @Post-Conditions:
  *   - Attack execution returns a valid game object if an attack strategy is set, or null otherwise.
- *   - Group attack execution properly coordinates the selected group strategy on the target.
+ *
  *
  * @see core.Behavior
  * @see core.behaviorItems.IAttackStrategy
@@ -41,7 +41,6 @@ public class EnemyBehavior extends Behavior
 {
 
     private IAttackStrategy attackStrategy = null;
-    static private IGroupAttackStrategy groupAttack = null;
     private IEnemyMovement movement;
     private static final ScheduledExecutorService localScheduler = Executors.newScheduledThreadPool(1);
 
@@ -79,11 +78,7 @@ public class EnemyBehavior extends Behavior
      */
     public IGameObject attack(InputEvent ie)
     {
-        if (groupAttack == null)
-            return null;
-
-
-        if(!this.isAttacking && this.isEnabled())
+        if( this.attackStrategy != null && !this.isAttacking && this.isEnabled())
         {
             // Schedule to reset the attack flag after 500ms delay
             localScheduler.schedule(this::stopAttack, this.attackDuration, TimeUnit.MILLISECONDS);
@@ -132,34 +127,6 @@ public class EnemyBehavior extends Behavior
             return;
 
         this.movement = movement;
-    }
-
-    /**
-     * Executes a group attack using the specified group attack strategy.
-     *
-     * @param strategy The group attack strategy to use.
-     * @param group The list of game objects participating in the attack.
-     * @param target The target of the group attack.
-     */
-    static public void groupAttack(IGroupAttackStrategy strategy, List<IGameObject> group, IGameObject target)
-    {
-        strategy.onInit(group, target);
-        strategy.execute(group, target);
-    }
-
-    /**
-     * Executes a group attack using the instance's group attack strategy.
-     *
-     * @param group The list of game objects participating in the attack.
-     * @param target The target of the group attack.
-     */
-    public void groupAttack(List<IGameObject> group, IGameObject target)
-    {
-        if (groupAttack == null)
-            return;
-
-        if(this.isEnabled())
-            groupAttack(groupAttack, group, target);
     }
 
     @Override

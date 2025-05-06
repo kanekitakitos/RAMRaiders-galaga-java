@@ -1,4 +1,5 @@
 package core.behaviorItems;
+import assets.AssetLoader;
 import core.*;
 import core.objectsInterface.IGameObject;
 import geometry.Ponto;
@@ -30,7 +31,8 @@ import geometry.Retangulo;
 public class LinearShootAttack implements IAttackStrategy
 {
     private static int index = 0;
-    private double SPEED = 1.0;
+    private double SPEED = 10.0;
+    private Shape shape = new Shape(AssetLoader.loadAnimationFrames("laser.gif"),90);
 
     private void invariante(IGameObject attacker)
     {
@@ -68,10 +70,10 @@ public class LinearShootAttack implements IAttackStrategy
 
         // Define the shape of the bullet as a rectangle
         Ponto[] rPoints = {
-            new Ponto(-0.4, 0.8),
-            new Ponto(0.4, 0.8),
-            new Ponto(0.4, -0.8),
-            new Ponto(-0.4, -0.8)
+            new Ponto(0, 3),
+            new Ponto(7, 3),
+            new Ponto(7, 0),
+            new Ponto(0, 0)
         };
         GameObject bullet = getGameObject(rPoints, transform, name);
 
@@ -97,7 +99,7 @@ public class LinearShootAttack implements IAttackStrategy
         Ponto bulletStart = new Ponto(p.x(), p.y() + offsetDistance);
 
         // Create a new transform for the bullet using the offset position
-        return new Transform(bulletStart, attacker.transform().layer(), attacker.transform().angle(), attacker.transform().scale());
+        return new Transform(bulletStart, attacker.transform().layer()-1, attacker.transform().angle(), attacker.transform().scale());
     }
 
     /**
@@ -111,11 +113,11 @@ public class LinearShootAttack implements IAttackStrategy
         Ponto p = attacker.transform().position();
 
         // Add an offset to spawn the bullet slightly in front of the attacker.
-        double offsetDistance = 2.0;
+        double offsetDistance = 35.0;
         Ponto bulletStart = new Ponto(p.x(), p.y() + offsetDistance);
 
         // Create a new transform for the bullet using the offset position
-        return new Transform(bulletStart, attacker.transform().layer(), attacker.transform().angle(), attacker.transform().scale());
+        return new Transform(bulletStart, attacker.transform().layer()+1, attacker.transform().angle(), attacker.transform().scale());
     }
 
 
@@ -127,7 +129,12 @@ public class LinearShootAttack implements IAttackStrategy
         Ponto velocity = new Ponto(0.0, SPEED);
 
         // Create the bullet object with its properties
-        Shape shape = new Shape();
+        Shape shape;
+        if(this.shape != null)
+            shape = this.shape;
+        else
+        shape = new Shape();
+
         Behavior behavior = new Behavior();
         GameObject bullet = new GameObject(name + " " + index, transform, rectangle, behavior, shape);
         bullet.velocity(velocity);

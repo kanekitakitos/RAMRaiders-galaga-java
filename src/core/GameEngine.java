@@ -108,12 +108,10 @@ import java.util.ArrayList;
       *
       * @return The total number of GameObjects.
       */
-     public int size() {
+     public int size()
+     {
          return this.totalObjects;
      }
-
-
-
 
      /**
       * Updates all GameObjects in the engine, moving them between layers if necessary.
@@ -125,6 +123,7 @@ import java.util.ArrayList;
      {
          // List for objects that need to change layers
          ArrayList<IGameObject> objectsToMove = new ArrayList<>();
+         ArrayList<IGameObject> attacksToAdd = new ArrayList<>();
 
          // Iterate through each layer in the map
          for (Map.Entry<Integer, ArrayList<IGameObject>> entry : layeredGameObjects.entrySet())
@@ -143,6 +142,11 @@ import java.util.ArrayList;
                  // Update the GameObject
                  go.behavior().onUpdate(dt,this.inputStatus);
 
+                 // Wait for the player to attack or enemy attack
+                 IGameObject attack = go.behavior().attack(this.inputStatus);
+                 if(attack != null)
+                     attacksToAdd.add(attack);
+
                  int newLayer = go.transform().layer();
                  if (originalLayer != newLayer)
                      objectsToMove.add(go);
@@ -155,6 +159,12 @@ import java.util.ArrayList;
              destroy(go);
              add(go);
          }
+         for (IGameObject go : attacksToAdd)
+             addEnable(go);
+
+        for(IGameObject go : this.disabledGameObjects)
+             this.destroy(go);
+
      }
 
      /**
@@ -182,13 +192,22 @@ import java.util.ArrayList;
                      if (i == j) continue;
 
                      IGameObject other = layerObjects.get(j);
-                     // Check for collision
-                     if (currentObject.collider().colision(other.collider()))
-                         output.add(other);
+
+
+                     if( currentObject.name().contains("Enemy") && other.name().contains("Enemy"))
+                         continue; // Skip collision with another enemy
+
+                    // Check for collision
+                    if (currentObject.collider().colision(other.collider()) )
+                        output.add(other);
                  }
 
                  if(!output.isEmpty())
-                    currentObject.behavior().onCollision(output);
+                    {
+                        currentObject.behavior().onCollision(output);
+                        this.disabledGameObjects.addAll(output);
+                        this.disabledGameObjects.add(currentObject);
+                    }
 
                  output.clear();
              }
@@ -343,4 +362,7 @@ import java.util.ArrayList;
              return snapshot;
          }
      }
+
+     
+
  }

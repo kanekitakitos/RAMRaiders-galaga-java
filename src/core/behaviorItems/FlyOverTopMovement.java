@@ -48,7 +48,7 @@ public class FlyOverTopMovement implements IEnemyMovement
     private Ponto initialPosition; // Initial position of the enemy
     private Ponto finalTarget; // Final target position for the movement
 
-    private double arcRadius = 3.5 * 0.25; // Radius of the arc phase
+    private double arcRadius = 3.5 * 0.25 ; // Radius of the arc phase
     private double circleRadius = 5.5 * 0.25; // Radius of the circular phase
     private double circleStartAngleDeg = 110.0; // Starting angle for the circular phase
 

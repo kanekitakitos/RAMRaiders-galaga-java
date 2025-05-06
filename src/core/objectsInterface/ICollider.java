@@ -66,8 +66,8 @@ public interface ICollider
      * on the screen, which can be helpful during development and testing.
      *
      * @param g2d The Graphics2D context used for drawing
-     * @param centerCartesianPlaneX The width of the panel where the collider is drawn
-     * @param centerCartesianPlaneY The height of the panel where the collider is drawn
+     * @param centerCartesianPlaneX
+     * @param centerCartesianPlaneY
      */
     void draw(Graphics2D g2d, double centerCartesianPlaneX, double centerCartesianPlaneY);
 }
