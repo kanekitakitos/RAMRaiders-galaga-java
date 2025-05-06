@@ -71,9 +71,8 @@ public class GameManager
     }
 
     private int currentGroup = 0;
-    // Puedes definir el tamaño de cada grupo en este array
-    private int[] groupSizes = {8, 8, 8, 8, 8, 8}; // Ejemplo: 4 grupos de tamaños diferentes
-    private int groupDelayFrames = 60; // X tiempo en frames (ajusta según tu motor)
+    private int[] groupSizes = {8, 8, 8, 8, 8, 8}; 
+    private int groupDelayFrames = 60;
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     public void startRelocateEnemies()
@@ -81,7 +80,7 @@ public class GameManager
         scheduler.scheduleAtFixedRate(() ->
         {
             relocateEnemies();
-        }, 1000, groupDelayFrames * 50, TimeUnit.MILLISECONDS); // 16ms ~ 1 frame a 60fps
+        }, 1000, groupDelayFrames * 120, TimeUnit.MILLISECONDS);
     }
 
     private void relocateEnemies()
@@ -97,19 +96,25 @@ public class GameManager
             startIdx += groupSizes[i];
         int endIdx = Math.min(startIdx + groupSizes[currentGroup], enemies.size());
 
+        // Agenda a entrada de cada inimigo com um atraso
         for (int i = startIdx; i < endIdx; i++)
         {
-            GameObject enemy = (GameObject) enemies.get(i);
+            final int enemyIndex = i;
+            scheduler.schedule(() -> {
+                GameObject enemy = (GameObject) enemies.get(enemyIndex);
 
-            FlySideMovement movement = new FlySideMovement();
-            movement.setFinalTarget(this.positions.get(i));
+                FlySideMovement movement = new FlySideMovement();
+                movement.setFinalTarget(positions.get(enemyIndex));
 
-            boolean isRightToLeft = enemy.transform().angle() == 180;
-            movement.setDirection(isRightToLeft);
+                boolean isRightToLeft = enemy.transform().angle() == 180;
+                movement.setDirection(isRightToLeft);
 
-            EnemyBehavior behavior = (EnemyBehavior) enemy.behavior();
-            behavior.setMovement(movement);
-            movement.setActive(true);
+                EnemyBehavior behavior = (EnemyBehavior) enemy.behavior();
+                behavior.setMovement(movement);
+                movement.setActive(true);
+            }, (i - startIdx) * 70, TimeUnit.MILLISECONDS); //atraso entre cada inimigo
+
+
         }
 
         currentGroup++;

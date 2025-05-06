@@ -32,7 +32,7 @@ public class LinearShootAttack implements IAttackStrategy
 {
     private static int index = 0;
     private double SPEED = 10.0;
-    private Shape shape = new Shape(AssetLoader.loadAnimationFrames("laser.gif"),90);
+    private Shape shape = new Shape(AssetLoader.loadImage("laser.png"),100);
 
     private void invariante(IGameObject attacker)
     {
@@ -71,8 +71,8 @@ public class LinearShootAttack implements IAttackStrategy
         // Define the shape of the bullet as a rectangle
         Ponto[] rPoints = {
             new Ponto(0, 2),
-            new Ponto(7, 2),
-            new Ponto(7, 0),
+            new Ponto(8, 2),
+            new Ponto(8, 0),
             new Ponto(0, 0)
         };
         GameObject bullet = getGameObject(rPoints, transform, name);
