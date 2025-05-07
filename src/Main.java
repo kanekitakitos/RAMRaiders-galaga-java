@@ -6,23 +6,19 @@ import assets.*;
 import gui.*;
 
 
-
-
-
 public class Main
 {
     public static IGameObject createPlayer()
     {
-        
         double scale = 5;
         int layer = 0;
         double angle = 90;
         Ponto position = new Ponto(0,-330);
         Ponto[] points = {new Ponto(-5, 5), new Ponto(5, 5), new Ponto(5, -5), new Ponto(-5, -5)};
 
-
         Transform t1 = new Transform(position ,layer, angle, scale);
         Poligono collider = new Poligono(points, t1);
+        // Circulo collider = new Circulo(5, t1);
         Shape shape = new Shape(AssetLoader.loadAnimationFrames("nave-HanSolo.png"),550);
         PlayerBehavior behavior = new PlayerBehavior();
         GameObject player = new GameObject("Player", t1, collider, behavior, shape);
@@ -35,7 +31,7 @@ public class Main
 
         Shape backGroundShape = new Shape(AssetLoader.loadAnimationFrames("background2.gif"), 1000);
         SwingGui gui = new SwingGui(1100, 800, backGroundShape);
-        gui.setHitbox(false);
+        gui.setHitbox(true);
 
         GameEngine engine = new GameEngine(gui);
 

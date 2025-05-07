@@ -7,6 +7,8 @@ import gui.*;
 import java.util.ArrayList;
  import java.util.HashMap;
  import java.util.Map;
+ import java.util.concurrent.CopyOnWriteArrayList;
+ import java.util.List;
 
  /**
   * The GameEngine class manages game objects, their layers, and updates.
@@ -30,7 +32,7 @@ import java.util.ArrayList;
  public class GameEngine implements IGameEngine
  {
      // Stores game objects organized by layers
-     private HashMap<Integer, ArrayList<IGameObject>> layeredGameObjects;
+     private HashMap<Integer, CopyOnWriteArrayList<IGameObject>> layeredGameObjects;
      private ArrayList<IGameObject> disabledGameObjects;
 
      // Tracks the total number of game objects
@@ -63,7 +65,7 @@ import java.util.ArrayList;
      {
          int layer = go.transform().layer();
          if (!layeredGameObjects.containsKey(layer))
-             layeredGameObjects.put(layer, new ArrayList<>());
+             layeredGameObjects.put(layer, new CopyOnWriteArrayList<>());
 
          layeredGameObjects.get(layer).add(go);
          this.totalObjects++;
@@ -99,7 +101,7 @@ import java.util.ArrayList;
          if (!layeredGameObjects.containsKey(layer) || indexGameObject < 0 || indexGameObject > this.totalObjects)
              return null;
 
-         ArrayList<IGameObject> layerObjects = layeredGameObjects.get(layer);
+        CopyOnWriteArrayList<IGameObject> layerObjects = layeredGameObjects.get(layer);
          return layerObjects.get(indexGameObject);
      }
 
@@ -126,9 +128,9 @@ import java.util.ArrayList;
          ArrayList<IGameObject> attacksToAdd = new ArrayList<>();
 
          // Iterate through each layer in the map
-         for (Map.Entry<Integer, ArrayList<IGameObject>> entry : layeredGameObjects.entrySet())
+         for (Map.Entry<Integer, CopyOnWriteArrayList<IGameObject>> entry : layeredGameObjects.entrySet())
          {
-             ArrayList<IGameObject> layerObjects = entry.getValue();
+            List<IGameObject> layerObjects = entry.getValue();
              if (layerObjects == null) continue;
 
              // Iterate through each GameObject in the layer
@@ -179,7 +181,7 @@ import java.util.ArrayList;
          IGameObject currentObject = null;
 
          // Iterate through each layer in the map
-         for (ArrayList<IGameObject> layerObjects : layeredGameObjects.values())
+         for (CopyOnWriteArrayList<IGameObject> layerObjects : layeredGameObjects.values())
          {
              if (layerObjects == null || layerObjects.isEmpty()) continue;
 
@@ -291,7 +293,7 @@ import java.util.ArrayList;
      @Override
      public void destroyAll()
      {
-         for (ArrayList<IGameObject> layerObjects : layeredGameObjects.values())
+         for (CopyOnWriteArrayList<IGameObject> layerObjects : layeredGameObjects.values())
          {
              if (layerObjects == null || layerObjects.isEmpty()) continue;
              for (IGameObject go : layerObjects) {
@@ -346,12 +348,12 @@ import java.util.ArrayList;
       * Devuelve una copia segura de los objetos habilitados (activos) para renderizar.
       * Es thread-safe usando synchronized sobre layeredGameObjects.
       */
-     public ArrayList<IGameObject> getEnabledObjectsSnapshot()
+     public CopyOnWriteArrayList<IGameObject> getEnabledObjectsSnapshot()
      {
-         ArrayList<IGameObject> snapshot = new ArrayList<>();
+        CopyOnWriteArrayList<IGameObject> snapshot = new CopyOnWriteArrayList<>();
          synchronized (layeredGameObjects)
          {
-             for (ArrayList<IGameObject> layer : layeredGameObjects.values())
+             for (CopyOnWriteArrayList<IGameObject> layer : layeredGameObjects.values())
              {
                  for (IGameObject go : layer)
                  {

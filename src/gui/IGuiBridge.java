@@ -1,10 +1,11 @@
 package gui;
 
 import core.objectsInterface.IGameObject;
-import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public interface IGuiBridge
 {
-    void draw(List<IGameObject> objects);
+    void draw(CopyOnWriteArrayList<IGameObject> objects);
+
     InputEvent getInputState(); // Pode ser expandido conforme necessidade
 }

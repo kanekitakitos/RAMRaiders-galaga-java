@@ -48,7 +48,7 @@ public class GameManager
         double bottomLeft = -bottomRight;
         double right = 400;
         double left = -right;
-        double bottomY=390;
+        double bottomY=440;
 
         double[] spawnAngles = {0.0, 180.0, 270.0, 270.0};
         double[] spawnXCoords = {left, right, bottomLeft, bottomRight};

@@ -267,32 +267,30 @@ public class Circulo extends Collider implements FiguraGeometrica
     @Override
     public void draw(Graphics2D g2d, double panelWidth, double panelHeight)
     {
-        // Parâmetros de conversão mundo -> tela (deve ser igual ao usado no GamePanel)
-
-        // Centro do círculo em coordenadas do mundo
-        double worldX = this.centro.x();
-        double worldY = this.centro.y();
-
-        // Converte para coordenadas de tela (origem no centro do painel, Y invertido)
-        double screenX = panelWidth / 2.0 + worldX ;
-        double screenY = panelHeight / 2.0 - worldY ;
-
         // Salva o estado original
         java.awt.Stroke oldStroke = g2d.getStroke();
         java.awt.Color oldColor = g2d.getColor();
-
+    
         // Define cor e espessura para depuração
         g2d.setColor(java.awt.Color.RED);
         g2d.setStroke(new java.awt.BasicStroke(2));
-
+    
+        // Converte o centro do círculo para coordenadas de tela (origem no centro do painel, Y invertido)
+        double screenX = panelWidth + this.centro.x();
+        double screenY = panelHeight - this.centro.y();
+    
+        // Calcula o canto superior esquerdo do oval
+        double topLeftX = screenX - this.r;
+        double topLeftY = screenY - this.r;
+    
         // Desenha a circunferência centralizada
         g2d.drawOval(
-            (int) Math.round(screenX - this.r),
-            (int) Math.round(screenY - this.r),
+            (int) Math.round(topLeftX),
+            (int) Math.round(topLeftY),
             (int) Math.round(2 * this.r),
             (int) Math.round(2 * this.r)
         );
-
+    
         // Restaura o estado original
         g2d.setStroke(oldStroke);
         g2d.setColor(oldColor);

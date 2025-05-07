@@ -3,7 +3,7 @@ package gui;
 import core.objectsInterface.IGameObject;
 import core.Shape; 
 import javax.swing.*;
-import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class SwingGui implements IGuiBridge
 {
@@ -45,7 +45,7 @@ public class SwingGui implements IGuiBridge
     }
 
     @Override
-    public void draw(List<IGameObject> objects)
+    public void draw(CopyOnWriteArrayList<IGameObject> objects)
     {
         SwingUtilities.invokeLater(() -> panel.updateGameObjects(objects));
     }
