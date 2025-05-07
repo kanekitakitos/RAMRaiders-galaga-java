@@ -217,7 +217,7 @@ public class TestEnemyBehavior
     @Test
     void testFlyOverTopMovementBehaviorRight()
     {
-        FlyOverTopMovement fly = new FlyOverTopMovement();
+        EnterOverTopMovement fly = new EnterOverTopMovement();
         enemyBehavior.setMovement(fly);
         assertFalse(fly.isActive(), "Movement should not be active");
         fly.setDirection(false);

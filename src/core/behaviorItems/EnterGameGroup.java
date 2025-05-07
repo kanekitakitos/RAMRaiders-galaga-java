@@ -29,7 +29,7 @@ public class EnterGameGroup implements IGroupAttackStrategy
     @Override
     public void execute(List<IGameObject> enemies, IGameObject target)
     {
-        startRelocateEnemies(enemies);
+        startRelocateEnemies(enemies,target);
     }
 
     @Override
@@ -38,15 +38,15 @@ public class EnterGameGroup implements IGroupAttackStrategy
         this.positions = calculateEnemyPositions(target.transform().position(), this.pattern, SPACING);
     }
 
-    public void startRelocateEnemies(List<IGameObject> enemies)
+    public void startRelocateEnemies(List<IGameObject> enemies,IGameObject target)
     {
         scheduler.scheduleAtFixedRate(() ->
         {
-            relocateEnemies(enemies);
+            relocateEnemies(enemies,target);
         }, 1000, groupDelayFrames * 120, TimeUnit.MILLISECONDS);
     }
 
-    private void relocateEnemies(List<IGameObject> enemies)
+    private void relocateEnemies(List<IGameObject> enemies,IGameObject target)
     {
         currentGroup++;
         if (currentGroup > 5)
@@ -55,37 +55,37 @@ public class EnterGameGroup implements IGroupAttackStrategy
             return;
         }
 
-        ArrayList<Integer> enemyIndices = new ArrayList<>();
-        int currentIndex = 0;
-
-        // Encontra todos os inimigos que pertencem ao grupo atual
-        for (int row = 0; row < pattern.length; row++)
-        {
-            for (int col = 0; col < pattern[row].length; col++)
-            {
-                if (pattern[row][col] != 0)
-                {
-                    if (pattern[row][col] == currentGroup && enemyIndices.size() < groupSizes[currentGroup - 1])
-                    {
-                        enemyIndices.add(currentIndex);
-                    }
-                    currentIndex++;
-                }
-            }
-        }
-
         // Agenda a entrada dos inimigos do grupo atual
-        for (int i = 0; i < enemyIndices.size(); i++)
+        Ponto playerPosition = target.transform().position();
+        for (int i = 0; i < groupSizes[currentGroup - 1]; i++)
         {
-            final int enemyIndex = enemyIndices.get(i);
-            scheduler.schedule(() -> {
+            final int enemyIndex = i + ((currentGroup - 1) * 8); // 8 inimigos por grupo
+            scheduler.schedule(() ->
+            {
                 GameObject enemy = (GameObject) enemies.get(enemyIndex);
+                Ponto targetPosition = positions.get(enemyIndex);
 
-                EnterSideMovement movement = new EnterSideMovement();
-                movement.setFinalTarget(positions.get(enemyIndex));
 
-                boolean isRightToLeft = enemy.transform().angle() == 180;
-                movement.setDirection(isRightToLeft);
+                IEnemyMovement movement;
+                // Se o ângulo é 270, está vindo de cima
+                if (enemy.transform().angle() == 270)
+                {
+                    EnterOverTopMovement bottom = new EnterOverTopMovement();
+                    bottom.setFinalTarget(targetPosition);
+                    
+                    boolean isRightToLeft = enemy.transform().position().x() > playerPosition.x();
+                    bottom.setDirection(isRightToLeft);
+                    movement = bottom;
+                }
+                else
+                {
+                    EnterSideMovement leftOrRight = new EnterSideMovement();
+                    leftOrRight.setFinalTarget(targetPosition);
+                    // Mantém a lógica original para outros ângulos
+                    boolean isRightToLeft = enemy.transform().angle() == 180;
+                    leftOrRight.setDirection(isRightToLeft);
+                    movement = leftOrRight;
+                }
 
                 EnemyBehavior behavior = (EnemyBehavior) enemy.behavior();
                 behavior.setMovement(movement);
@@ -94,27 +94,36 @@ public class EnterGameGroup implements IGroupAttackStrategy
         }
     }
 
+
     private ArrayList<Ponto> calculateEnemyPositions(Ponto playerPosition, int[][] pattern, double spacing)
     {
-        ArrayList<Ponto> positions = new ArrayList<>();
-        int rows = pattern.length;
-        int cols = pattern[0].length;
+        @SuppressWarnings("unchecked")
+        ArrayList<Ponto>[] priorityGroups = new ArrayList[6];
+        for (int i = 1; i <= 5; i++)
+            priorityGroups[i] = new ArrayList<>();
 
-        double startX = playerPosition.x() - ((cols - 1) * spacing) / 2.0;
+        double startX = playerPosition.x() - ((pattern[0].length - 1) * spacing) / 2.0;
         double startY = playerPosition.y() + 660;
 
-        for (int row = 0; row < rows; row++)
+        for (int row = 0; row < pattern.length; row++)
         {
-            for (int col = 0; col < cols; col++)
+            for (int col = 0; col < pattern[0].length; col++)
             {
-                if (pattern[row][col] != 0)
-                {
+                int priority = pattern[row][col];
+                if (priority > 0) {
                     double x = startX + col * spacing;
                     double y = startY - row * spacing;
-                    positions.add(new Ponto(x, y));
+                    priorityGroups[priority].add(new Ponto(x, y));
                 }
             }
         }
+
+        ArrayList<Ponto> positions = new ArrayList<>();
+        for (int priority = 1; priority <= 5; priority++)
+        {
+            positions.addAll(priorityGroups[priority]);
+        }
+
         return positions;
     }
 

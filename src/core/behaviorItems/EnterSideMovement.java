@@ -138,7 +138,7 @@ public class EnterSideMovement implements IEnemyMovement
     /**
      * Calculates the position of the enemy at a given time in the movement
      * sequence.
-     * 
+     *
      * @param localT The time value for which to calculate the position.
      * @return The position as a Ponto object.
      */
@@ -152,7 +152,7 @@ public class EnterSideMovement implements IEnemyMovement
 
     /**
      * Handles the lateral entry and circular lasso phases of the movement.
-     * 
+     *
      * @param normT Normalized time (0 to 1) for this phase.
      * @return The position as a Ponto object.
      */
@@ -198,7 +198,7 @@ public class EnterSideMovement implements IEnemyMovement
 
     /**
      * Handles the final approach phase of the movement.
-     * 
+     *
      * @param normT Normalized time (0 to 1) for this phase.
      * @return The position as a Ponto object.
      */
@@ -238,19 +238,19 @@ public class EnterSideMovement implements IEnemyMovement
         double dx = nextPoint.x() - shipCenter.x();
         double dy = nextPoint.y() - shipCenter.y();
 
-        // Calcula o ângulo desejado
+
         double desiredAngle = new Ponto(dx, dy).theta();
-        
-        // Obtém o ângulo atual do inimigo
+
+
         double currentAngle = enemy.transform().angle();
-        
-        // Calcula a diferença entre o ângulo desejado e o atual
+
+
         double nextAngle = (desiredAngle + 360) - currentAngle;
-        
-        // Normaliza o ângulo para estar entre -180 e 180 graus
+
+
         while (nextAngle > 180) nextAngle -= 360;
         while (nextAngle < -180) nextAngle += 360;
-        
+
         return nextAngle;
     }
 
@@ -266,10 +266,11 @@ public class EnterSideMovement implements IEnemyMovement
 
         double rotationSpeed = angleDiff * 0.1;
 
-        if (Math.abs(rotationSpeed) > 5.0) {
+        if (Math.abs(rotationSpeed) > 5.0)
+        {
             rotationSpeed = Math.signum(rotationSpeed) * 5.0;
         }
-        
+
         enemy.rotateSpeed(rotationSpeed);
     }
 }

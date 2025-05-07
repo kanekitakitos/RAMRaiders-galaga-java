@@ -5,7 +5,7 @@ import core.behaviorItems.*;
 import core.objectsInterface.*;
 import geometry.*;
 import assets.*;
-import java.util.function.Predicate;
+import java.util.function.Function;
 
 public class GameManager
 {
@@ -20,36 +20,56 @@ public class GameManager
         this.enemies = new ArrayList<>();
         this.player = player;
         this.groupAttackStrategy = new EnterGameGroup();
-        this.generateEnemies(groupAttackStrategy.getNumberOfEnemies(), i -> i < groupAttackStrategy.getNumberOfEnemies()/2);
+
+        Function<Integer, Integer> spawnIndexFunction = (Integer i) ->
+        {
+            int groupSize = 8;
+            int groupNumber = i / groupSize;
+            int patternIndex = groupNumber % 4;
+
+            return patternIndex;
+        };
+
+        this.generateEnemies(groupAttackStrategy.getNumberOfEnemies(), spawnIndexFunction);
         this.groupAttackStrategy.onInit(this.enemies, player);
     }
 
-    public void generateEnemies(int count, Predicate<Integer> spawnPredicate)
+
+
+    public void generateEnemies(int count, Function<Integer, Integer> spawnIndexFunction)
     {
-        double angleLeft = 0.0;
-        double angleRight = 180.0;
+        // Constantes de spawn
         double scale = 4;
         int layer = 1;
-        int spawnRight = 400;
-        int spawnLeft = -spawnRight;
+        double defaultY = this.player.transform().position().y() * 0.5;
+        // Índices: 0 = esquerda, 1 = direita, 2 = topo-esquerda, 3 = topo-direita
+
+        double bottomRight = 100;
+        double bottomLeft = -bottomRight;
+        double right = 400;
+        double left = -right;
+        double bottomY=390;
+
+        double[] spawnAngles = {0.0, 180.0, 270.0, 270.0};
+        double[] spawnXCoords = {left, right, bottomLeft, bottomRight};
+        double[] spawnYCoords = {defaultY, defaultY, bottomY, bottomY};
 
         Ponto[] points = {new Ponto(-5, 5), new Ponto(5, 5), new Ponto(5, -5), new Ponto(-5, -5)};
+
         for (int i = 0; i < count; i++)
         {
-            boolean spawnOnRight = spawnPredicate.test(i);
-            Transform t = new Transform(
-                new Ponto(spawnOnRight ? spawnRight : spawnLeft, this.player.transform().position().y()*0.5),
-                layer,
-                spawnOnRight ? angleRight : angleLeft,
-                scale
-            );
+            int spawnIndex = spawnIndexFunction.apply(i);
+
+            Ponto spawnPoint = new Ponto(spawnXCoords[spawnIndex], spawnYCoords[spawnIndex]);
+            double spawnAngle = spawnAngles[spawnIndex];
+
+            Transform t = new Transform(spawnPoint, layer, spawnAngle, scale);
             Poligono collider = new Poligono(points, t);
             EnemyBehavior behavior = new EnemyBehavior();
-
             Shape shape = new Shape(AssetLoader.loadAnimationFrames("nave.png"), 550);
+
             GameObject enemy = new GameObject("Enemy " + i, t, collider, behavior, shape);
             enemy.onInit();
-
             enemy.behavior().subscribe(this.player);
             enemies.add(enemy);
         }
@@ -111,4 +131,5 @@ public class GameManager
             engine.addEnable(enemy);
         }
     }
+
 }

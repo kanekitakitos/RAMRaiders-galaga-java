@@ -12,17 +12,14 @@ import geometry.Ponto;
  *
  * @Pre-Conditions:
  *  - The finalTarget must be set using setFinalTarget() before activating the movement
- *  - The GameObject passed to move() must not be null
- *  - The GameObject must have a valid Transform component
  *  - The direction (goRightToLeft) should be set before activation
  *  - The initial position is automatically captured when movement starts
  *
  * @Post-Conditions:
  *  - The enemy will execute a three-phase movement:
- *      1. Arc phase (t1 = 0.9): Creates an upward arc motion
- *      2. Circle phase (t2 = 1.2): Performs a circular movement
- *      3. Final approach phase (t3 = 1.0): Moves directly to the
- *  target position
+ *      1. Arc phase : Creates an upward arc motion
+ *      2. Circle phase : Performs a circular movement
+ *      3. Final approach phase : Moves directly to the target position
  *  - Movement deactivates automatically when total time exceeds t1 + t2 + t3
  *  - When deactivated:
  *  - Time (t) resets to 0
@@ -38,7 +35,7 @@ import geometry.Ponto;
  * @author Brandon mejia
  * @version 2025-04-25
  */
-public class FlyOverTopMovement implements IEnemyMovement
+public class EnterOverTopMovement implements IEnemyMovement
 {
 
     private boolean active = false; // Indicates whether the movement is active
@@ -48,13 +45,13 @@ public class FlyOverTopMovement implements IEnemyMovement
     private Ponto initialPosition; // Initial position of the enemy
     private Ponto finalTarget; // Final target position for the movement
 
-    private double arcRadius = 3.5 * 0.25 ; // Radius of the arc phase
-    private double circleRadius = 5.5 * 0.25; // Radius of the circular phase
+    private double arcRadius = 150  ; // Radius of the arc phase
+    private double circleRadius = 170 ; // Radius of the circular phase
     private double circleStartAngleDeg = 110.0; // Starting angle for the circular phase
 
     private final double tIncrement = 0.018; // Time increment for each movement step
-    private final double t1 = 0.9; // Duration of the arc phase
-    private final double t2 = 1.2; // Duration of the circular phase
+    private final double t1 = 0.8; // Duration of the arc phase
+    private final double t2 = 1.3; // Duration of the circular phase
     private final double t3 = 1.0; // Duration of the final approach phase
 
     private Ponto arcEnd; // End position of the arc phase
@@ -141,12 +138,18 @@ public class FlyOverTopMovement implements IEnemyMovement
         Ponto velocity = new Ponto(next.x() - current.x(), next.y() - current.y());
 
         enemy.velocity(velocity);
+        enemy.rotateSpeed(3);
 
         t += tIncrement;
-
         if (t >= t1 + t2 + t3)
         {
-            enemy.velocity(new Ponto(0, 0));
+            if(enemy.transform().angle()!= 90)
+                {
+                    rotateToVertical(enemy);
+                    enemy.velocity(new Ponto(0,0));
+                    return;
+                }
+
             setActive(false);
         }
     }
@@ -216,7 +219,7 @@ public class FlyOverTopMovement implements IEnemyMovement
     private Ponto handleCircle(double normT)
     {
         double startAngle = Math.toRadians(adjustAngle(circleStartAngleDeg));
-        double sweepAngle = Math.toRadians(290);
+        double sweepAngle = Math.toRadians(230);
 
         double angle;
         if (goRightToLeft) {
@@ -252,7 +255,41 @@ public class FlyOverTopMovement implements IEnemyMovement
      * @param angleDeg The angle in degrees.
      * @return The adjusted angle in degrees.
      */
-    private double adjustAngle(double angleDeg) {
+    private double adjustAngle(double angleDeg)
+    {
         return goRightToLeft ? 180.0 - angleDeg : angleDeg;
     }
+
+    private void rotateToVertical(GameObject enemy)
+    {
+        double currentAngle = enemy.transform().angle();
+        double targetAngle = 90.0;
+
+        // Calcula a diferença mais curta entre os ângulos
+        double angleDiff = targetAngle - currentAngle;
+
+        // Normaliza para o caminho mais curto
+        while (angleDiff > 180) angleDiff -= 360;
+        while (angleDiff < -180) angleDiff += 360;
+
+        // Aplica uma rotação mais suave
+        double rotationSpeed = angleDiff * 0.15;
+
+        // Limita a velocidade máxima de rotação
+        double maxSpeed = 5.0;
+        rotationSpeed = Math.max(-maxSpeed, Math.min(maxSpeed, rotationSpeed));
+
+        // Se estiver muito próximo do ângulo desejado, ajusta diretamente
+        if (Math.abs(angleDiff) < 0.5)
+        {
+            enemy.rotateSpeed(0);
+        }
+        else
+        {
+            enemy.rotateSpeed(rotationSpeed);
+        }
+    }
+
+    
+
 }
