@@ -8,17 +8,20 @@ import geometry.Ponto;
  * This class defines a zigzag movement pattern for enemy objects, where the
  * enemy alternates its horizontal movement direction over time.
  *
- * <p>The movement is controlled by an active state, and the zigzag pattern
- * is determined by a time-based calculation.</p>
+ * <p>
+ * The movement is controlled by an active state, and the zigzag pattern
+ * is determined by a time-based calculation.
+ * </p>
  *
  * @Pre-Conditions:
- * - The enemy object must not be null.
- * - The enemy object must have a valid velocity property.
+ *                  - The enemy object must not be null.
+ *                  - The enemy object must have a valid velocity property.
  *
  * @Post-Conditions:
- * - When active, the enemy's velocity alternates between positive and negative
- *   horizontal directions based on the time variable.
- * - When inactive, the enemy's velocity remains unchanged.
+ *                   - When active, the enemy's velocity alternates between
+ *                   positive and negative
+ *                   horizontal directions based on the time variable.
+ *                   - When inactive, the enemy's velocity remains unchanged.
  *
  * @see IEnemyMovement
  * @see GameObject
@@ -27,8 +30,7 @@ import geometry.Ponto;
  * @author Brandon Mejia
  * @version 2025-04-03
  */
-public class ZigzagMovement implements IEnemyMovement
-{
+public class ZigzagMovement implements IEnemyMovement {
     private boolean isActive = false; // Indicates whether the movement is active
     private double time = 0; // Tracks the time for calculating the zigzag pattern
 
@@ -39,9 +41,9 @@ public class ZigzagMovement implements IEnemyMovement
      * @param enemy The `GameObject` representing the enemy to be moved.
      */
     @Override
-    public void move(GameObject enemy)
-    {
-        if (!isActive) return;
+    public void move(GameObject enemy) {
+        if (!isActive)
+            return;
 
         time += 45; // Increment time to determine the movement phase
         double amplitude = 0.5; // Amplitude of the zigzag movement
@@ -57,8 +59,7 @@ public class ZigzagMovement implements IEnemyMovement
      * @param active `true` to activate the movement, `false` to deactivate it.
      */
     @Override
-    public void setActive(boolean active)
-    {
+    public void setActive(boolean active) {
         this.isActive = active;
         if (active)
             time = 0; // Reset time when movement is activated
@@ -70,8 +71,7 @@ public class ZigzagMovement implements IEnemyMovement
      * @return `true` if the movement is active, `false` otherwise.
      */
     @Override
-    public boolean isActive()
-    {
+    public boolean isActive() {
         return isActive;
     }
 }

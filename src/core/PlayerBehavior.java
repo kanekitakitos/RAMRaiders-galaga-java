@@ -1,203 +1,202 @@
 package core;
 
- import core.behaviorItems.IAttackStrategy;
- import core.behaviorItems.LinearShootAttack;
- import core.objectsInterface.IGameObject;
- import geometry.Ponto;
- import gui.IInputEvent;
- import gui.InputEvent;
+import core.behaviorItems.IAttackStrategy;
+import core.behaviorItems.LinearShootAttack;
+import core.objectsInterface.IGameObject;
+import geometry.Ponto;
+import gui.IInputEvent;
+import gui.InputEvent;
 
- import java.util.ArrayList;
- import java.util.concurrent.Executors;
- import java.util.concurrent.TimeUnit;
- import java.util.concurrent.ScheduledExecutorService;
+import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ScheduledExecutorService;
 
- /**
-  * Represents the behavior of a player in the game.
-  *
-  * <p>This class defines the player's actions, including movement, attacks, and collision handling.
-  * It also manages the player's life and invincibility state.</p>
-  *
-  * @Pre-Conditions:
-  * - The required dependencies such as the game object, transform, and collider must be properly initialized.
-  * - The attack strategy must be set or a default strategy is provided.
-  *
-  * @Post-Conditions:
-  * - The player's input events lead to evasive maneuvers, attacks, and accurate collision handling.
-  * - The game object's state is updated accordingly based on player actions.
-  *
-  * @see <a href="https://www.youtube.com/watch?v=PJxcxHgmK4w">ScheduledExecutorService</a>
-  * @see <a href="https://stackoverflow.com/questions/71371997/single-scheduledexecutorservice-instance-vs-multiple-scheduledexecutorservice-in">Single ScheduledExecutorService instance vs Multiple ScheduledExecutorService instances</a>
-  * @see <a href="https://www.blackbox.ai/share/211e5a8d-74e2-4daf-aca4-469f1fa1c7e9">Is ScheduledExecutorService useful? - BlackBox.ai</a>
-  * @see core.Behavior
-  *
-  * @Author Brandon Mejia
-  * @Author Gabriel Pedroso
-  * @Author Miguel Correia
-  * @Version 2025-04-18
-  */
- public class PlayerBehavior extends Behavior
- {
-     private IAttackStrategy attackStrategy; // The attack strategy used by the player
-     private boolean isAttacking = false; // Indicates whether the player is currently attacking
+/**
+ * Represents the behavior of a player in the game.
+ *
+ * <p>
+ * This class defines the player's actions, including movement, attacks, and
+ * collision handling.
+ * It also manages the player's life and invincibility state.
+ * </p>
+ *
+ * @Pre-Conditions:
+ *                  - The required dependencies such as the game object,
+ *                  transform, and collider must be properly initialized.
+ *                  - The attack strategy must be set or a default strategy is
+ *                  provided.
+ *
+ * @Post-Conditions:
+ *                   - The player's input events lead to evasive maneuvers,
+ *                   attacks, and accurate collision handling.
+ *                   - The game object's state is updated accordingly based on
+ *                   player actions.
+ *
+ * @see <a href=
+ *      "https://www.youtube.com/watch?v=PJxcxHgmK4w">ScheduledExecutorService</a>
+ * @see <a href=
+ *      "https://stackoverflow.com/questions/71371997/single-scheduledexecutorservice-instance-vs-multiple-scheduledexecutorservice-in">Single
+ *      ScheduledExecutorService instance vs Multiple ScheduledExecutorService
+ *      instances</a>
+ * @see <a href=
+ *      "https://www.blackbox.ai/share/211e5a8d-74e2-4daf-aca4-469f1fa1c7e9">Is
+ *      ScheduledExecutorService useful? - BlackBox.ai</a>
+ * @see core.Behavior
+ *
+ * @Author Brandon Mejia
+ * @Author Gabriel Pedroso
+ * @Author Miguel Correia
+ * @Version 2025-04-18
+ */
+public class PlayerBehavior extends Behavior {
+    private IAttackStrategy attackStrategy; // The attack strategy used by the player
+    private boolean isAttacking = false; // Indicates whether the player is currently attacking
 
-     private int life = 3; // The player's remaining lives
-     private boolean isInvincible = false; // Indicates whether the player is invincible
-     private final long invincibilityDuration = 2000; // Duration of invincibility in milliseconds
+    private int life = 3; // The player's remaining lives
+    private boolean isInvincible = false; // Indicates whether the player is invincible
+    private final long invincibilityDuration = 2000; // Duration of invincibility in milliseconds
 
-     private final ScheduledExecutorService localScheduler; // Scheduler for handling timed tasks
+    private final ScheduledExecutorService localScheduler; // Scheduler for handling timed tasks
 
-     /**
-      * Constructs a new PlayerBehavior instance.
-      * Initializes the default attack strategy and the scheduler.
-      */
-     public PlayerBehavior()
-     {
-         super();
-         this.attackStrategy = new LinearShootAttack();
-         this.localScheduler = Executors.newSingleThreadScheduledExecutor();
-     }
+    /**
+     * Constructs a new PlayerBehavior instance.
+     * Initializes the default attack strategy and the scheduler.
+     */
+    public PlayerBehavior() {
+        super();
+        this.attackStrategy = new LinearShootAttack();
+        this.localScheduler = Executors.newSingleThreadScheduledExecutor();
+    }
 
-     /**
-      * Sets the attack strategy for the player.
-      *
-      * @param attackStrategy The attack strategy to use.
-      */
-     public void setAttackStrategy(IAttackStrategy attackStrategy)
-     {
-         this.attackStrategy = attackStrategy;
-     }
+    /**
+     * Sets the attack strategy for the player.
+     *
+     * @param attackStrategy The attack strategy to use.
+     */
+    public void setAttackStrategy(IAttackStrategy attackStrategy) {
+        this.attackStrategy = attackStrategy;
+    }
 
-     /**
-      * Checks if the player is currently invincible.
-      *
-      * @return True if the player is invincible, false otherwise.
-      */
-     public boolean isInvincible()
-     {
-         return this.isInvincible;
-     }
+    /**
+     * Checks if the player is currently invincible.
+     *
+     * @return True if the player is invincible, false otherwise.
+     */
+    public boolean isInvincible() {
+        return this.isInvincible;
+    }
 
-     /**
-      * Gets the player's remaining lives.
-      *
-      * @return The number of lives the player has.
-      */
-     public int life()
-     {
-         return this.life;
-     }
+    /**
+     * Gets the player's remaining lives.
+     *
+     * @return The number of lives the player has.
+     */
+    public int life() {
+        return this.life;
+    }
 
-     /**
-      * Updates the behavior logic.
-      * Processes input events to handle movement and evasive maneuvers.
-      *
-      * @param dT The time delta since the last update.
-      * @param ie The input event to process.
-      */
-     @Override
-     public void onUpdate(double dT, IInputEvent ie)
-     {
-         super.onUpdate(dT, ie);
-         this.moveAndEvasiveManeuver(ie);
-     }
+    /**
+     * Updates the behavior logic.
+     * Processes input events to handle movement and evasive maneuvers.
+     *
+     * @param dT The time delta since the last update.
+     * @param ie The input event to process.
+     */
+    @Override
+    public void onUpdate(double dT, IInputEvent ie) {
+        super.onUpdate(dT, ie);
+        this.moveAndEvasiveManeuver(ie);
+    }
 
-     /**
-      * Executes an attack using the current attack strategy.
-      *
-      * @param ie The input event triggering the attack.
-      * @return The game object resulting from the attack, or null if no attack is executed.
-      */
-     @Override
-     public IGameObject attack(IInputEvent ie)
-     {
-         if (this.attackStrategy == null)
-             return null;
+    /**
+     * Executes an attack using the current attack strategy.
+     *
+     * @param ie The input event triggering the attack.
+     * @return The game object resulting from the attack, or null if no attack is
+     *         executed.
+     */
+    @Override
+    public IGameObject attack(IInputEvent ie) {
+        if (this.attackStrategy == null)
+            return null;
 
-         if (!this.isAttacking && this.isEnabled() && ie.isActionActive("ATTACK"))
-         {
-             this.isAttacking = true;
+        if (!this.isAttacking && this.isEnabled() && ie.isActionActive("ATTACK")) {
+            this.isAttacking = true;
 
-             // Schedule to reset the attack flag after the invincibility duration
-             localScheduler.schedule(() ->
-             {
-                 isAttacking = false;
-             }, invincibilityDuration, TimeUnit.MILLISECONDS);
+            // Schedule to reset the attack flag after the invincibility duration
+            localScheduler.schedule(() -> {
+                isAttacking = false;
+            }, invincibilityDuration, TimeUnit.MILLISECONDS);
 
-             return this.attackStrategy.execute(this.go, this.observedObject);
-         }
-         else
-         {
-             return null;
-         }
-     }
+            return this.attackStrategy.execute(this.go, this.observedObject);
+        } else {
+            return null;
+        }
+    }
 
-     /**
-      * Handles collisions with other game objects.
-      * Reduces the player's life and triggers invincibility if applicable.
-      *
-      * @param collisions A list of game objects that this behavior collided with.
-      */
-     @Override
-     public void onCollision(ArrayList<IGameObject> collisions)
-     {
-         for (IGameObject go : collisions)
-             go.behavior().onDestroy();
+    /**
+     * Handles collisions with other game objects.
+     * Reduces the player's life and triggers invincibility if applicable.
+     *
+     * @param collisions A list of game objects that this behavior collided with.
+     */
+    @Override
+    public void onCollision(ArrayList<IGameObject> collisions) {
+        for (IGameObject go : collisions)
+            go.behavior().onDestroy();
 
-         if (this.life > 0 && !this.isInvincible && this.isEnabled())
-         {
-             this.life--;
+        if (this.life > 0 && !this.isInvincible && this.isEnabled()) {
+            this.life--;
 
-             this.isInvincible = true;
+            this.isInvincible = true;
 
-             // Schedule to reset the invincibility flag after the invincibility duration
-             localScheduler.schedule(() ->
-             {
-                 this.isInvincible = false;
-             }, invincibilityDuration, TimeUnit.MILLISECONDS);
+            // Schedule to reset the invincibility flag after the invincibility duration
+            localScheduler.schedule(() -> {
+                this.isInvincible = false;
+            }, invincibilityDuration, TimeUnit.MILLISECONDS);
 
-             System.out.println("Player hit! Remaining life: " + this.life);
-         }
+            System.out.println("Player hit! Remaining life: " + this.life);
+        }
 
-         if (this.life <= 0 && this.isEnabled())
-             this.onDestroy();
-     }
+        if (this.life <= 0 && this.isEnabled())
+            this.onDestroy();
+    }
 
-     /**
-      * Executes an evasive maneuver based on the input event.
-      * Moves the player in the specified direction and temporarily enables invincibility.
-      *
-      * @param Iie The input event triggering the evasive maneuver.
-      */
-     public void moveAndEvasiveManeuver(IInputEvent Iie)
-     {
-         if (Iie == null)
-             return;
+    /**
+     * Executes an evasive maneuver based on the input event.
+     * Moves the player in the specified direction and temporarily enables
+     * invincibility.
+     *
+     * @param Iie The input event triggering the evasive maneuver.
+     */
+    public void moveAndEvasiveManeuver(IInputEvent Iie) {
+        if (Iie == null)
+            return;
 
-         InputEvent ie = (InputEvent) Iie;
-         // Determine direction based on the input event
-         double deltaX = 0;
-         double deltaY = 0;
+        InputEvent ie = (InputEvent) Iie;
+        // Determine direction based on the input event
+        double deltaX = 0;
+        double deltaY = 0;
 
-         // Define move step
-         double moveStep = 2.5;
+        // Define move step
+        double moveStep = 2.5;
 
-         if (ie.isActionActive("RIGHT"))
-             deltaX += moveStep;
-         if (ie.isActionActive("LEFT"))
-             deltaX -= moveStep;
+        if (ie.isActionActive("RIGHT"))
+            deltaX += moveStep;
+        if (ie.isActionActive("LEFT"))
+            deltaX -= moveStep;
 
-         final Ponto evasionVector = new Ponto(deltaX, deltaY);
+        final Ponto evasionVector = new Ponto(deltaX, deltaY);
 
-         this.isInvincible = true;
-         // Apply an evasive move based on the calculated direction
-         this.go.transform().move(evasionVector, 0);
-         // Also update the collider position
-         this.go.collider().updatePosicao();
+        this.isInvincible = true;
+        // Apply an evasive move based on the calculated direction
+        this.go.transform().move(evasionVector, 0);
+        // Also update the collider position
+        this.go.collider().updatePosicao();
 
-         localScheduler.schedule(() ->
-         {
-             this.isInvincible = false;
-         }, invincibilityDuration, TimeUnit.MILLISECONDS);
-     }
- }
+        localScheduler.schedule(() -> {
+            this.isInvincible = false;
+        }, invincibilityDuration, TimeUnit.MILLISECONDS);
+    }
+}

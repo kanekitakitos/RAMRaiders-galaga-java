@@ -4,28 +4,35 @@ import javax.swing.JFrame;
 
 /**
  * Interface for handling input events in a GUI.
- * Provides methods to check the state of specific actions and register input handlers.
+ * Provides methods to check the state of specific actions and register input
+ * handlers.
  *
- * <p>Example usage:</p>
+ * <p>
+ * Example usage:
+ * </p>
+ * 
  * <pre>
- *     IInputEvent inputEvent = new SomeInputEventImplementation();
- *     boolean isActive = inputEvent.isActionActive("JUMP");
- *     inputEvent.registerInputHandlers(frame);
+ * IInputEvent inputEvent = new SomeInputEventImplementation();
+ * boolean isActive = inputEvent.isActionActive("JUMP");
+ * inputEvent.registerInputHandlers(frame);
  * </pre>
  *
  * @preConditions:
- * - The action string passed to isActionActive must not be null.
- * - The JFrame passed to registerInputHandlers must be a valid, initialized JFrame.
+ *                 - The action string passed to isActionActive must not be
+ *                 null.
+ *                 - The JFrame passed to registerInputHandlers must be a valid,
+ *                 initialized JFrame.
  *
  * @postConditions:
- * - isActionActive returns the current state of the specified action.
- * - registerInputHandlers associates input handlers with the provided JFrame.
+ *                  - isActionActive returns the current state of the specified
+ *                  action.
+ *                  - registerInputHandlers associates input handlers with the
+ *                  provided JFrame.
  *
  * @author Brandon Mejia
  * @version 2025-03-25
  */
-public interface IInputEvent
-{
+public interface IInputEvent {
     /**
      * Checks if a specific action is currently active.
      *

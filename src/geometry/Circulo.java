@@ -9,7 +9,8 @@ import core.Transform;
 /**
  * The `Circulo` class represents a circle with a center point and a radius.
  * It extends the `Collider` class to provide circle-based collision detection.
- * This class also implements the `FiguraGeometrica` interface for geometric operations.
+ * This class also implements the `FiguraGeometrica` interface for geometric
+ * operations.
  *
  * @author Brandon Mejia
  * @version 2025-02-10
@@ -19,7 +20,8 @@ import core.Transform;
  * @see geometry.Ponto
  * @see geometry.Segmento
  *
- * @inv The circle must have a positive radius and its center must be in the first quadrant.
+ * @inv The circle must have a positive radius and its center must be in the
+ *      first quadrant.
  */
 public class Circulo extends Collider implements FiguraGeometrica {
 
@@ -30,7 +32,7 @@ public class Circulo extends Collider implements FiguraGeometrica {
      * Ensures the invariants of the circle are maintained.
      * The radius must be positive and the center must be in the first quadrant.
      *
-     * @param r The radius of the circle.
+     * @param r      The radius of the circle.
      * @param centro The center point of the circle.
      */
     private void invariantes(double r, Ponto centro) {
@@ -42,11 +44,12 @@ public class Circulo extends Collider implements FiguraGeometrica {
     }
 
     /**
-     * Constructs a `Circulo` object with the specified center coordinates, radius, and transform.
+     * Constructs a `Circulo` object with the specified center coordinates, radius,
+     * and transform.
      *
-     * @param x The x-coordinate of the center.
-     * @param y The y-coordinate of the center.
-     * @param r The radius of the circle.
+     * @param x         The x-coordinate of the center.
+     * @param y         The y-coordinate of the center.
+     * @param r         The radius of the circle.
      * @param transform The transform associated with the circle.
      */
     public Circulo(double x, double y, double r, Transform transform) {
@@ -59,7 +62,7 @@ public class Circulo extends Collider implements FiguraGeometrica {
     /**
      * Constructs a `Circulo` object with the specified radius and transform.
      *
-     * @param r The radius of the circle.
+     * @param r         The radius of the circle.
      * @param transform The transform associated with the circle.
      */
     public Circulo(double r, Transform transform) {
@@ -70,10 +73,11 @@ public class Circulo extends Collider implements FiguraGeometrica {
     }
 
     /**
-     * Constructs a `Circulo` object with the specified center point, radius, and transform.
+     * Constructs a `Circulo` object with the specified center point, radius, and
+     * transform.
      *
-     * @param c The center point of the circle.
-     * @param r The radius of the circle.
+     * @param c         The center point of the circle.
+     * @param r         The radius of the circle.
      * @param transform The transform associated with the circle.
      */
     public Circulo(Ponto c, double r, Transform transform) {
@@ -250,8 +254,8 @@ public class Circulo extends Collider implements FiguraGeometrica {
      * This method is used to render the collider's shape and boundaries
      * on the screen, which can be helpful during development and testing.
      *
-     * @param g2d The `Graphics2D` context used for drawing.
-     * @param panelWidth The width of the panel where the collider is drawn.
+     * @param g2d         The `Graphics2D` context used for drawing.
+     * @param panelWidth  The width of the panel where the collider is drawn.
      * @param panelHeight The height of the panel where the collider is drawn.
      */
     @Override
@@ -274,11 +278,10 @@ public class Circulo extends Collider implements FiguraGeometrica {
 
         // Draw the circle
         g2d.drawOval(
-            (int) Math.round(topLeftX),
-            (int) Math.round(topLeftY),
-            (int) Math.round(2 * this.r),
-            (int) Math.round(2 * this.r)
-        );
+                (int) Math.round(topLeftX),
+                (int) Math.round(topLeftY),
+                (int) Math.round(2 * this.r),
+                (int) Math.round(2 * this.r));
 
         // Restore the original state
         g2d.setStroke(oldStroke);

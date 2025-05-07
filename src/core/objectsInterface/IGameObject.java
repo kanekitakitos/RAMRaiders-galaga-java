@@ -3,8 +3,10 @@ package core.objectsInterface;
 import core.Shape;
 
 /**
- * The IGameObject interface defines the contract for game objects in the game world.
- * A game object represents an entity that can be manipulated in the game, including
+ * The IGameObject interface defines the contract for game objects in the game
+ * world.
+ * A game object represents an entity that can be manipulated in the game,
+ * including
  * movement, rotation, and scaling.
  *
  * @author Brandon Mejia
@@ -13,8 +15,7 @@ import core.Shape;
  *
  * @version 2025-03-25
  */
-public interface IGameObject
-{
+public interface IGameObject {
     /**
      * Gets the name of the game object.
      *
@@ -35,7 +36,6 @@ public interface IGameObject
      * @return The collider of the game object.
      */
     ICollider collider();
-
 
     Shape shape();
 
