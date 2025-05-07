@@ -79,14 +79,16 @@ public class PlayerBehavior extends Behavior
         this.moveAndEvasiveManeuver(ie);
     }
 
-    public IGameObject attack(InputEvent ie)
+    @Override
+    public IGameObject attack(IInputEvent ie)
     {
         if(this.attackStrategy == null )
             return null;
 
-        if(!this.isAttacking && this.isEnabled() && ie.isAttack())
+        if(!this.isAttacking && this.isEnabled() && ie.isActionActive("ATTACK"))
         {
 
+            
             this.isAttacking = true;
 
             // Schedule to reset the attack flag after 500ms delay
@@ -154,9 +156,9 @@ public class PlayerBehavior extends Behavior
         // Define move step.
         double moveStep = 2.5;
 
-        if (ie.isRight())
+        if (ie.isActionActive("RIGHT"))
             deltaX += moveStep;
-        if (ie.isLeft())
+        if (ie.isActionActive("LEFT"))
             deltaX -= moveStep;
 
         final Ponto evasionVector = new Ponto(deltaX, deltaY);

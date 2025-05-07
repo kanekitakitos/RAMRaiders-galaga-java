@@ -233,7 +233,7 @@ public class Behavior implements IBehavior
     * @return The resulting GameObject from the attack, or null if not applicable.
     */
    @Override
-   public IGameObject attack(InputEvent ie)
+   public IGameObject attack(IInputEvent ie)
    {
        return null;
    }

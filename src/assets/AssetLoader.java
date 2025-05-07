@@ -13,7 +13,6 @@ import java.util.List;
 public class AssetLoader
 {
 
-
     public static BufferedImage loadImage(String fileName)
     {
         try

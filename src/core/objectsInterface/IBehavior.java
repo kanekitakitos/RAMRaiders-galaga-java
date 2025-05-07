@@ -91,5 +91,5 @@ import gui.InputEvent;
          * @param ie The input event triggering the attack.
          * @return The game object resulting from the attack, or null if no attack is performed.
          */
-        IGameObject attack(InputEvent ie);
+        IGameObject attack(IInputEvent ie);
     }

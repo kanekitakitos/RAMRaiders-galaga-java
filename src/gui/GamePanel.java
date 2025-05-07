@@ -20,20 +20,17 @@ public class GamePanel extends JPanel
     public GamePanel(int width, int height)
     {
         setPreferredSize(new Dimension(width, height));
-        setFocusable(true);
         setBackground(Color.BLACK);
-
     }
 
     public GamePanel(int width, int height,Shape backgroundShape)
     {
         setPreferredSize(new Dimension(width, height));
-        setFocusable(true);
         setBackground(Color.BLACK);
         this.backgroundShape = backgroundShape;
-
     }
 
+    
 
     public void updateGameObjects(List<IGameObject> newObjects)
     {
@@ -63,9 +60,6 @@ public class GamePanel extends JPanel
             if ( go.transform() == null || go.shape() == null) continue;
                 drawGameObject(g2d, go, getWidth(), getHeight());
         }
-
-
-
         drawInfo(g2d);
     }
 
@@ -105,8 +99,8 @@ public class GamePanel extends JPanel
         g2d.rotate(Math.toRadians(-angle));
     
         // Usar as dimensões pré-calculadas do Shape
-        double logicalWidth = shape.getLogicalWidth()*2;
-        double logicalHeight = shape.getLogicalHeight()*2;
+        double logicalWidth = shape.getLogicalWidth()*1.5;
+        double logicalHeight = shape.getLogicalHeight()*1.5;
     
         g2d.drawImage(img, (int)(-logicalWidth/2), (int)(-logicalHeight/2),
                       (int)logicalWidth, (int)logicalHeight, null);

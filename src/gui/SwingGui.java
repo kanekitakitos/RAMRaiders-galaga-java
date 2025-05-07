@@ -9,7 +9,7 @@ public class SwingGui implements IGuiBridge
 {
     private JFrame frame;
     private GamePanel panel;
-    private InputEvent inputState;
+    private IInputEvent inputState;
 
     public SwingGui(int width, int height)
     {
@@ -20,12 +20,11 @@ public class SwingGui implements IGuiBridge
         this.frame.pack();
         this.frame.setLocationRelativeTo(null);
         this.frame.setVisible(true);
-        this.frame.setResizable(false); 
+        this.frame.setResizable(false);
 
-        this.inputState = new InputEvent();
+
+        this.inputState = new HandlerInputPlayer();
         this.inputState.registerInputHandlers(this.frame);
-
-        this.frame.setFocusable(true);
     }
 
     public SwingGui(int width, int height,Shape backgroundShape)
@@ -37,12 +36,18 @@ public class SwingGui implements IGuiBridge
         this.frame.pack();
         this.frame.setLocationRelativeTo(null);
         this.frame.setVisible(true);
+        this.frame.setResizable(false);
 
-        this.inputState = new InputEvent();
-        this.inputState.registerInputHandlers(this.frame);
-
-        this.frame.setFocusable(true);
     }
+
+    public void setInput(IInputEvent inputState)
+    {
+       this.inputState = inputState;
+        this.inputState.registerInputHandlers(this.frame);
+        this.frame.setFocusable(true);
+
+    }
+
 
     @Override
     public void draw(CopyOnWriteArrayList<IGameObject> objects)
@@ -51,7 +56,7 @@ public class SwingGui implements IGuiBridge
     }
 
     @Override
-    public InputEvent getInputState()
+    public IInputEvent getInputState()
     {
         return this.inputState;
     }

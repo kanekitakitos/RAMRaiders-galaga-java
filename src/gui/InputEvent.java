@@ -5,6 +5,9 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.JFrame;
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * Represents a class that handles keyboard and mouse input events.
@@ -29,163 +32,102 @@ import javax.swing.JFrame;
  */
 public class InputEvent implements IInputEvent, KeyListener, MouseListener
 {
-    // Movement keys state
-    private boolean RIGHT = false;
-    private boolean LEFT = false;
 
-    // Mouse buttons state
-    private boolean MOUSE_RIGHT = false;
-    private boolean MOUSE_LEFT = false;
+    private InputMapping inputMapping = new InputMapping();
+    private Map<Integer, String> keyToActionMap = new HashMap<>();
+    private Map<Integer, String> mouseButtonToActionMap = new HashMap<>();
 
-    /**
-     * @return true if the "Right" (D) key is pressed, false otherwise.
-     */
-    public boolean isRight() { return RIGHT; }
-
-    /**
-     * @return true if the "Left" (A) key is pressed, false otherwise.
-     */
-    public boolean isLeft() { return LEFT; }
-
-
-    /**
-     * @return true if the right mouse button is pressed, false otherwise.
-     */
-    public boolean isAttack() { return MOUSE_LEFT; }
-
-    /**
-     * @return true if the left mouse button is pressed, false otherwise.
-     */
-    public boolean isEvasiveManeuver() { return MOUSE_RIGHT; }
-
-    /**
-     * Sets the state of a specific key or mouse button.
-     *
-     * @param key   The key or mouse button identifier (e.g., "RIGHT", "LEFT", "MOUSE_RIGHT").
-     * @param value The state to set (true for pressed, false for released).
-     */
-    public void setPlayerMove(String key, boolean value)
+    public InputEvent(Map<Integer, String> customKeyMap, Map<Integer, String> customMouseMap)
     {
-        switch (key)
-        {
-            case "RIGHT" -> RIGHT = value;
-            case "LEFT" -> LEFT = value;
-            case "MOUSE_RIGHT", "ATTACK" -> MOUSE_RIGHT = value;
-            case "MOUSE_LEFT", "EVASIVE" -> MOUSE_LEFT = value;
-        }
+        this.keyToActionMap = customKeyMap;
+        this.mouseButtonToActionMap = customMouseMap;
     }
 
-    /**
-     * Invoked when a key is typed. Not implemented.
-     *
-     * @param e The KeyEvent associated with the key typed.
-     */
     @Override
-    public void keyTyped(KeyEvent e) {}
+    public boolean isActionActive(String action)
+    {
+        return inputMapping.isActionActive(action);
+    }
 
-    /**
-     * Invoked when a key is pressed. Updates the state of movement keys.
-     *
-     * @param e The KeyEvent associated with the key pressed.
-     */
     @Override
     public void keyPressed(KeyEvent e)
     {
-        switch (e.getKeyCode())
+        String action = keyToActionMap.get(e.getKeyCode());
+        if (action != null)
         {
-            case KeyEvent.VK_D, KeyEvent.VK_RIGHT -> RIGHT = true;
-            case KeyEvent.VK_A, KeyEvent.VK_LEFT -> LEFT = true;
-            case KeyEvent.VK_C ->  MOUSE_LEFT = true;
-            case KeyEvent.VK_X ->  MOUSE_RIGHT = true;
+            inputMapping.setActionState(action, true);
         }
     }
 
-    /**
-     * Invoked when a key is released. Updates the state of movement keys.
-     *
-     * @param e The KeyEvent associated with the key released.
-     */
     @Override
     public void keyReleased(KeyEvent e)
     {
-        switch (e.getKeyCode())
-        {
-            case KeyEvent.VK_D, KeyEvent.VK_RIGHT -> RIGHT = false;
-            case KeyEvent.VK_A, KeyEvent.VK_LEFT -> LEFT = false;
-            case KeyEvent.VK_C ->  MOUSE_LEFT = false;
-            case KeyEvent.VK_X ->  MOUSE_RIGHT = false;
-        }
+        String action = keyToActionMap.get(e.getKeyCode());
+        if (action != null)
+            inputMapping.setActionState(action, false);
+
     }
 
-    /**
-     * Invoked when a mouse button is clicked. Not implemented.
-     *
-     * @param e The MouseEvent associated with the mouse click.
-     */
-    @Override
-    public void mouseClicked(MouseEvent e) {}
-
-    /**
-     * Invoked when a mouse button is pressed. Updates the state of mouse buttons.
-     *
-     * @param e The MouseEvent associated with the mouse press.
-     */
     @Override
     public void mousePressed(MouseEvent e)
     {
-        if (e.getButton() == MouseEvent.BUTTON1)
-        {
-            MOUSE_LEFT = true;
-        }
-        else if (e.getButton() == MouseEvent.BUTTON3)
-        {
-            MOUSE_RIGHT = true;
-        }
+        int button = e.getButton();
+        String action = mouseButtonToActionMap.get(button);
+        if (action != null)
+            inputMapping.setActionState(action, true);
+
     }
 
-    /**
-     * Invoked when a mouse button is released. Updates the state of mouse buttons.
-     *
-     * @param e The MouseEvent associated with the mouse release.
-     */
     @Override
     public void mouseReleased(MouseEvent e)
     {
-        if (e.getButton() == MouseEvent.BUTTON1)
-        {
-            MOUSE_LEFT = false;
-        }
-        else if (e.getButton() == MouseEvent.BUTTON3)
-        {
-            MOUSE_RIGHT = false;
-        }
+        int button = e.getButton();
+        String action = mouseButtonToActionMap.get(button);
+        if (action != null)
+            inputMapping.setActionState(action, false);
+
     }
 
-    /**
-     * Invoked when the mouse enters a component. Not implemented.
-     *
-     * @param e The MouseEvent associated with the mouse entering.
-     */
     @Override
-    public void mouseEntered(MouseEvent e) {}
-
-    /**
-     * Invoked when the mouse exits a component. Not implemented.
-     *
-     * @param e The MouseEvent associated with the mouse exiting.
-     */
-    @Override
-    public void mouseExited(MouseEvent e) {}
-
-    /**
-     * Registers this InputEvent instance as a listener for keyboard and mouse events on the given frame.
-     *
-     * @param frame The JFrame to which the input handlers will be added.
-     */
     public void registerInputHandlers(JFrame frame)
     {
         frame.addKeyListener(this);
         frame.addMouseListener(this);
         frame.setFocusable(true);
     }
+
+    public void keyTyped(KeyEvent e)
+    {
+        // Not used in this implementation
+    }
+
+    public void mouseClicked(MouseEvent e) {
+        
+
+    }
+
+    public void mouseEntered(MouseEvent e) {
+        
+    }
+
+    public void mouseExited(MouseEvent e) {
+        
+    }
+
+
+    private  class InputMapping
+    {
+        private Map<String, Boolean> actionStates = new HashMap<>();
+
+        public void setActionState(String action, boolean state)
+        {
+            actionStates.put(action, state);
+        }
+
+        public boolean isActionActive(String action)
+        {
+            return actionStates.getOrDefault(action, false);
+        }
+    }
+
 }

@@ -39,7 +39,7 @@ import java.util.ArrayList;
      private int totalObjects;
 
      // Input event handler
-     private InputEvent inputStatus;
+     private IInputEvent inputStatus;
      private IGuiBridge gui;
 
      /**
@@ -81,7 +81,8 @@ import java.util.ArrayList;
      public void destroy(IGameObject go)
      {
          int layer = go.transform().layer();
-         if (layeredGameObjects.containsKey(layer)) {
+         if (layeredGameObjects.containsKey(layer))
+         {
              layeredGameObjects.get(layer).remove(go);
              this.totalObjects--;
              if (layeredGameObjects.get(layer).isEmpty()) // Remove the list if it is empty

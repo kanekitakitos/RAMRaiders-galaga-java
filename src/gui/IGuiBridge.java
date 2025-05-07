@@ -7,5 +7,5 @@ public interface IGuiBridge
 {
     void draw(CopyOnWriteArrayList<IGameObject> objects);
 
-    InputEvent getInputState(); // Pode ser expandido conforme necessidade
+    IInputEvent getInputState();
 }

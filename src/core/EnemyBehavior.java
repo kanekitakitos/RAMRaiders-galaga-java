@@ -139,7 +139,4 @@ public class EnemyBehavior extends Behavior
         super.move();
     }
 
-
-
-
 }

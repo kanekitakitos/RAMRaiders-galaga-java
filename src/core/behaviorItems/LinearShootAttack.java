@@ -2,8 +2,11 @@ package core.behaviorItems;
 import assets.AssetLoader;
 import core.*;
 import core.objectsInterface.IGameObject;
+import geometry.Poligono;
 import geometry.Ponto;
-import geometry.Retangulo;
+import java.util.Random;
+
+//import java.util.Random;
 
 /**
  * The `ShootAttack` class implements the `IAttackStrategy` interface.
@@ -95,8 +98,11 @@ public class LinearShootAttack implements IAttackStrategy
         Ponto p = attacker.transform().position();
 
         // Add an offset to spawn the bullet slightly in front of the attacker.
-        double offsetDistance = -35.0;
-        Ponto bulletStart = new Ponto(p.x(), p.y() + offsetDistance);
+        double offsetDistanceY = -35.0;
+        Random random = new Random();
+        double randomOffsetX = (random.nextDouble() - 0.5) * 25;
+
+        Ponto bulletStart = new Ponto(p.x()+ randomOffsetX, p.y() + offsetDistanceY);
 
         // Create a new transform for the bullet using the offset position
         return new Transform(bulletStart, attacker.transform().layer()-1, attacker.transform().angle(), attacker.transform().scale());
@@ -113,8 +119,11 @@ public class LinearShootAttack implements IAttackStrategy
         Ponto p = attacker.transform().position();
 
         // Add an offset to spawn the bullet slightly in front of the attacker.
-        double offsetDistance = 35.0;
-        Ponto bulletStart = new Ponto(p.x(), p.y() + offsetDistance);
+        double offsetDistanceY = 35.0;
+        Random random = new Random();
+        double randomOffsetX = (random.nextDouble() - 0.5) * 25;
+
+        Ponto bulletStart = new Ponto(p.x()+randomOffsetX, p.y() + offsetDistanceY);
 
         // Create a new transform for the bullet using the offset position
         return new Transform(bulletStart, attacker.transform().layer()+1, attacker.transform().angle(), attacker.transform().scale());
@@ -123,7 +132,7 @@ public class LinearShootAttack implements IAttackStrategy
 
     private GameObject getGameObject(Ponto[] rPoints, Transform transform, String name)
     {
-        Retangulo rectangle = new Retangulo(rPoints, transform);
+        Poligono rectangle = new Poligono(rPoints, transform);
 
         // Set the velocity of the bullet
         Ponto velocity = new Ponto(0.0, SPEED);
