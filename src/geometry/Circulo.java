@@ -7,8 +7,10 @@ import core.objectsInterface.ICollider;
 import core.Transform;
 
 /**
- * The Circulo class represents a circle with a center point and a radius.
- * It extends the Collider class to provide circle-based collision detection.
+ * The `Circulo` class represents a circle with a center point and a radius.
+ * It extends the `Collider` class to provide circle-based collision detection.
+ * This class also implements the `FiguraGeometrica` interface for geometric operations.
+ *
  * @author Brandon Mejia
  * @version 2025-02-10
  *
@@ -19,10 +21,10 @@ import core.Transform;
  *
  * @inv The circle must have a positive radius and its center must be in the first quadrant.
  */
-public class Circulo extends Collider implements FiguraGeometrica
-{
-    private double r;
-    private Ponto centro;
+public class Circulo extends Collider implements FiguraGeometrica {
+
+    private double r; // The radius of the circle
+    private Ponto centro; // The center point of the circle
 
     /**
      * Ensures the invariants of the circle are maintained.
@@ -32,7 +34,7 @@ public class Circulo extends Collider implements FiguraGeometrica
      * @param centro The center point of the circle.
      */
     private void invariantes(double r, Ponto centro) {
-        if (r > 0 )
+        if (r > 0)
             return;
 
         System.out.println("Circulo:vi");
@@ -40,15 +42,14 @@ public class Circulo extends Collider implements FiguraGeometrica
     }
 
     /**
-     * Constructs a Circulo object with the specified center coordinates, radius and transform.
+     * Constructs a `Circulo` object with the specified center coordinates, radius, and transform.
      *
      * @param x The x-coordinate of the center.
      * @param y The y-coordinate of the center.
      * @param r The radius of the circle.
      * @param transform The transform associated with the circle.
      */
-    public Circulo(double x, double y, double r, Transform transform)
-    {
+    public Circulo(double x, double y, double r, Transform transform) {
         super(transform);
         this.centro = new Ponto(x, y);
         invariantes(r, centro);
@@ -56,28 +57,26 @@ public class Circulo extends Collider implements FiguraGeometrica
     }
 
     /**
-     * Constructs a Circulo object with the specified string representation and transform.
+     * Constructs a `Circulo` object with the specified radius and transform.
      *
+     * @param r The radius of the circle.
      * @param transform The transform associated with the circle.
      */
-    public Circulo(double r, Transform transform)
-    {
+    public Circulo(double r, Transform transform) {
         super(transform);
         this.centro = transform.position();
         this.r = r;
         invariantes(r, centro);
-
     }
 
     /**
-     * Constructs a Circulo object with the specified center point, radius and transform.
+     * Constructs a `Circulo` object with the specified center point, radius, and transform.
      *
      * @param c The center point of the circle.
      * @param r The radius of the circle.
      * @param transform The transform associated with the circle.
      */
-    public Circulo(Ponto c, double r, Transform transform)
-    {
+    public Circulo(Ponto c, double r, Transform transform) {
         super(transform);
         this.centro = new Ponto(c);
         invariantes(r, centro);
@@ -118,8 +117,7 @@ public class Circulo extends Collider implements FiguraGeometrica
      * @return The perimeter of the circle.
      */
     @Override
-    public double perimetro()
-    {
+    public double perimetro() {
         return 2 * Math.PI * this.r;
     }
 
@@ -129,8 +127,7 @@ public class Circulo extends Collider implements FiguraGeometrica
      * @return A string representation of the circle.
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         String r = String.format("%.2f", this.r).replace(",", ".");
         return String.format("%s %s", this.centro.toString(), r);
     }
@@ -141,8 +138,7 @@ public class Circulo extends Collider implements FiguraGeometrica
      * @param newCenter The new center point to which the circle will be translated.
      * @return A new instance of the circle translated to the new center point.
      */
-    public Circulo translacao(Ponto newCenter)
-    {
+    public Circulo translacao(Ponto newCenter) {
         return new Circulo(new Ponto(newCenter.x(), newCenter.y()), this.r, this.transform);
     }
 
@@ -152,8 +148,7 @@ public class Circulo extends Collider implements FiguraGeometrica
      * @param p The point to which the distance is calculated.
      * @return The distance from the center of the circle to the given point.
      */
-    public double distanciaAoCentro(Ponto p)
-    {
+    public double distanciaAoCentro(Ponto p) {
         return Math.sqrt(Math.pow(this.centro.x() - p.x(), 2) + Math.pow(this.centro.y() - p.y(), 2));
     }
 
@@ -163,8 +158,7 @@ public class Circulo extends Collider implements FiguraGeometrica
      * @param c The other circle to check for intersection.
      * @return true if the circles intersect, false otherwise.
      */
-    public boolean intersecta(Circulo c)
-    {
+    public boolean intersecta(Circulo c) {
         double dx = c.centro.x() - this.centro.x();
         double dy = c.centro.y() - this.centro.y();
         double distance = Math.sqrt(dx * dx + dy * dy);
@@ -177,14 +171,12 @@ public class Circulo extends Collider implements FiguraGeometrica
      * @param poligono The polygon to check.
      * @return true if the circle contains the polygon, false otherwise.
      */
-    public boolean isInside(Poligono poligono)
-    {
+    public boolean isInside(Poligono poligono) {
         boolean isInside = false;
         double distance = 0;
-        for (Ponto vertice : poligono.vertices())
-        {
+        for (Ponto vertice : poligono.vertices()) {
             distance = this.distanciaAoCentro(vertice);
-            if ( distance < this.r)
+            if (distance < this.r)
                 isInside = true;
         }
 
@@ -198,115 +190,116 @@ public class Circulo extends Collider implements FiguraGeometrica
      * @return true if the figures intersect, false otherwise.
      */
     @Override
-    public boolean intersecta(FiguraGeometrica f)
-    {
-        if(f instanceof Poligono poligono)
-        {
-			for (Segmento s : poligono.lados)
-                if ( s.intersecta(this))
+    public boolean intersecta(FiguraGeometrica f) {
+        if (f instanceof Poligono poligono) {
+            for (Segmento s : poligono.lados)
+                if (s.intersecta(this))
                     return true;
 
             return this.isInside(poligono) || poligono.isInside(this);
         }
 
-        if( f instanceof Circulo  circulo)
-        {
+        if (f instanceof Circulo circulo) {
             return this.intersecta(circulo);
         }
 
         return false;
     }
 
-
     /**
      * Updates the collider's state based on its transform.
      * This method calls the specific update methods in sequence:
-     * 1. updateEscalar() - Updates scaling
-     * 2. updatePosicao() - Updates position
+     * 1. `updateEscalar()` - Updates scaling.
+     * 2. `updatePosicao()` - Updates position.
      */
-    public void onUpdateCollider()
-    {
+    public void onUpdateCollider() {
         this.updateEscalar();
         this.updatePosicao();
     }
 
+    /**
+     * Updates the position of the circle based on its transform.
+     */
     @Override
-    public void updatePosicao()
-    {
+    public void updatePosicao() {
         this.centro = transform.position();
     }
 
+    /**
+     * Updates the scale of the circle based on its transform.
+     */
     @Override
-    public void updateEscalar()
-    {
+    public void updateEscalar() {
         this.r *= transform.scale();
     }
 
-
     /**
      * Handles a collision between this collider and another collider.
-     * This method should be implemented by subclasses to define how the collision is handled.
+     *
+     * @param other The other collider to check for collision.
+     * @return true if a collision occurs, false otherwise.
      */
     @Override
-    public boolean colision(ICollider other)
-    {
-            FiguraGeometrica f = (FiguraGeometrica) other;
-            return this.intersecta(f);
+    public boolean colision(ICollider other) {
+        FiguraGeometrica f = (FiguraGeometrica) other;
+        return this.intersecta(f);
     }
-
 
     /**
      * Draws the collider's visual representation for debugging purposes.
      * This method is used to render the collider's shape and boundaries
      * on the screen, which can be helpful during development and testing.
      *
-     * @param g2d The Graphics2D context used for drawing
-     * @param panelWidth The width of the panel where the collider is drawn
-     * @param panelHeight The height of the panel where the collider is drawn
+     * @param g2d The `Graphics2D` context used for drawing.
+     * @param panelWidth The width of the panel where the collider is drawn.
+     * @param panelHeight The height of the panel where the collider is drawn.
      */
     @Override
-    public void draw(Graphics2D g2d, double panelWidth, double panelHeight)
-    {
-        // Salva o estado original
+    public void draw(Graphics2D g2d, double panelWidth, double panelHeight) {
+        // Save the original state
         java.awt.Stroke oldStroke = g2d.getStroke();
         java.awt.Color oldColor = g2d.getColor();
-    
-        // Define cor e espessura para depuração
+
+        // Set color and stroke for debugging
         g2d.setColor(java.awt.Color.RED);
         g2d.setStroke(new java.awt.BasicStroke(2));
-    
-        // Converte o centro do círculo para coordenadas de tela (origem no centro do painel, Y invertido)
+
+        // Convert the center of the circle to screen coordinates
         double screenX = panelWidth + this.centro.x();
         double screenY = panelHeight - this.centro.y();
-    
-        // Calcula o canto superior esquerdo do oval
+
+        // Calculate the top-left corner of the oval
         double topLeftX = screenX - this.r;
         double topLeftY = screenY - this.r;
-    
-        // Desenha a circunferência centralizada
+
+        // Draw the circle
         g2d.drawOval(
             (int) Math.round(topLeftX),
             (int) Math.round(topLeftY),
             (int) Math.round(2 * this.r),
             (int) Math.round(2 * this.r)
         );
-    
-        // Restaura o estado original
+
+        // Restore the original state
         g2d.setStroke(oldStroke);
         g2d.setColor(oldColor);
     }
 
+    /**
+     * Gets the logical width of the circle.
+     *
+     * @return The logical width of the circle.
+     */
+    public double getLogicalWidth() {
+        return (2 * this.r);
+    }
 
-	public double getLogicalWidth()
-	{
-		return (2 * this.r) ;
-	}
-
-	public double getLogicalHeight()
-	{
-		return (2 * this.r) ;
-	}
-
-
-
+    /**
+     * Gets the logical height of the circle.
+     *
+     * @return The logical height of the circle.
+     */
+    public double getLogicalHeight() {
+        return (2 * this.r);
+    }
 }

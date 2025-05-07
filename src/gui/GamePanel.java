@@ -1,120 +1,196 @@
 package gui;
 
-import core.objectsInterface.IGameObject;
-import geometry.Ponto;
-import core.Shape; 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-import java.util.Collections;
-import java.util.List;
+        import core.objectsInterface.IGameObject;
+        import geometry.Ponto;
+        import core.Shape;
+        import javax.swing.JPanel;
+        import java.awt.Color;
+        import java.awt.Dimension;
+        import java.awt.Graphics;
+        import java.awt.Graphics2D;
+        import java.awt.RenderingHints;
+        import java.awt.geom.AffineTransform;
+        import java.awt.image.BufferedImage;
+        import java.util.Collections;
+        import java.util.List;
 
-
-public class GamePanel extends JPanel
-{
-    private volatile List<IGameObject> objectsToRender = Collections.emptyList();
-    private Shape backgroundShape;
-    private boolean hitbox= false;
-
-    public GamePanel(int width, int height)
-    {
-        setPreferredSize(new Dimension(width, height));
-        setBackground(Color.BLACK);
-    }
-
-    public GamePanel(int width, int height,Shape backgroundShape)
-    {
-        setPreferredSize(new Dimension(width, height));
-        setBackground(Color.BLACK);
-        this.backgroundShape = backgroundShape;
-    }
-
-    
-
-    public void updateGameObjects(List<IGameObject> newObjects)
-    {
-        this.objectsToRender = newObjects;
-        repaint();
-    }
-
-    public void setHitbox(boolean hitbox)
-    {
-        this.hitbox = hitbox;
-    }
-
-    @Override
-    protected void paintComponent(Graphics g)
-    {
-        super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
-
-        drawBackground(g2d);
-
-
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-
-        for (IGameObject go : objectsToRender)
+        /**
+         * A custom JPanel for rendering game objects and background in a 2D game.
+         * Handles drawing of game objects with transformations, animations and hitboxes.
+         *
+         * <p>This panel maintains a list of game objects to render and optionally displays
+         * a background shape. It performs coordinate transformations to center objects
+         * and applies rotations based on object transforms.</p>
+         *
+         * <p>Example usage:</p>
+         * <pre>
+         *     GamePanel panel = new GamePanel(800, 600);
+         *     panel.updateGameObjects(gameObjects);
+         *     panel.setHitbox(true);
+         *     frame.add(panel);
+         * </pre>
+         *
+         * @preConditions:
+         * - Width and height parameters must be positive integers
+         * - GameObjects in objectsToRender must have valid transform and shape components
+         * - Background shape must have valid image frames if provided
+         *
+         * @postConditions:
+         * - Panel is initialized with specified dimensions
+         * - Game objects are rendered with proper transformations
+         * - Background is drawn if provided
+         * - Info panel is drawn on the right side
+         * - Hitboxes are displayed if enabled
+         *
+         * @author Brandon Mejia
+         * @version 2025-03-25
+         */
+        public class GamePanel extends JPanel
         {
-            if ( go.transform() == null || go.shape() == null) continue;
-                drawGameObject(g2d, go, getWidth(), getHeight());
-        }
-        drawInfo(g2d);
-    }
+            private volatile List<IGameObject> objectsToRender = Collections.emptyList();
+            private Shape backgroundShape;
+            private boolean hitbox = false;
 
-
-    private void drawBackground(Graphics2D g2d)
-    {
-        if (this.backgroundShape != null) {
-            this.backgroundShape.updateAnimation();
-            BufferedImage currentBgFrame = this.backgroundShape.getImagem();
-            if (currentBgFrame != null)
+            /**
+             * Creates a game panel with specified dimensions and black background.
+             *
+             * @param width The width of the panel in pixels
+             * @param height The height of the panel in pixels
+             */
+            public GamePanel(int width, int height)
             {
-                g2d.drawImage(currentBgFrame, 0, 0, getWidth()-getWidth()/3,getHeight(), this);
-                return;
+                setPreferredSize(new Dimension(width, height));
+                setBackground(Color.BLACK);
             }
-            else
+
+            /**
+             * Creates a game panel with specified dimensions and background shape.
+             *
+             * @param width The width of the panel in pixels
+             * @param height The height of the panel in pixels
+             * @param backgroundShape The shape to use as background
+             */
+            public GamePanel(int width, int height, Shape backgroundShape)
             {
-                System.err.println("Frame atual do background é null. Desenhando fundo branco.");
+                setPreferredSize(new Dimension(width, height));
+                setBackground(Color.BLACK);
+                this.backgroundShape = backgroundShape;
+            }
+
+            /**
+             * Updates the list of game objects to be rendered.
+             * Triggers a repaint of the panel.
+             *
+             * @param newObjects The new list of game objects to render
+             */
+            public void updateGameObjects(List<IGameObject> newObjects)
+            {
+                this.objectsToRender = newObjects;
+                repaint();
+            }
+
+            /**
+             * Sets whether hitboxes should be displayed for game objects.
+             *
+             * @param hitbox True to show hitboxes, false to hide them
+             */
+            public void setHitbox(boolean hitbox)
+            {
+                this.hitbox = hitbox;
+            }
+
+            /**
+             * Overrides paintComponent to render all game objects and background.
+             * Applies transformations and draws objects centered on screen.
+             *
+             * @param g The graphics context to paint on
+             */
+            @Override
+            protected void paintComponent(Graphics g)
+            {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+
+                drawBackground(g2d);
+
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                for (IGameObject go : objectsToRender)
+                {
+                    if (go.transform() == null || go.shape() == null) continue;
+                    drawGameObject(g2d, go, getWidth(), getHeight());
+                }
+                drawInfo(g2d);
+            }
+
+            /**
+             * Draws the background shape if one is set.
+             * Updates animation frames of the background.
+             *
+             * @param g2d The graphics context to draw on
+             */
+            private void drawBackground(Graphics2D g2d)
+            {
+                if (this.backgroundShape != null) {
+                    this.backgroundShape.updateAnimation();
+                    BufferedImage currentBgFrame = this.backgroundShape.getImagem();
+                    if (currentBgFrame != null)
+                    {
+                        g2d.drawImage(currentBgFrame, 0, 0, getWidth()-getWidth()/3, getHeight(), this);
+                        return;
+                    }
+                    else
+                    {
+                        System.err.println("Frame atual do background é null. Desenhando fundo branco.");
+                    }
+                }
+            }
+
+            /**
+             * Draws a single game object with proper transformations.
+             * Handles positioning, rotation and scaling of the object's shape.
+             *
+             * @param g2d The graphics context to draw on
+             * @param go The game object to draw
+             * @param panelWidth Width of the panel
+             * @param panelHeight Height of the panel
+             */
+            private void drawGameObject(Graphics2D g2d, IGameObject go, int panelWidth, int panelHeight) {
+                Ponto position = go.transform().position();
+                double angle = go.transform().angle();
+
+                core.Shape shape = go.shape();
+                java.awt.image.BufferedImage img = shape.getImagem();
+                if (img == null) return;
+
+                AffineTransform oldTransform = g2d.getTransform();
+
+                double screenX = panelWidth / 2.0 -panelWidth/6.0 + position.x();
+                double screenY = panelHeight / 2.0 - position.y();
+
+                g2d.translate(screenX, screenY);
+                g2d.rotate(Math.toRadians(-angle));
+
+                double logicalWidth = shape.getLogicalWidth()*1.5;
+                double logicalHeight = shape.getLogicalHeight()*1.5;
+
+                g2d.drawImage(img, (int)(-logicalWidth/2), (int)(-logicalHeight/2),
+                              (int)logicalWidth, (int)logicalHeight, null);
+
+                g2d.setTransform(oldTransform);
+
+                if(hitbox)
+                    go.collider().draw(g2d, panelWidth / 2.0 -panelWidth/6.0, panelHeight / 2.0);
+            }
+
+            /**
+             * Draws the information panel on the right side of the screen.
+             *
+             * @param g2d The graphics context to draw on
+             */
+            public void drawInfo(Graphics g2d)
+            {
+                g2d.setColor(Color.BLACK);
+                g2d.fillRect(getWidth() - getWidth()/3, 0, getWidth()/3, getHeight());
             }
         }
-
-    }
-
-    private void drawGameObject(Graphics2D g2d, IGameObject go, int panelWidth, int panelHeight) {
-        Ponto position = go.transform().position();
-        double angle = go.transform().angle();
-    
-        core.Shape shape = go.shape();
-        java.awt.image.BufferedImage img = shape.getImagem();
-        if (img == null) return;
-    
-        AffineTransform oldTransform = g2d.getTransform();
-    
-        double screenX = panelWidth / 2.0 -panelWidth/6.0 + position.x();
-        double screenY = panelHeight / 2.0 - position.y();
-    
-        g2d.translate(screenX, screenY);
-        g2d.rotate(Math.toRadians(-angle));
-    
-        // Usar as dimensões pré-calculadas do Shape
-        double logicalWidth = shape.getLogicalWidth()*1.5;
-        double logicalHeight = shape.getLogicalHeight()*1.5;
-    
-        g2d.drawImage(img, (int)(-logicalWidth/2), (int)(-logicalHeight/2),
-                      (int)logicalWidth, (int)logicalHeight, null);
-    
-        g2d.setTransform(oldTransform);
-    
-        if(hitbox)
-            go.collider().draw(g2d, panelWidth / 2.0 -panelWidth/6.0, panelHeight / 2.0);
-    }
-
-   public void drawInfo(Graphics g2d)
-    {
-        g2d.setColor(Color.BLACK);
-        g2d.fillRect(getWidth() - getWidth()/3, 0, getWidth()/3, getHeight());
-    }
-
-}

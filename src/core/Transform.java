@@ -5,13 +5,14 @@ import geometry.Ponto;
 /**
  * The Transform class represents the transformation properties of a geometric figure,
  * including position, layer, angle, and scale.
- * @Preconditions:
+ *
+ * @preConditions:
  * - The provided Ponto (position) object must not be null.
  * - The angle is expected to be within the range [0, 360), though the constructor and
  *   rotate method will ensure it remains within 0 and 360.
  * - The initial scale and layer should be valid numbers.
  *
- * @Postconditions:
+ * @postConditions:
  * - A Transform object is created that encapsulates a copy of the provided position.
  * - The transform stores the specific layer, angle, and scale, ensuring that changes
  *   to the original Ponto object do not affect the internal state.
@@ -28,14 +29,11 @@ import geometry.Ponto;
  */
 public class Transform implements ITransform
 {
-    private Ponto position;
-    private int layer;
-    private double angle; // 0 <= angle < 360
-    private double previousAngle;
-
-    private double scale;
-
-
+    private Ponto position; // The position of the transform
+    private int layer; // The layer of the transform
+    private double angle; // The angle of the transform (0 <= angle < 360)
+    private double previousAngle; // The previous angle of the transform
+    private double scale; // The scale of the transform
 
     /**
      * Constructs a Transform object with the specified position, layer, angle, and scale.
@@ -71,7 +69,6 @@ public class Transform implements ITransform
         this.scale = t.scale();
     }
 
-
     /**
      * Moves the transform by the specified position and layer.
      *
@@ -94,14 +91,13 @@ public class Transform implements ITransform
     public void rotate(double dTheta)
     {
         this.previousAngle = this.angle;
-        this.angle +=dTheta;
+        this.angle += dTheta;
         this.previousAngle = this.previousAngle % 360;
 
         if(this.angle < 0)
             this.angle += 360;
-        
-        this.angle = this.angle % 360;
 
+        this.angle = this.angle % 360;
     }
 
     /**
@@ -148,11 +144,21 @@ public class Transform implements ITransform
         return this.angle;
     }
 
+    /**
+     * Gets the previous angle of the transform.
+     *
+     * @return The previous angle of the transform.
+     */
     public double previousAngle()
     {
         return this.previousAngle;
     }
 
+    /**
+     * Sets the previous angle of the transform.
+     *
+     * @param angle The angle to set as the previous angle.
+     */
     public void previousAngle(double angle)
     {
          this.previousAngle = angle;
