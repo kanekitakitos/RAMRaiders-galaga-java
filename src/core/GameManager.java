@@ -6,6 +6,7 @@ import core.objectsInterface.*;
 import geometry.*;
 import assets.*;
 import java.util.function.Function;
+import java.util.concurrent.*;
 
 /**
  * The `GameManager` class is responsible for managing the game's enemies,
@@ -38,10 +39,11 @@ import java.util.function.Function;
  */
 public class GameManager
 {
-    private ArrayList<IGameObject> enemies = new ArrayList<>(); // List of enemy game objects
+    private CopyOnWriteArrayList<IGameObject> enemies = new CopyOnWriteArrayList<>(); // List of enemy game objects
     private GameEngine engine; // The game engine managing game objects
     private IGameObject player; // The player game object
     private IGroupAttackStrategy groupAttackStrategy; // Strategy for group attacks
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
 
 
@@ -74,11 +76,13 @@ public class GameManager
         invariante(engine,player);
 
         this.engine = engine;
-        this.enemies = new ArrayList<>();
+        this.enemies = new CopyOnWriteArrayList<>();
         this.player = player;
         this.groupAttackStrategy = new EnterGameGroup();
+        ((EnterGameGroup)this.groupAttackStrategy).setScheduler(this.scheduler);
 
-        Function<Integer, Integer> spawnIndexFunction = (Integer i) -> {
+        Function<Integer, Integer> spawnIndexFunction = (Integer i) ->
+        {
             int groupSize = 8;
             int groupNumber = i / groupSize;
             int patternIndex = groupNumber % 4;
@@ -89,6 +93,7 @@ public class GameManager
         this.generateEnemies(groupAttackStrategy.getNumberOfEnemies(), spawnIndexFunction);
         this.groupAttackStrategy.onInit(this.enemies, player);
     }
+
 
     /**
      * Generates enemy game objects and assigns them to the enemies list.
@@ -144,7 +149,7 @@ public class GameManager
      *
      * @return The list of enemies.
      */
-    public ArrayList<IGameObject> getEnemys() {
+    public CopyOnWriteArrayList<IGameObject> getEnemys() {
         return enemies;
     }
 
@@ -205,6 +210,14 @@ public class GameManager
         for (IGameObject enemy : enemies)
         {
             engine.addEnable(enemy);
+        }
+    }
+
+    public void shutdown()
+    {
+        if (scheduler != null && !scheduler.isShutdown())
+        {
+            scheduler.shutdown();
         }
     }
 }

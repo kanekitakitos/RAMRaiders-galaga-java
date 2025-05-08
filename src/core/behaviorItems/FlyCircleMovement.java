@@ -47,10 +47,10 @@ public class FlyCircleMovement implements IEnemyMovement {
     private Ponto circleCenter; // Center of the current circle
     private Ponto initialPosition; // Initial position of the enemy
 
-    private final double radius = 3; // Radius of the large circle
+    private final double radius = 230; // Radius of the large circle
     private final double smallRadius = radius / 3; // Radius of the small circles
     private double currentAngle; // Current angle of movement
-    private final double angleIncrement = Math.toRadians(10); // Angle increment per step
+    private final double angleIncrement = Math.toRadians(2.5); // Angle increment per step
     private int currentCircle = 1; // Tracks the current circle (1, 2, or 3)
 
     private boolean isLeft = false; // Determines if the enemy is on the left side
@@ -141,7 +141,6 @@ public class FlyCircleMovement implements IEnemyMovement {
             initialPosition = enemy.transform().position();
             circleCenter = new Ponto(currentPosition.x() - smallRadius, currentPosition.y());
             currentAngle = Math.toRadians(0);
-            enemy.rotateSpeed(Math.toDegrees(angleIncrement));
             return;
         }
 
@@ -177,7 +176,6 @@ public class FlyCircleMovement implements IEnemyMovement {
             currentAngle = Math.toRadians(90);
             this.currentPosition = enemy.transform().position();
             circleCenter = new Ponto(currentPosition.x(), currentPosition.y() - radius);
-            enemy.rotateSpeed(-Math.toDegrees(angleIncrement));
         }
     }
 
@@ -227,7 +225,7 @@ public class FlyCircleMovement implements IEnemyMovement {
             initialPosition = enemy.transform().position();
             circleCenter = new Ponto(currentPosition.x() + smallRadius, currentPosition.y());
             currentAngle = Math.toRadians(180);
-            enemy.rotateSpeed(-Math.toDegrees(angleIncrement));
+
             return;
         }
 
@@ -263,7 +261,6 @@ public class FlyCircleMovement implements IEnemyMovement {
             currentAngle = Math.toRadians(90);
             this.currentPosition = enemy.transform().position();
             circleCenter = new Ponto(currentPosition.x(), currentPosition.y() - radius);
-            enemy.rotateSpeed(Math.toDegrees(angleIncrement));
         }
     }
 
@@ -276,7 +273,7 @@ public class FlyCircleMovement implements IEnemyMovement {
         currentAngle += angleIncrement;
         double newX = circleCenter.x() + radius * Math.cos(currentAngle);
         double newY = circleCenter.y() + radius * Math.sin(currentAngle);
-        updateEnemyPosition(enemy, newX, newY);
+        updateEnemyPositionBigCircle(enemy, newX, newY);
 
         if (Math.toDegrees(currentAngle) >= 280) {
             currentCircle = 3;
@@ -307,7 +304,8 @@ public class FlyCircleMovement implements IEnemyMovement {
      *
      * @param enemy The GameObject representing the enemy.
      */
-    private void returnToInitialPosition(GameObject enemy) {
+    private void returnToInitialPosition(GameObject enemy)
+    {
         Ponto currentPos = enemy.transform().position();
         double dx = initialPosition.x() - currentPos.x();
         double dy = initialPosition.y() - currentPos.y();
@@ -320,7 +318,7 @@ public class FlyCircleMovement implements IEnemyMovement {
             return;
         }
 
-        double RETURN_SPEED = 0.5;
+        double RETURN_SPEED = 10;
         Ponto velocity = new Ponto(
                 dx * RETURN_SPEED / distance,
                 dy * RETURN_SPEED / distance);
@@ -334,8 +332,27 @@ public class FlyCircleMovement implements IEnemyMovement {
      * @param newX  The new X-coordinate.
      * @param newY  The new Y-coordinate.
      */
-    private void updateEnemyPosition(GameObject enemy, double newX, double newY) {
-        double SPEED = 1.0;
+    private void updateEnemyPosition(GameObject enemy, double newX, double newY)
+    {
+        double SPEED =1.0;
+        Ponto currentPos = enemy.transform().position();
+        Ponto velocity = new Ponto(
+                (newX - currentPos.x()) * SPEED,
+                (newY - currentPos.y()) * SPEED);
+        enemy.velocity(velocity);
+    }
+
+
+    /**
+     * Updates the enemy's position based on the calculated new position.
+     *
+     * @param enemy The GameObject representing the enemy.
+     * @param newX  The new X-coordinate.
+     * @param newY  The new Y-coordinate.
+     */
+    private void updateEnemyPositionBigCircle(GameObject enemy, double newX, double newY)
+    {
+        double SPEED = 0.5;
         Ponto currentPos = enemy.transform().position();
         Ponto velocity = new Ponto(
                 (newX - currentPos.x()) * SPEED,

@@ -97,7 +97,8 @@ public class PlayerBehavior extends Behavior
      *
      * @return The number of lives the player has.
      */
-    public int life() {
+    public int life()
+    {
         return this.life;
     }
 
@@ -115,7 +116,9 @@ public class PlayerBehavior extends Behavior
             return;
 
         super.onUpdate(dT, ie);
-        this.moveAndEvasiveManeuver(ie);
+
+        this.moveTo(ie);
+        this.evasiveManeuver(ie);
     }
 
     /**
@@ -179,25 +182,62 @@ public class PlayerBehavior extends Behavior
             this.onDestroy();
     }
 
+
+    /**
+     * Moves the player based on the input event.
+     *
+     * <p>
+     * This method processes the input event to determine the direction of movement
+     * and updates the player's position accordingly. It also ensures that the
+     * player's collider position is updated to match the new position.
+     * </p>
+     *
+     * @param ie The input event containing movement actions. If null, no movement is performed.
+     */
+    public void moveTo(IInputEvent ie)
+    {
+        if (ie == null)
+            return;
+
+        // Initialize movement deltas
+        double deltaX = 0;
+        double deltaY = 0;
+
+        // Define the step size for movement
+        double moveStep = 2.5;
+
+        // Adjust movement deltas based on input actions
+        if (ie.isActionActive("RIGHT"))
+            deltaX += moveStep;
+        if (ie.isActionActive("LEFT"))
+            deltaX -= moveStep;
+
+        // Create a movement vector based on the calculated deltas
+        final Ponto moveVector = new Ponto(deltaX, deltaY);
+
+        // Update the game object's position and collider
+        this.go.transform().move(moveVector, 0);
+        this.go.collider().updatePosicao();
+    }
+
     /**
      * Executes an evasive maneuver based on the input event.
      * Moves the player in the specified direction and temporarily enables
      * invincibility.
      *
-     * @param Iie The input event triggering the evasive maneuver.
+     * @param ie The input event triggering the evasive maneuver.
      */
-    public void moveAndEvasiveManeuver(IInputEvent Iie)
+    public void evasiveManeuver(IInputEvent ie)
     {
-        if (Iie == null)
+        if (ie == null || !ie.isActionActive("EVASIVE") || this.isInvincible)
             return;
 
-        InputEvent ie = (InputEvent) Iie;
         // Determine direction based on the input event
         double deltaX = 0;
         double deltaY = 0;
 
         // Define move step
-        double moveStep = 2.5;
+        double moveStep = 2.5*3;
 
         if (ie.isActionActive("RIGHT"))
             deltaX += moveStep;

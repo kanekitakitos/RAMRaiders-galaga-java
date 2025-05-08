@@ -87,10 +87,10 @@ public class HomingShootAttack implements IAttackStrategy
         String name = "HOMING_BULLET";
         // Define the shape of the bullet as a rectangle
         Ponto[] rPoints = {
-                new Ponto(-0.8, 0.4),
-                new Ponto(0.8, 0.4),
-                new Ponto(0.8, -0.4),
-                new Ponto(-0.8, -0.4)
+            new Ponto(0, 2),
+            new Ponto(8, 2),
+            new Ponto(8, 0),
+            new Ponto(0, 0)
         };
         GameObject bullet = getGameObject(rPoints, attacker, name, target);
 
@@ -110,10 +110,10 @@ public class HomingShootAttack implements IAttackStrategy
      * @return The created bullet as a GameObject.
      */
     private GameObject getGameObject(Ponto[] rPoints, IGameObject attacker, String name, IGameObject target) {
-        double SPEED = 1.0;
+        double SPEED = 10.0;
         double theta = calculateAngleToTarget(attacker, target);
         Ponto bulletStart = calculateBulletStartPosition(attacker.transform().position(), theta);
-        return createBullet(rPoints, attacker, name, theta, bulletStart, SPEED);
+        return createBullet(rPoints, attacker, name, theta, bulletStart, SPEED,target.transform().layer());
     }
 
     /**
@@ -159,10 +159,10 @@ public class HomingShootAttack implements IAttackStrategy
      * @return The created bullet as a GameObject.
      */
     private GameObject createBullet(Ponto[] rPoints, IGameObject attacker, String name, double theta, Ponto bulletStart,
-            double speed) {
+            double speed, int layer) {
         Transform transform = new Transform(
                 bulletStart,
-                attacker.transform().layer(),
+                layer,
                 (Math.toDegrees(theta) + 360),
                 attacker.transform().scale());
 

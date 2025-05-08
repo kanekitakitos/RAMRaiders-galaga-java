@@ -2,6 +2,7 @@ package core.behaviorItems;
 
 import java.util.List;
 import core.objectsInterface.IGameObject;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Interface for defining group attack strategies.
@@ -74,4 +75,28 @@ public interface IGroupAttackStrategy {
      * @return The number of enemies as an integer.
      */
     int getNumberOfEnemies();
+
+
+    /**
+     * Checks if the group attack strategy has completed its execution.
+     * This method determines whether all enemies have finished their attack formation
+     * and positioning sequence.
+     *
+     * @return true if the group attack sequence is complete, false otherwise
+     * 
+     */
+    boolean isGroupAttackComplete();
+
+
+    /**
+     * Sets the scheduler service for managing timed operations in the group attack strategy.
+     * This method provides the strategy with a scheduler to coordinate the timing of enemy
+     * movements and group formations.
+     *
+     * @param scheduler The ScheduledExecutorService instance to be used for timing operations.
+     *                 Must not be null to ensure proper execution of timed enemy movements.
+     * 
+     * @see java.util.concurrent.ScheduledExecutorService
+     */
+    void setScheduler(ScheduledExecutorService scheduler);
 }

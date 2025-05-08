@@ -24,7 +24,8 @@ public class Main
      *
      * @return IGameObject The player game object.
      */
-    public static IGameObject createPlayer() {
+    public static IGameObject createPlayer()
+    {
         double scale = 4; // Scale of the player object
         int layer = 0; // Layer of the player object
         double angle = 90; // Initial angle of the player object
