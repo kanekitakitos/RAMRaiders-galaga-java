@@ -79,7 +79,7 @@ public class GameEngine implements IGameEngine
         this.disabledGameObjects = new ArrayList<>();
         this.totalObjects = 0;
         this.gui = gui;
-        this.inputStatus = this.gui.getInputState();
+        this.inputStatus = this.gui.getInput();
     }
 
     /**
@@ -355,5 +355,11 @@ public class GameEngine implements IGameEngine
             }
             return snapshot;
         }
+    }
+
+
+    public IGuiBridge getGui()
+    {
+        return gui;
     }
 }

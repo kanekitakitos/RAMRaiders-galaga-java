@@ -45,5 +45,13 @@ public interface IGuiBridge {
      *
      * @return An object representing the current input state.
      */
-    IInputEvent getInputState();
+    IInputEvent getInput();
+
+
+     /**
+     * Sets a custom input event handler for the GUI.
+     *
+     * @param inputState The input event handler to set.
+     */
+    void setInput(IInputEvent inputState);
 }

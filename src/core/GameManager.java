@@ -7,6 +7,11 @@ import geometry.*;
 import assets.*;
 import java.util.function.Function;
 import java.util.concurrent.*;
+import gui.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The `GameManager` class is responsible for managing the game's enemies,
@@ -76,10 +81,15 @@ public class GameManager
         invariante(engine,player);
 
         this.engine = engine;
+        this.engine.getGui().setInput(this.getInput());
+
         this.enemies = new CopyOnWriteArrayList<>();
         this.player = player;
+
+
         this.groupAttackStrategy = new EnterGameGroup();
         ((EnterGameGroup)this.groupAttackStrategy).setScheduler(this.scheduler);
+
 
         Function<Integer, Integer> spawnIndexFunction = (Integer i) ->
         {
@@ -159,7 +169,7 @@ public class GameManager
     /**
      * Executes the group attack strategy to relocate enemies.
      */
-    public void startRelocateEnemies()
+    private void startRelocateEnemies()
     {
         this.groupAttackStrategy.execute(this.enemies, this.player);
     }
@@ -223,5 +233,36 @@ public class GameManager
         {
             scheduler.shutdown();
         }
+    }
+
+
+    /**
+     * Configures and returns the input mapping for the game.
+     *
+     * @return InputEvent The input event mapping for keys and mouse buttons.
+     */
+    public InputEvent getInput()
+    {
+        Map<Integer, String> customKeyMap = new HashMap<>(); // Map for custom key bindings
+        customKeyMap.put(KeyEvent.VK_A, "LEFT");
+        customKeyMap.put(KeyEvent.VK_LEFT, "LEFT");
+        customKeyMap.put(KeyEvent.VK_RIGHT, "RIGHT");
+        customKeyMap.put(KeyEvent.VK_D, "RIGHT");
+        customKeyMap.put(KeyEvent.VK_C, "ATTACK");
+        customKeyMap.put(KeyEvent.VK_X, "EVASIVE");
+
+        Map<Integer, String> customMouseMap = new HashMap<>(); // Map for custom mouse bindings
+        customMouseMap.put(MouseEvent.BUTTON1, "ATTACK");
+        customMouseMap.put(MouseEvent.BUTTON3, "EVASIVE");
+
+        return new InputEvent(customKeyMap, customMouseMap); // Return the input event mapping
+    }
+
+
+    public void startGame()
+    {
+        this.enableEnemiesToEngine();
+        this.startRelocateEnemies();
+        engine.run();
     }
 }

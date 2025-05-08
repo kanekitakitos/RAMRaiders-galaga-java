@@ -112,6 +112,7 @@ public class SwingGui implements IGuiBridge
      *
      * @param inputState The input event handler to set.
      */
+    @Override
     public void setInput(IInputEvent inputState)
     {
         if (inputState == null)
@@ -139,7 +140,7 @@ public class SwingGui implements IGuiBridge
      * @return The input event handler representing the current input state.
      */
     @Override
-    public IInputEvent getInputState() {
+    public IInputEvent getInput() {
         return this.inputState;
     }
 

@@ -1,14 +1,12 @@
 
 import core.*;
-import core.behaviorItems.FlyCircleMovement;
+
 import core.objectsInterface.*;
 import geometry.*;
 import assets.*;
 import gui.*;
-import java.awt.event.*;
-import java.util.HashMap;
-import java.util.Map;
-import gui.InputEvent;
+
+
 
 
 /**
@@ -51,16 +49,6 @@ public class Main
      */
     public static void createGameEngine(SwingGui GUI)
     {
-        GameEngine engine = new GameEngine(GUI); // Initialize the game engine with the GUI
-
-        IGameObject player = createPlayer(); // Create the player object
-        GameManager gameManager = new GameManager(engine, player); // Initialize the game manager with the engine and player
-        gameManager.enableEnemiesToEngine(); // Enable enemies in the game engine
-
-        engine.addEnable(player); // Add the player to the engine
-        gameManager.startRelocateEnemies(); // Start relocating enemies
-
-
         //Ponto position = new Ponto(0,200); // Initial position of the player object
         //Ponto[] points = {new Ponto(-5, 5), new Ponto(5, 5), new Ponto(5, -5), new Ponto(-5, -5)}; // Points for the collider
 
@@ -79,28 +67,11 @@ public class Main
         //engine.addEnable(enemy); // Add the player to the engine
 
 
-        engine.run(); // Start the game loop
-    }
-
-    /**
-     * Configures and returns the input mapping for the game.
-     *
-     * @return InputEvent The input event mapping for keys and mouse buttons.
-     */
-    public static InputEvent getInput() {
-        Map<Integer, String> customKeyMap = new HashMap<>(); // Map for custom key bindings
-        customKeyMap.put(KeyEvent.VK_A, "LEFT");
-        customKeyMap.put(KeyEvent.VK_LEFT, "LEFT");
-        customKeyMap.put(KeyEvent.VK_RIGHT, "RIGHT");
-        customKeyMap.put(KeyEvent.VK_D, "RIGHT");
-        customKeyMap.put(KeyEvent.VK_C, "ATTACK");
-        customKeyMap.put(KeyEvent.VK_X, "EVASIVE");
-
-        Map<Integer, String> customMouseMap = new HashMap<>(); // Map for custom mouse bindings
-        customMouseMap.put(MouseEvent.BUTTON1, "ATTACK");
-        customMouseMap.put(MouseEvent.BUTTON3, "EVASIVE");
-
-        return new InputEvent(customKeyMap, customMouseMap); // Return the input event mapping
+        GameEngine engine = new GameEngine(GUI); // Initialize the game engine with the GUI
+        IGameObject player = createPlayer(); // Create the player object
+        GameManager gameManager = new GameManager(engine, player); // Initialize the game manager with the engine and player
+        engine.addEnable(player); // Add the player to the engine
+        gameManager.startGame(); // Start the game
     }
 
     /**
@@ -112,9 +83,7 @@ public class Main
     {
         Shape backGroundShape = new Shape(AssetLoader.loadAnimationFrames("background2.gif"), 1000); // Background shape
         SwingGui gui = new SwingGui(1100, 800, backGroundShape); // Initialize the GUI with dimensions and background
-        gui.setHitbox(true); // Enable hitbox visualization
-
-        gui.setInput(getInput()); // Set the input mapping for the GUI
+        gui.setHitbox(false); // Enable hitbox visualization
 
         createGameEngine(gui); // Create and start the game engine
     }
