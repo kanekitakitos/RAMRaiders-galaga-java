@@ -2,7 +2,7 @@ package gui;
 
 import core.objectsInterface.IGameObject;
 import geometry.Ponto;
-import core.Shape;
+import core.objectsInterface.IShape;
 import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -55,7 +55,9 @@ import java.util.List;
 public class GamePanel extends JPanel
 {
     private volatile List<IGameObject> objectsToRender = Collections.emptyList();
-    private Shape backgroundShape;
+    private volatile List<IGameObject> infoToRender = Collections.emptyList();
+
+    private IShape backgroundShape;
     private boolean hitbox = false;
 
 
@@ -99,7 +101,7 @@ public class GamePanel extends JPanel
      * @param height          The height of the panel in pixels
      * @param backgroundShape The shape to use as background
      */
-    public GamePanel(int width, int height, Shape backgroundShape)
+    public GamePanel(int width, int height, IShape backgroundShape)
     {
         invariantes(width, height);
 
@@ -121,54 +123,55 @@ public class GamePanel extends JPanel
     }
 
     /**
+     * Updates the list of Info objects to be rendered.
+     * Triggers a repaint of the panel.
+     *
+     * @param newObjects The new list of game objects to render
+     */
+    public void updateInfoObjects(List<IGameObject> newObjects)
+    {
+        this.objectsToRender = newObjects;
+        repaint();
+    }
+
+
+    public void setShape(IShape shape)
+    {
+        this.backgroundShape = shape;
+    }
+
+
+    /**
      * Sets whether hitboxes should be displayed for game objects.
      *
      * @param hitbox True to show hitboxes, false to hide them
      */
-    public void setHitbox(boolean hitbox) {
+    public void setHitbox(boolean hitbox)
+    {
         this.hitbox = hitbox;
     }
 
-    /**
-     * Overrides paintComponent to render all game objects and background.
-     * Applies transformations and draws objects centered on screen.
-     *
-     * @param g The graphics context to paint on
-     */
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;
 
-        drawBackground(g2d);
-
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        for (IGameObject go : objectsToRender) {
-            if (go.transform() == null || go.shape() == null)
-                continue;
-            drawGameObject(g2d, go, getWidth(), getHeight());
+    private void drawBackground(Graphics2D g2d)
+    {
+        if (this.backgroundShape == null)
+        {
+            g2d.setColor(Color.BLACK);
+            g2d.fillRect(0, 0, getWidth() - getWidth() / 3, getHeight());
+            return;
         }
-        drawInfo(g2d);
-    }
-
-    /**
-     * Draws the background shape if one is set.
-     * Updates animation frames of the background.
-     *
-     * @param g2d The graphics context to draw on
-     */
-    private void drawBackground(Graphics2D g2d) {
-        if (this.backgroundShape != null) {
             this.backgroundShape.updateAnimation();
             BufferedImage currentBgFrame = this.backgroundShape.getImagem();
-            if (currentBgFrame != null) {
+            if (currentBgFrame != null)
+            {
                 g2d.drawImage(currentBgFrame, 0, 0, getWidth() - getWidth() / 3, getHeight(), this);
                 return;
-            } else {
+            }
+            else
+            {
                 System.err.println("Frame atual do background é null. Desenhando fundo branco.");
             }
-        }
+
     }
 
     /**
@@ -180,7 +183,8 @@ public class GamePanel extends JPanel
      * @param panelWidth  Width of the panel
      * @param panelHeight Height of the panel
      */
-    private void drawGameObject(Graphics2D g2d, IGameObject go, int panelWidth, int panelHeight) {
+    private void drawGameObject(Graphics2D g2d, IGameObject go, int panelWidth, int panelHeight)
+    {
         Ponto position = go.transform().position();
         double angle = go.transform().angle();
 
@@ -214,8 +218,54 @@ public class GamePanel extends JPanel
      *
      * @param g2d The graphics context to draw on
      */
-    public void drawInfo(Graphics g2d) {
+    private void drawInfoStats(Graphics2D g2d, IGameObject go, int panelWidth, int panelHeight)
+    {
         g2d.setColor(Color.BLACK);
         g2d.fillRect(getWidth() - getWidth() / 3, 0, getWidth() / 3, getHeight());
+        drawGameObject(g2d, go, panelWidth, panelHeight);
+    }
+
+
+
+    private void drawGame(Graphics2D g2d)
+    {
+
+        for (IGameObject go : objectsToRender)
+        {
+            if (go.transform() == null || go.shape() == null)
+                continue;
+
+            drawGameObject(g2d, go, getWidth(), getHeight());
+        }
+
+        for (IGameObject go : infoToRender)
+        {
+            if (go.transform() == null || go.shape() == null)
+                continue;
+
+            drawInfoStats(g2d, go, getWidth(), getHeight());
+        }
+
+        
+    }
+
+
+
+//--------------------------------------------------------------------------------------
+    /**
+     * Overrides paintComponent to render all game objects and background.
+     * Applies transformations and draws objects centered on screen.
+     *
+     * @param g The graphics context to paint on
+     */
+    @Override
+    protected void paintComponent(Graphics g)
+    {
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        drawBackground(g2d);
+        drawGame(g2d);
     }
 }

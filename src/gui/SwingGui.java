@@ -126,12 +126,12 @@ public class SwingGui implements IGuiBridge
     /**
      * Renders the provided list of game objects on the panel.
      *
-     * @param objects A thread-safe list of game objects to render.
+     * @param objectsToRender A thread-safe list of game objects to render.
      */
     @Override
-    public void draw(CopyOnWriteArrayList<IGameObject> objects)
+    public void draw(CopyOnWriteArrayList<IGameObject> objectsToRender)
     {
-        SwingUtilities.invokeLater(() -> panel.updateGameObjects(objects));
+        SwingUtilities.invokeLater(() -> panel.updateGameObjects(objectsToRender));
     }
 
     /**
@@ -140,7 +140,8 @@ public class SwingGui implements IGuiBridge
      * @return The input event handler representing the current input state.
      */
     @Override
-    public IInputEvent getInput() {
+    public IInputEvent getInput()
+    {
         return this.inputState;
     }
 

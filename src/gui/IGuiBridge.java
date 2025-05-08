@@ -36,9 +36,9 @@ public interface IGuiBridge {
     /**
      * Draws the provided list of game objects on the GUI.
      *
-     * @param objects A thread-safe list of game objects to render.
+     * @param objectsToRender A thread-safe list of game objects to render.
      */
-    void draw(CopyOnWriteArrayList<IGameObject> objects);
+    void draw(CopyOnWriteArrayList<IGameObject> objectsToRender);
 
     /**
      * Retrieves the current input state from the GUI.
