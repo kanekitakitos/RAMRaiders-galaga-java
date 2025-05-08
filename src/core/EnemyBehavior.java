@@ -83,8 +83,8 @@ public class EnemyBehavior extends Behavior
         if (this.attackStrategy != null && this.isAttacking && this.isEnabled())
         {
             this.stopAttack();
-            long minDelay = 2000;
-            long maxDelay = 5000;
+            long minDelay = 2500;
+            long maxDelay = 9000;
             long randomDelay = minDelay + (long) (Math.random() * (maxDelay - minDelay));
             // Schedule to reset the attack flag after the specified attack duration
             localScheduler.schedule(() ->

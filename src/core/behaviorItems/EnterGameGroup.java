@@ -8,7 +8,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import core.GameObject;
 import core.EnemyBehavior;
-import core.behaviorItems.*;
 
 /**
  * Strategy for managing the entry of enemy groups into the game.

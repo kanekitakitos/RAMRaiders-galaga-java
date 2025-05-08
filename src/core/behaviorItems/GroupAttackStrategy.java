@@ -7,7 +7,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import core.GameObject;
 import core.EnemyBehavior;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Estratégia para gerenciar ataques coordenados de grupos de inimigos.

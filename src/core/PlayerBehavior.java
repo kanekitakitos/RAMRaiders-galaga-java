@@ -5,7 +5,6 @@ import core.behaviorItems.LinearShootAttack;
 import core.objectsInterface.IGameObject;
 import geometry.Ponto;
 import gui.IInputEvent;
-import gui.InputEvent;
 
 import java.util.ArrayList;
 import java.util.concurrent.Executors;

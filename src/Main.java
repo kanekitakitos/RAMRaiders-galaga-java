@@ -31,7 +31,7 @@ public class Main
         int layer = 0; // Layer of the player object
         double angle = 90; // Initial angle of the player object
         Ponto position = new Ponto(0, -330); // Initial position of the player object
-        Ponto[] points = {new Ponto(-5, 5), new Ponto(5, 5), new Ponto(5, -5), new Ponto(-5, -5)}; // Points for the collider
+        Ponto[] points = {new Ponto(0, 0), new Ponto(0, 12), new Ponto(12, 6)}; // Points for the collider
 
         Transform t1 = new Transform(position, layer, angle, scale); // Transform for the player
         Poligono collider = new Poligono(points, t1); // Polygon collider for the player
@@ -113,7 +113,7 @@ public class Main
     {
         Shape backGroundShape = new Shape(AssetLoader.loadAnimationFrames("background2.gif"), 1000); // Background shape
         SwingGui gui = new SwingGui(1100, 800, backGroundShape); // Initialize the GUI with dimensions and background
-        gui.setHitbox(false); // Enable hitbox visualization
+        gui.setHitbox(true); // Enable hitbox visualization
 
         gui.setInput(getInput()); // Set the input mapping for the GUI
 

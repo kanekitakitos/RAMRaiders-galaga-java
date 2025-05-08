@@ -124,7 +124,7 @@ public class GameManager
         double[] spawnXCoords = { left, right, bottomLeft, bottomRight };
         double[] spawnYCoords = { defaultY, defaultY, bottomY, bottomY };
 
-        Ponto[] points = { new Ponto(-5, 5), new Ponto(5, 5), new Ponto(5, -5), new Ponto(-5, -5) };
+        Ponto[] points = { new Ponto(0, 0), new Ponto(0, 12), new Ponto(12, 6) };
 
         for (int i = 0; i < count; i++) {
             int spawnIndex = spawnIndexFunction.apply(i);
@@ -149,14 +149,16 @@ public class GameManager
      *
      * @return The list of enemies.
      */
-    public ArrayList<IGameObject> getEnemys() {
+    public ArrayList<IGameObject> getEnemys()
+    {
         return new ArrayList<>(enemies);
     }
 
     /**
      * Executes the group attack strategy to relocate enemies.
      */
-    public void startRelocateEnemies() {
+    public void startRelocateEnemies()
+    {
         this.groupAttackStrategy.execute(this.enemies, this.player);
     }
 

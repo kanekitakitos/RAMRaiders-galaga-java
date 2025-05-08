@@ -289,7 +289,8 @@ public class Poligono extends Collider implements FiguraGeometrica {
 	 *
 	 * @return A Ponto object representing the centroid of the polygon.
 	 */
-	public Ponto centro() {
+	public Ponto centro()
+	{
 		double area = 0; // Área do polígono
 		double xc = 0, yc = 0; // Coordenadas do centroide
 		int n = this.vertices.length;
@@ -359,13 +360,15 @@ public class Poligono extends Collider implements FiguraGeometrica {
 	 * @param factor The factor to scale the polygon by.
 	 * @return A new instance of the polygon scaled by the given factor.
 	 */
-	public Poligono escalar(double factor) {
+	public Poligono escalar(double factor)
+	{
 
 		Ponto centro = this.centro();
 		Ponto[] pontos = new Ponto[this.vertices.length];
 		double x, y, newX, newY;
 
-		for (int i = 0; i < this.vertices.length; i++) {
+		for (int i = 0; i < this.vertices.length; i++)
+		{
 			x = this.vertices[i].x();
 			y = this.vertices[i].y();
 
@@ -397,9 +400,11 @@ public class Poligono extends Collider implements FiguraGeometrica {
 	 * sides.
 	 */
 	@Override
-	public void updateRotacao() {
+	public void updateRotacao()
+	{
 		double angle = transform.angle() - this.transform.previousAngle();
-		if (angle != 0) {
+		if (angle != 0)
+		{
 			Poligono poligono = this.rotacao(angle);
 			this.vertices = poligono.vertices();
 			this.lados = poligono.lados();
@@ -413,8 +418,10 @@ public class Poligono extends Collider implements FiguraGeometrica {
 	 * and sides.
 	 */
 	@Override
-	public void updateEscalar() {
-		if (transform.scale() >= 1.0) {
+	public void updateEscalar()
+	{
+		if (transform.scale() >= 1.0)
+		{
 			Poligono poligono = this.escalar(transform.scale());
 			this.vertices = poligono.vertices();
 			this.lados = poligono.lados();
@@ -427,7 +434,8 @@ public class Poligono extends Collider implements FiguraGeometrica {
 	 * is handled.
 	 */
 	@Override
-	public boolean colision(ICollider other) {
+	public boolean colision(ICollider other) 
+	{
 		FiguraGeometrica f = (FiguraGeometrica) other;
 		return this.intersecta(f);
 	}
@@ -508,7 +516,8 @@ public class Poligono extends Collider implements FiguraGeometrica {
 	 * @return The logical height of the polygon as a double.
 	 */
 	@Override
-	public double getLogicalHeight() {
+	public double getLogicalHeight()
+	{
 		double minY = Double.POSITIVE_INFINITY;
 		double maxY = Double.NEGATIVE_INFINITY;
 

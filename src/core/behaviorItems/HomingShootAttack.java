@@ -113,7 +113,7 @@ public class HomingShootAttack implements IAttackStrategy
     private GameObject getGameObject(Ponto[] rPoints, IGameObject attacker, String name, IGameObject target)
     {
         long minSpeed = 7;
-        long maxSpeed = 11;
+        long maxSpeed = 12;
         long randomSpeed = minSpeed + (long) (Math.random() * (maxSpeed - minSpeed));
         double theta = calculateAngleToTarget(attacker, target);
 
