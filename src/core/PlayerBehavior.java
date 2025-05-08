@@ -163,7 +163,8 @@ public class PlayerBehavior extends Behavior
         for (IGameObject go : collisions)
             go.behavior().onDestroy();
 
-        if (this.life > 0 && !this.isInvincible && this.isEnabled()) {
+        if (this.life > 0 && !this.isInvincible && this.isEnabled())
+        {
             this.life--;
 
             this.isInvincible = true;

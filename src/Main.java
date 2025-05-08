@@ -75,8 +75,7 @@ public class Main
         //FlyCircleMovement movement = new FlyCircleMovement();
         //movement.setIsLeft(false);
         //behavior.setMovement(movement);
-        //movement.setActive(true);;
-        
+        //movement.setActive(true);
         //engine.addEnable(enemy); // Add the player to the engine
 
 

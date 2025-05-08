@@ -124,16 +124,18 @@ public class GameManager
         double[] spawnXCoords = { left, right, bottomLeft, bottomRight };
         double[] spawnYCoords = { defaultY, defaultY, bottomY, bottomY };
 
-        Ponto[] points = { new Ponto(0, 0), new Ponto(0, 12), new Ponto(12, 6) };
+        Ponto[] pointsTriangulo = { new Ponto(0, 0), new Ponto(0, 12), new Ponto(12, 6) };
+        //Ponto[] pointsQuadrado = { new Ponto(-5, 5), new Ponto(5, 5), new Ponto(5, -5), new Ponto(-5, -5)};
 
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count; i++)
+        {
             int spawnIndex = spawnIndexFunction.apply(i);
 
             Ponto spawnPoint = new Ponto(spawnXCoords[spawnIndex], spawnYCoords[spawnIndex]);
             double spawnAngle = spawnAngles[spawnIndex];
 
             Transform t = new Transform(spawnPoint, layer, spawnAngle, scale);
-            Poligono collider = new Poligono(points, t);
+            Poligono collider = new Poligono(pointsTriangulo, t);
             EnemyBehavior behavior = new EnemyBehavior();
             Shape shape = new Shape(AssetLoader.loadAnimationFrames("nave.png"), 550);
 
