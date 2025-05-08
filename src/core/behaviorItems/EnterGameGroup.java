@@ -203,7 +203,8 @@ public class EnterGameGroup implements IGroupAttackStrategy
      *
      * @return The total number of enemies.
      */
-    public int getNumberOfEnemies() {
+    public int getNumberOfEnemies()
+    {
         return 40;
     }
 }
