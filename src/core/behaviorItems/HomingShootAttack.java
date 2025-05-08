@@ -46,7 +46,8 @@ import geometry.Poligono;
  *
  * @version 2025-04-21
  */
-public class HomingShootAttack implements IAttackStrategy {
+public class HomingShootAttack implements IAttackStrategy
+{
     // Static index to ensure unique naming for bullets
     private static int index = 0;
     private final Shape shape = new Shape(AssetLoader.loadImage("laser.png"), 100); // Default shape of the bullet
