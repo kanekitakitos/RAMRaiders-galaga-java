@@ -73,10 +73,11 @@ public class LinearShootAttack implements IAttackStrategy {
      * @return The created bullet object as an `IGameObject`.
      */
     @Override
-    public IGameObject execute(IGameObject attacker, IGameObject target) {
+    public IGameObject execute(IGameObject attacker, IGameObject target)
+    {
         invariante(attacker);
 
-        String name = "LINEAR_BULLET";
+        String name = "Linear_Bullet";
 
         double angle = attacker.transform().angle();
         Transform transform;

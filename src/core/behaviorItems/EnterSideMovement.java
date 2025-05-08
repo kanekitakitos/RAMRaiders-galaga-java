@@ -55,11 +55,11 @@ public class EnterSideMovement implements IEnemyMovement {
     private final double tIncrement = 0.018; // Time increment for each movement step
 
     private final double t1 = 2.0; // Duration of the entry and lasso phases
-    private final double t2 = 1.5; // Duration of the final approach phase
+    private final double t2 = 2.0; // Duration of the final approach phase
 
     // Base distances (in units before applying the scale)
     private final double baseHorizontalDistance = 140.0; // Horizontal distance for entry
-    private final double baseCircleRadius = 40; // Radius of the circular lasso
+    private final double baseCircleRadius = 60; // Radius of the circular lasso
 
 
     /**
@@ -150,7 +150,8 @@ public class EnterSideMovement implements IEnemyMovement {
         t += tIncrement;
 
         if (t > t1 + t2) {
-            if (enemy.transform().angle() != 90) {
+            if (enemy.transform().angle() != 90)
+            {
                 rotateToVertical(enemy);
                 enemy.velocity(new Ponto(0, 0));
                 return;
@@ -257,7 +258,8 @@ public class EnterSideMovement implements IEnemyMovement {
      * @param nextPoint The next position of the enemy.
      * @return The angle for the enemy's rotation.
      */
-    private double calculateAngle(GameObject enemy, Ponto nextPoint) {
+    private double calculateAngle(GameObject enemy, Ponto nextPoint)
+    {
         Ponto shipCenter = enemy.transform().position();
         double dx = nextPoint.x() - shipCenter.x();
         double dy = nextPoint.y() - shipCenter.y();

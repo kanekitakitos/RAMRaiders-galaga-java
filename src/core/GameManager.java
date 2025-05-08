@@ -149,8 +149,8 @@ public class GameManager
      *
      * @return The list of enemies.
      */
-    public CopyOnWriteArrayList<IGameObject> getEnemys() {
-        return enemies;
+    public ArrayList<IGameObject> getEnemys() {
+        return new ArrayList<>(enemies);
     }
 
     /**

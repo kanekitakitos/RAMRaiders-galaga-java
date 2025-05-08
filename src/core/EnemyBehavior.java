@@ -3,11 +3,11 @@ package core;
 import core.behaviorItems.IEnemyMovement;
 import core.behaviorItems.ZigzagMovement;
 import core.objectsInterface.IGameObject;
-import gui.InputEvent;
 import core.behaviorItems.IAttackStrategy;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import gui.IInputEvent;
 
 /**
  * The `EnemyBehavior` class defines the behavior of an enemy in the game.
@@ -49,7 +49,6 @@ public class EnemyBehavior extends Behavior
                                                                                                         // timed tasks
 
     private boolean isAttacking = false; // Indicates whether the enemy is currently attacking
-    private long attackDuration = 500; // Attack duration in milliseconds
 
     /**
      * Default constructor for `EnemyBehavior`.
@@ -78,13 +77,25 @@ public class EnemyBehavior extends Behavior
      * @return The game object resulting from the attack, or null if no strategy is
      *         set.
      */
-    public IGameObject attack(InputEvent ie)
+    @Override
+    public IGameObject attack(IInputEvent ie)
     {
-        if (this.attackStrategy != null && !this.isAttacking && this.isEnabled()) {
+        if (this.attackStrategy != null && this.isAttacking && this.isEnabled())
+        {
+            this.stopAttack();
+            long minDelay = 2000;
+            long maxDelay = 5000;
+            long randomDelay = minDelay + (long) (Math.random() * (maxDelay - minDelay));
             // Schedule to reset the attack flag after the specified attack duration
-            localScheduler.schedule(this::stopAttack, this.attackDuration, TimeUnit.MILLISECONDS);
+            localScheduler.schedule(() ->
+            {
+                this.startAttack();
+            }, randomDelay, TimeUnit.MILLISECONDS);
+
             return this.attackStrategy.execute(this.go, this.observedObject);
-        } else {
+        }
+        else
+        {
             return null;
         }
     }
@@ -128,7 +139,8 @@ public class EnemyBehavior extends Behavior
      *
      * @param movement The movement strategy to use.
      */
-    public void setMovement(IEnemyMovement movement) {
+    public void setMovement(IEnemyMovement movement)
+    {
         if (movement == null)
             return;
 
@@ -143,7 +155,22 @@ public class EnemyBehavior extends Behavior
     public void move()
     {
         if (movement.isActive())
-            movement.move(this.go);
+            {
+                movement.move(this.go);
+                if(!movement.isActive())
+                {
+                    // Generate a random delay between 700 and 2000 milliseconds
+                    long minDelay = 700;
+                    long maxDelay = 2000;
+                    long randomDelay = minDelay + (long) (Math.random() * (maxDelay - minDelay));
+
+                    // Schedule to reset the Movement flag after the specified Movement duration
+                    localScheduler.schedule(() ->
+                    {
+                        this.movement.setActive(true);
+                    }, randomDelay, TimeUnit.MILLISECONDS);
+                }
+            }
 
         super.move();
     }

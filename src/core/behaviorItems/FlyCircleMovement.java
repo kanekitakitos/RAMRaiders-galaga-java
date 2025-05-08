@@ -47,10 +47,10 @@ public class FlyCircleMovement implements IEnemyMovement {
     private Ponto circleCenter; // Center of the current circle
     private Ponto initialPosition; // Initial position of the enemy
 
-    private final double radius = 230; // Radius of the large circle
+    private final double radius = 210; // Radius of the large circle
     private final double smallRadius = radius / 3; // Radius of the small circles
     private double currentAngle; // Current angle of movement
-    private final double angleIncrement = Math.toRadians(2.5); // Angle increment per step
+    private final double angleIncrement = Math.toRadians(3); // Angle increment per step
     private int currentCircle = 1; // Tracks the current circle (1, 2, or 3)
 
     private boolean isLeft = false; // Determines if the enemy is on the left side
@@ -157,6 +157,9 @@ public class FlyCircleMovement implements IEnemyMovement {
             case 4:
                 returnToInitialPosition(enemy);
                 break;
+            case 5:
+                rotateToVertical(enemy);
+                break;
         }
     }
 
@@ -165,13 +168,15 @@ public class FlyCircleMovement implements IEnemyMovement {
      *
      * @param enemy The GameObject representing the enemy.
      */
-    private void handleFirstCircleLeft(GameObject enemy) {
+    private void handleFirstCircleLeft(GameObject enemy)
+    {
         currentAngle += angleIncrement;
         double newX = circleCenter.x() + smallRadius * Math.cos(currentAngle);
         double newY = circleCenter.y() + smallRadius * Math.sin(currentAngle);
-        updateEnemyPosition(enemy, newX, newY);
+        updateEnemyPositionBigCircle(enemy, newX, newY);
 
-        if (Math.toDegrees(currentAngle) >= 260) {
+        if (Math.toDegrees(currentAngle) >= 260)
+        {
             currentCircle = 2;
             currentAngle = Math.toRadians(90);
             this.currentPosition = enemy.transform().position();
@@ -184,13 +189,15 @@ public class FlyCircleMovement implements IEnemyMovement {
      *
      * @param enemy The GameObject representing the enemy.
      */
-    private void handleSecondCircleLeft(GameObject enemy) {
-        currentAngle -= angleIncrement;
+    private void handleSecondCircleLeft(GameObject enemy)
+    {
+        currentAngle -= angleIncrement/1.5;
         double newX = circleCenter.x() + radius * Math.cos(currentAngle);
         double newY = circleCenter.y() + radius * Math.sin(currentAngle);
         updateEnemyPosition(enemy, newX, newY);
 
-        if (Math.toDegrees(currentAngle) < -90) {
+        if (Math.toDegrees(currentAngle) < -90)
+        {
             currentCircle = 3;
             currentAngle = Math.toRadians(260);
             this.currentPosition = enemy.transform().position();
@@ -242,6 +249,9 @@ public class FlyCircleMovement implements IEnemyMovement {
             case 4:
                 returnToInitialPosition(enemy);
                 break;
+            case 5:
+                rotateToVertical(enemy);
+                break;
         }
     }
 
@@ -269,13 +279,15 @@ public class FlyCircleMovement implements IEnemyMovement {
      *
      * @param enemy The GameObject representing the enemy.
      */
-    private void handleSecondCircleRight(GameObject enemy) {
-        currentAngle += angleIncrement;
+    private void handleSecondCircleRight(GameObject enemy)
+    {
+        currentAngle += angleIncrement/1.5;
         double newX = circleCenter.x() + radius * Math.cos(currentAngle);
         double newY = circleCenter.y() + radius * Math.sin(currentAngle);
         updateEnemyPositionBigCircle(enemy, newX, newY);
 
-        if (Math.toDegrees(currentAngle) >= 280) {
+        if (Math.toDegrees(currentAngle) >= 280)
+        {
             currentCircle = 3;
             currentAngle = Math.toRadians(280);
             this.currentPosition = enemy.transform().position();
@@ -304,6 +316,24 @@ public class FlyCircleMovement implements IEnemyMovement {
      *
      * @param enemy The GameObject representing the enemy.
      */
+    /**
+     * Verifica se o inimigo está muito próximo da posição inicial e o para completamente.
+     * 
+     * @param enemy O GameObject representando o inimigo
+     * @return true se o inimigo foi parado, false caso contrário
+     */
+    private boolean handleVeryCloseStop(GameObject enemy, double distance) {
+        if (distance < 0.005)
+        {
+
+            // Primeiro zera a velocidade
+            enemy.velocity(new Ponto(0, 0));
+            currentCircle = 5;
+            return true;
+        }
+        return false;
+    }
+
     private void returnToInitialPosition(GameObject enemy)
     {
         Ponto currentPos = enemy.transform().position();
@@ -311,18 +341,37 @@ public class FlyCircleMovement implements IEnemyMovement {
         double dy = initialPosition.y() - currentPos.y();
         double distance = Math.sqrt(dx * dx + dy * dy);
 
-        if (distance < 0.1) {
-            enemy.velocity(new Ponto(0, 0));
-            setActive(false);
-            currentCircle = 1;
+        // Verifica se está muito próximo e deve parar
+        if (handleVeryCloseStop(enemy, distance))
+        {
+            // Garante que o inimigo fique na posição vertical ao parar
+            rotateToVertical(enemy);
             return;
         }
 
-        double RETURN_SPEED = 10;
+        // Sistema de velocidade adaptativa com amortecimento
+        double RETURN_SPEED = Math.min(8.0, Math.max(0.1, distance));
+        
+        // Calcula a velocidade com amortecimento suave
         Ponto velocity = new Ponto(
                 dx * RETURN_SPEED / distance,
                 dy * RETURN_SPEED / distance);
+
+        // Se a velocidade for muito baixa, usa o método de parada
+        if (Math.abs(velocity.x()) < 0.001 && Math.abs(velocity.y()) < 0.001)
+        {
+            handleVeryCloseStop(enemy, distance);
+            return;
+        }
+        
         enemy.velocity(velocity);
+        
+        // Calcula e aplica a rotação durante o movimento de retorno
+        Ponto nextPoint = new Ponto(
+            currentPos.x() + velocity.x(),
+            currentPos.y() + velocity.y()
+        );
+        enemy.rotateSpeed(calculateAngle(enemy, nextPoint));
     }
 
     /**
@@ -334,12 +383,13 @@ public class FlyCircleMovement implements IEnemyMovement {
      */
     private void updateEnemyPosition(GameObject enemy, double newX, double newY)
     {
-        double SPEED =1.0;
+        double SPEED =0.5;
         Ponto currentPos = enemy.transform().position();
         Ponto velocity = new Ponto(
                 (newX - currentPos.x()) * SPEED,
                 (newY - currentPos.y()) * SPEED);
         enemy.velocity(velocity);
+        enemy.rotateSpeed(calculateAngle(enemy, new Ponto(velocity.x()+currentPos.x(), velocity.y()+currentPos.y())));
     }
 
 
@@ -358,5 +408,76 @@ public class FlyCircleMovement implements IEnemyMovement {
                 (newX - currentPos.x()) * SPEED,
                 (newY - currentPos.y()) * SPEED);
         enemy.velocity(velocity);
+        enemy.rotateSpeed(calculateAngle(enemy, new Ponto(velocity.x()+currentPos.x(), velocity.y()+currentPos.y())));
     }
+
+
+
+    /**
+     * Calculates the angle for the enemy's rotation based on its current position
+     * and the next position.
+     *
+     * @param enemy     The `GameObject` representing the enemy.
+     * @param nextPoint The next position of the enemy.
+     * @return The angle for the enemy's rotation.
+     */
+    private double calculateAngle(GameObject enemy, Ponto nextPoint)
+    {
+        Ponto shipCenter = enemy.transform().position();
+        double dx = nextPoint.x() - shipCenter.x();
+        double dy = nextPoint.y() - shipCenter.y();
+
+        double desiredAngle = new Ponto(dx, dy).theta();
+        double currentAngle = enemy.transform().angle();
+
+        double nextAngle = (desiredAngle + 360) - currentAngle;
+
+        while (nextAngle > 180)
+            nextAngle -= 360;
+        while (nextAngle < -180)
+            nextAngle += 360;
+
+        return nextAngle;
+    }
+
+    /**
+     * Rotates the enemy to a vertical orientation (90 degrees).
+     * Smoothly adjusts the rotation speed to achieve the desired angle.
+     *
+     * @param enemy The `GameObject` to rotate.
+     */
+    private void rotateToVertical(GameObject enemy)
+    {
+        double currentAngle = enemy.transform().angle();
+        double targetAngle = 90.0;
+        double delta = 0.0001; // Valor delta para considerar o ângulo como 90 graus
+
+        if(Math.abs(currentAngle - targetAngle) < delta)
+        {
+            currentCircle = 1;
+            setActive(false);
+            currentPosition = null;
+            circleCenter = null;
+            initialPosition = null;
+            enemy.rotateSpeed(0);
+            return;
+        }
+
+        double angleDiff = (targetAngle + 360) - currentAngle;
+
+        while (angleDiff > 180)
+            angleDiff -= 360;
+        while (angleDiff < -180)
+            angleDiff += 360;
+
+        double rotationSpeed = angleDiff * 0.1;
+
+        if (Math.abs(rotationSpeed) > 5.0)
+        {
+            rotationSpeed = Math.signum(rotationSpeed) * 5.0;
+        }
+
+        enemy.rotateSpeed(rotationSpeed);
+    }
+
 }

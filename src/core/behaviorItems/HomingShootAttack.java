@@ -8,6 +8,7 @@ import core.Transform;
 import core.objectsInterface.IGameObject;
 import geometry.Ponto;
 import geometry.Poligono;
+import java.util.Random;
 
 /**
  * The `HomingShootAttack` class implements the `IAttackStrategy` interface.
@@ -84,7 +85,7 @@ public class HomingShootAttack implements IAttackStrategy
     public IGameObject execute(IGameObject attacker, IGameObject target) {
         invariante(attacker, target);
 
-        String name = "HOMING_BULLET";
+        String name = "Homing_Bullet";
         // Define the shape of the bullet as a rectangle
         Ponto[] rPoints = {
             new Ponto(0, 2),
@@ -109,11 +110,18 @@ public class HomingShootAttack implements IAttackStrategy
      * @param target   The target game object.
      * @return The created bullet as a GameObject.
      */
-    private GameObject getGameObject(Ponto[] rPoints, IGameObject attacker, String name, IGameObject target) {
-        double SPEED = 10.0;
+    private GameObject getGameObject(Ponto[] rPoints, IGameObject attacker, String name, IGameObject target)
+    {
+        long minSpeed = 7;
+        long maxSpeed = 11;
+        long randomSpeed = minSpeed + (long) (Math.random() * (maxSpeed - minSpeed));
         double theta = calculateAngleToTarget(attacker, target);
-        Ponto bulletStart = calculateBulletStartPosition(attacker.transform().position(), theta);
-        return createBullet(rPoints, attacker, name, theta, bulletStart, SPEED,target.transform().layer());
+
+        Random random = new Random();
+        double randomOffsetX = (random.nextDouble() - 0.5) * 25;
+        Ponto bulletStart = attacker.transform().position();
+        bulletStart = calculateBulletStartPosition(new Ponto(bulletStart.x() + randomOffsetX,bulletStart.y()), theta);
+        return createBullet(rPoints, attacker, name, theta, bulletStart, randomSpeed,target.transform().layer());
     }
 
     /**
@@ -123,7 +131,8 @@ public class HomingShootAttack implements IAttackStrategy
      * @param target   The target game object.
      * @return The angle in radians.
      */
-    private double calculateAngleToTarget(IGameObject attacker, IGameObject target) {
+    private double calculateAngleToTarget(IGameObject attacker, IGameObject target)
+    {
         Ponto attackerPosition = attacker.transform().position();
         Ponto targetPosition = target.transform().position();
         double dx = targetPosition.x() - attackerPosition.x();

@@ -159,7 +159,7 @@ public class EnterOverTopMovement implements IEnemyMovement
         Ponto velocity = new Ponto(next.x() - current.x(), next.y() - current.y());
 
         enemy.velocity(velocity);
-        enemy.rotateSpeed(2.5);
+        enemy.rotateSpeed(3);
 
         t += tIncrement;
         if (t >= t1 + t2 + t3) {

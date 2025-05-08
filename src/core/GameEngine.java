@@ -212,6 +212,9 @@ public class GameEngine implements IGameEngine
                     if (currentObject.name().contains("Enemy") && other.name().contains("Enemy"))
                         continue;
 
+                    //if (currentObject.name().contains("Bullet") && other.name().contains("Bullet"))
+                    //    continue;
+
                     if (currentObject.collider().colision(other.collider()))
                         output.add(other);
                 }

@@ -128,10 +128,13 @@ public class EnterGameGroup implements IGroupAttackStrategy
         currentGroup++;
         if (currentGroup > 5)
         {
-            this.assignMovementPatterns(enemies);
             this.assignAttackPatterns(enemies);
+            this.assignMovementPatterns(enemies);
+
             scheduler.shutdown();
             isGroupAttackComplete = true;
+
+
             return;
         }
         for (int i = 0; i < groupSizes[currentGroup - 1]; i++)
@@ -232,7 +235,7 @@ public class EnterGameGroup implements IGroupAttackStrategy
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 1, 0, 0, 1, 0, 0, 1, 0, 0, 1 }
+            { 1, 0, 0, 0, 1, 0, 1, 0, 0, 1 }
         };
 
         // Mapeia as posições do pattern para os índices dos inimigos
@@ -241,7 +244,7 @@ public class EnterGameGroup implements IGroupAttackStrategy
         {
             for (int col = 0; col < movementPattern[row].length; col++)
             {
-                if (movementPattern[row][col] > 0) 
+                if (movementPattern[row][col] > 0)
                 {
                     // Calcula o índice real do inimigo baseado na sua posição no pattern original
                     int realIndex = findEnemyIndexInOriginalPattern(row, col);
@@ -263,8 +266,17 @@ public class EnterGameGroup implements IGroupAttackStrategy
                 {
                     GameObject enemy = (GameObject) enemies.get(currentIndex);
                     EnemyBehavior enemyBehavior = (EnemyBehavior) enemy.behavior();
-                    IEnemyMovement movement = new FlyCircleMovement();
+                    FlyCircleMovement movement = new FlyCircleMovement();
+
+                    if(enemy.transform().position().x() > 0)
+                        movement.setIsLeft(true);
+                    else
+                        movement.setIsLeft(false);
+
                     enemyBehavior.setMovement(movement);
+
+                    
+
                     movement.setActive(true);
 
                 }
@@ -275,9 +287,9 @@ public class EnterGameGroup implements IGroupAttackStrategy
     private void assignAttackPatterns(List<IGameObject> enemies) {
         int[][] attackPattern = {
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 },
-            { 0, 1, 0, 0, 1, 0, 0, 0, 1, 0 },
-            { 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 },
+            { 0, 0, 0, 1, 0, 1, 0, 0, 0, 0 },
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
+            { 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
         };
 
@@ -310,6 +322,7 @@ public class EnterGameGroup implements IGroupAttackStrategy
                     EnemyBehavior enemyBehavior = (EnemyBehavior) enemy.behavior();
                     IAttackStrategy attack = new HomingShootAttack();
                     enemyBehavior.setAttack(attack);
+                    enemyBehavior.startAttack();
                 
                 }
             }, i * 200, TimeUnit.MILLISECONDS);
