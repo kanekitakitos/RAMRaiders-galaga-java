@@ -30,18 +30,35 @@ import geometry.Ponto;
  *                  modification capabilities.
  *
  * @author Brandon Mejia
- * @author Gabriel Pedroso
- * @author Miguel Correia
  *
  * @version 2025-03-25
  */
-public class Transform implements ITransform {
+public class Transform implements ITransform
+{
     private Ponto position; // The position of the transform
     private int layer; // The layer of the transform
     private double angle; // The angle of the transform (0 <= angle < 360)
     private double previousAngle; // The previous angle of the transform
     private double scale; // The scale of the transform
 
+
+
+    /**
+    * Validates the invariants for the `Transform` class.
+    * Ensures that the provided layer and scale values are positive.
+    * If the validation fails, an error message is printed, and the program exits.
+    *
+    * @param layer The layer of the transform. Must be greater than 0.
+    * @param scale The scale of the transform. Must be greater than 0.
+    */
+    private void invariante(int layer, double scale)
+    {
+        if(layer >= 0 && scale > 0)
+            return;
+
+        System.out.println("Transform:iv");
+        System.exit(0);
+    }
     /**
      * Constructs a Transform object with the specified position, layer, angle, and
      * scale.
@@ -51,7 +68,10 @@ public class Transform implements ITransform {
      * @param angle The angle of the transform.
      * @param scale The scale of the transform.
      */
-    public Transform(Ponto p, int layer, double angle, double scale) {
+    public Transform(Ponto p, int layer, double angle, double scale)
+    {
+        invariante(layer, scale);
+
         this.position = new Ponto(p);
         this.layer = layer;
         this.scale = scale;

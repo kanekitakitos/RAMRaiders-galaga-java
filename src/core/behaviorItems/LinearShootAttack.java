@@ -40,15 +40,13 @@ import java.util.Random;
  * @see Shape
  *
  * @author Brandon Mejia
- * @author Gabriel Pedroso
- * @author Miguel Correia
  *
  * @version 2025-04-03
  */
 public class LinearShootAttack implements IAttackStrategy {
     private static int index = 0; // Counter for unique bullet naming
     private double SPEED = 10.0; // Default speed of the bullet
-    private Shape shape = new Shape(AssetLoader.loadImage("laser.png"), 100); // Default shape of the bullet
+    private final Shape shape = new Shape(AssetLoader.loadImage("laser.png"), 100); // Default shape of the bullet
 
     /**
      * Validates the attacker parameter to ensure it is not null.
@@ -56,11 +54,14 @@ public class LinearShootAttack implements IAttackStrategy {
      * @param attacker The `IGameObject` initiating the attack.
      * @throws IllegalArgumentException if the attacker is null.
      */
-    private void invariante(IGameObject attacker) {
-        if (attacker == null) {
-            System.out.println("LinearShootAttack:vi");
-            throw new IllegalArgumentException("attacker is null");
-        }
+    private void invariante(IGameObject attacker)
+    {
+        if (attacker != null)
+            return;
+
+
+        System.out.println("LinearShootAttack:vi");
+        System.exit(0);
     }
 
     /**
@@ -166,7 +167,7 @@ public class LinearShootAttack implements IAttackStrategy {
         if (this.shape != null)
             shape = this.shape;
         else
-            shape = new Shape();
+            shape = new Shape(this.shape);
 
         Behavior behavior = new Behavior();
         GameObject bullet = new GameObject(name + " " + index, transform, rectangle, behavior, shape);

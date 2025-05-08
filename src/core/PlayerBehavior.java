@@ -45,11 +45,10 @@ import java.util.concurrent.ScheduledExecutorService;
  * @see core.Behavior
  *
  * @Author Brandon Mejia
- * @Author Gabriel Pedroso
- * @Author Miguel Correia
  * @Version 2025-04-18
  */
-public class PlayerBehavior extends Behavior {
+public class PlayerBehavior extends Behavior
+{
     private IAttackStrategy attackStrategy; // The attack strategy used by the player
     private boolean isAttacking = false; // Indicates whether the player is currently attacking
 
@@ -59,11 +58,13 @@ public class PlayerBehavior extends Behavior {
 
     private final ScheduledExecutorService localScheduler; // Scheduler for handling timed tasks
 
+
     /**
      * Constructs a new PlayerBehavior instance.
      * Initializes the default attack strategy and the scheduler.
      */
-    public PlayerBehavior() {
+    public PlayerBehavior()
+    {
         super();
         this.attackStrategy = new LinearShootAttack();
         this.localScheduler = Executors.newSingleThreadScheduledExecutor();
@@ -74,7 +75,11 @@ public class PlayerBehavior extends Behavior {
      *
      * @param attackStrategy The attack strategy to use.
      */
-    public void setAttackStrategy(IAttackStrategy attackStrategy) {
+    public void setAttackStrategy(IAttackStrategy attackStrategy)
+    {
+        if(attackStrategy == null)
+            throw new IllegalArgumentException("Attack strategy cannot be null");
+
         this.attackStrategy = attackStrategy;
     }
 
@@ -104,7 +109,11 @@ public class PlayerBehavior extends Behavior {
      * @param ie The input event to process.
      */
     @Override
-    public void onUpdate(double dT, IInputEvent ie) {
+    public void onUpdate(double dT, IInputEvent ie)
+    {
+        if(ie == null)
+            return;
+
         super.onUpdate(dT, ie);
         this.moveAndEvasiveManeuver(ie);
     }
@@ -117,11 +126,13 @@ public class PlayerBehavior extends Behavior {
      *         executed.
      */
     @Override
-    public IGameObject attack(IInputEvent ie) {
-        if (this.attackStrategy == null)
+    public IGameObject attack(IInputEvent ie)
+    {
+        if (this.attackStrategy == null || ie == null)
             return null;
 
-        if (!this.isAttacking && this.isEnabled() && ie.isActionActive("ATTACK")) {
+        if (!this.isAttacking && this.isEnabled() && ie.isActionActive("ATTACK"))
+        {
             this.isAttacking = true;
 
             // Schedule to reset the attack flag after the invincibility duration
@@ -142,7 +153,11 @@ public class PlayerBehavior extends Behavior {
      * @param collisions A list of game objects that this behavior collided with.
      */
     @Override
-    public void onCollision(ArrayList<IGameObject> collisions) {
+    public void onCollision(ArrayList<IGameObject> collisions)
+    {
+        if(collisions == null || collisions.isEmpty())
+            return;
+
         for (IGameObject go : collisions)
             go.behavior().onDestroy();
 
@@ -152,7 +167,8 @@ public class PlayerBehavior extends Behavior {
             this.isInvincible = true;
 
             // Schedule to reset the invincibility flag after the invincibility duration
-            localScheduler.schedule(() -> {
+            localScheduler.schedule(() ->
+            {
                 this.isInvincible = false;
             }, invincibilityDuration, TimeUnit.MILLISECONDS);
 
@@ -170,7 +186,8 @@ public class PlayerBehavior extends Behavior {
      *
      * @param Iie The input event triggering the evasive maneuver.
      */
-    public void moveAndEvasiveManeuver(IInputEvent Iie) {
+    public void moveAndEvasiveManeuver(IInputEvent Iie)
+    {
         if (Iie == null)
             return;
 

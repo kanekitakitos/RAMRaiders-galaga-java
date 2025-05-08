@@ -1,6 +1,7 @@
 package core.behaviorItems;
 
 import core.GameObject;
+import core.objectsInterface.IGameObject;
 import geometry.Ponto;
 
 /**
@@ -50,7 +51,8 @@ import geometry.Ponto;
  *      "https://chatgpt.com/share/68095b69-8cb0-8011-8705-2d3eade4aa69"> How to
  *      create a parametric function and what attributes I need to define one -
  *      ChatGPT</a>
- *
+ *      
+ * @author Brandon Mejia
  * @version 2025-04-23
  */
 public class FlyTopDownMovement implements IEnemyMovement {
@@ -69,6 +71,24 @@ public class FlyTopDownMovement implements IEnemyMovement {
     private final double C1 = 2 * Math.PI; // Frequency of vertical oscillation in phase 1
     private final double D1 = 45.0 * scale; // Vertical descent rate in phase 1
     private final double t1 = 2 * Math.PI / C1; // Duration of phase 1
+
+
+    /**
+     * Validates the invariant for the `FlyTopDownMovement` class.
+     * Ensures that the provided `IGameObject` instance is not null.
+     * If the validation fails, an error message is printed, and the program exits.
+     *
+     * @param go The `IGameObject` instance to validate. Must not be null.
+     */
+    private void invariante(IGameObject go)
+    {
+        if(go != null)
+            return;
+
+        System.out.println("FlyTopDownMovement:iv");
+        System.exit(0);
+    }
+
 
     /**
      * Activates or deactivates the movement.
@@ -113,7 +133,10 @@ public class FlyTopDownMovement implements IEnemyMovement {
      * @param enemy The GameObject to move.
      */
     @Override
-    public void move(GameObject enemy) {
+    public void move(GameObject enemy)
+    {
+        invariante(enemy);
+
         if (!active)
             return;
 

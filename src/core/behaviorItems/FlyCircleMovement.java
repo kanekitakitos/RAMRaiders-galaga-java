@@ -1,6 +1,7 @@
 package core.behaviorItems;
 
 import core.GameObject;
+import core.objectsInterface.IGameObject;
 import geometry.Ponto;
 
 /**
@@ -37,8 +38,6 @@ import geometry.Ponto;
  *                  completion.
  *
  * @author Brandon Mejia
- * @author Gabriel Pedroso
- * @author Miguel Correia
  *
  * @version 2025-04-19
  */
@@ -57,13 +56,35 @@ public class FlyCircleMovement implements IEnemyMovement {
     private boolean isLeft = false; // Determines if the enemy is on the left side
     private boolean active = false; // Indicates if the movement is active
 
+
+
+    /**
+     * Validates the invariant for the `FlyCircleMovement` class.
+     * Ensures that the provided `IGameObject` instance is not null.
+     * If the validation fails, an error message is printed, and the program exits.
+     *
+     * @param go The `IGameObject` instance to validate. Must not be null.
+     */
+    private void invariante(IGameObject go)
+    {
+        if(go != null)
+            return;
+
+        System.out.println("FlyCircleMovement:iv");
+        System.exit(0);
+    }
+
+
     /**
      * Moves the enemy based on its current state and position.
      *
      * @param enemy The GameObject representing the enemy.
      */
     @Override
-    public void move(GameObject enemy) {
+    public void move(GameObject enemy)
+    {
+        invariante(enemy);
+
         if (!active)
             return;
 
@@ -79,9 +100,11 @@ public class FlyCircleMovement implements IEnemyMovement {
      * @param active True to activate, false to deactivate.
      */
     @Override
-    public void setActive(boolean active) {
+    public void setActive(boolean active)
+    {
         this.active = active;
-        if (!active) {
+        if (!active)
+        {
             currentPosition = null;
             circleCenter = null;
             initialPosition = null;

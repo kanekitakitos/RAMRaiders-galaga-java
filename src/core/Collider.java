@@ -25,11 +25,10 @@ import java.awt.Graphics2D;
  * @see geometry.Ponto
  *
  * @Author Brandon Mejia
- * @Author Gabriel Pedroso
- * @Author Miguel Correia
  * @Version 2025-03-25
  */
-public abstract class Collider implements ICollider {
+public abstract class Collider implements ICollider
+{
     protected Transform transform; // The transform associated with this collider
 
     /**

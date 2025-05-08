@@ -52,10 +52,31 @@ import java.util.List;
  * @author Brandon Mejia
  * @version 2025-03-25
  */
-public class GamePanel extends JPanel {
+public class GamePanel extends JPanel
+{
     private volatile List<IGameObject> objectsToRender = Collections.emptyList();
     private Shape backgroundShape;
     private boolean hitbox = false;
+
+
+
+    /**
+     * Validates the invariants for the GamePanel class.
+     * Ensures that the width and height parameters are positive integers.
+     * If the validation fails, an error message is printed, and the program exits.
+     *
+     * @param width  The width of the panel in pixels. Must be greater than 0.
+     * @param height The height of the panel in pixels. Must be greater than 0.
+     */
+    private void invariantes(int width, int height)
+    {
+        if(width > 0 && height > 0)
+            return;
+
+        System.out.println("GamePanel:iv");
+        System.exit(0);
+    }
+
 
     /**
      * Creates a game panel with specified dimensions and black background.
@@ -63,7 +84,10 @@ public class GamePanel extends JPanel {
      * @param width  The width of the panel in pixels
      * @param height The height of the panel in pixels
      */
-    public GamePanel(int width, int height) {
+    public GamePanel(int width, int height)
+    {
+        invariantes(width, height);
+
         setPreferredSize(new Dimension(width, height));
         setBackground(Color.BLACK);
     }
@@ -75,7 +99,10 @@ public class GamePanel extends JPanel {
      * @param height          The height of the panel in pixels
      * @param backgroundShape The shape to use as background
      */
-    public GamePanel(int width, int height, Shape backgroundShape) {
+    public GamePanel(int width, int height, Shape backgroundShape)
+    {
+        invariantes(width, height);
+
         setPreferredSize(new Dimension(width, height));
         setBackground(Color.BLACK);
         this.backgroundShape = backgroundShape;
@@ -87,7 +114,8 @@ public class GamePanel extends JPanel {
      *
      * @param newObjects The new list of game objects to render
      */
-    public void updateGameObjects(List<IGameObject> newObjects) {
+    public void updateGameObjects(List<IGameObject> newObjects)
+    {
         this.objectsToRender = newObjects;
         repaint();
     }

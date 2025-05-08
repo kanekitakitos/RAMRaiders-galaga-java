@@ -47,7 +47,8 @@ import gui.InputEvent;
  * @Author Brandon Mejia
  * @Version 2025-04-16
  */
-public class Behavior implements IBehavior {
+public class Behavior implements IBehavior
+{
     protected GameObject go; // The GameObject associated with this behavior
     protected boolean isEnabled; // Indicates whether the behavior is enabled
 
@@ -59,7 +60,8 @@ public class Behavior implements IBehavior {
      * Initializes the behavior with no associated GameObject and sets it as
      * disabled.
      */
-    public Behavior() {
+    public Behavior()
+    {
         this.go = null;
         this.isEnabled = false;
         this.observedObject = null;

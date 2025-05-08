@@ -8,8 +8,6 @@ import geometry.Ponto;
  * including moving, rotating, and scaling.
  * 
  * @author Brandon Mejia
- * @author Gabriel Pedroso
- * @author Miguel Correia
  *
  * @version 2025-03-25
  */

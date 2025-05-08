@@ -4,6 +4,9 @@ import java.util.List;
 /**
  * The IShape interface defines the structure for objects that have
  * animation capabilities and can provide image frames for rendering.
+ *
+ * @author Brandon Mejia
+ * @version 2025-05-07
  */
 public interface IShape
 {

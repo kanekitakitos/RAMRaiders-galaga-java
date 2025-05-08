@@ -6,6 +6,11 @@ import gui.IInputEvent;
 /**
  * Interface representing the behavior of a game object.
  * Defines the lifecycle methods and interaction mechanisms for game objects.
+ *
+ *
+ * @author Brandon Mejia
+ * @version 2025-05-07
+ *
  */
 public interface IBehavior {
 

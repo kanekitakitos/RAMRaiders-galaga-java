@@ -31,12 +31,11 @@ import java.util.List;
  * @see IGuiBridge
  *
  * @author Brandon Mejia
- * @author Gabriel Pedroso
- * @author Miguel Correia
  *
  * @version 2025-04-16
  */
-public class GameEngine implements IGameEngine {
+public class GameEngine implements IGameEngine
+{
     // Stores game objects organized by layers
     private HashMap<Integer, CopyOnWriteArrayList<IGameObject>> layeredGameObjects;
     private ArrayList<IGameObject> disabledGameObjects;
@@ -49,13 +48,33 @@ public class GameEngine implements IGameEngine {
     private IGuiBridge gui;
 
     /**
+     * Validates the invariant for the `GameEngine` class.
+     * Ensures that the provided `IGuiBridge` instance is not null.
+     * If the validation fails, an error message is printed, and the program exits.
+     *
+     * @param gui The `IGuiBridge` instance used for input and rendering. Must not be null.
+     */
+    private void invariante(IGuiBridge gui)
+    {
+        if(gui != null)
+            return;
+
+        System.out.println("GameEngine:iv");
+        System.exit(0);
+    }
+
+
+    /**
      * Constructs a new `GameEngine` instance.
      * Initializes the layered game objects map and sets the total object count to
      * zero.
      *
      * @param gui The GUI bridge used for input and rendering.
      */
-    public GameEngine(IGuiBridge gui) {
+    public GameEngine(IGuiBridge gui)
+    {
+        invariante(gui);
+
         this.layeredGameObjects = new HashMap<>();
         this.disabledGameObjects = new ArrayList<>();
         this.totalObjects = 0;

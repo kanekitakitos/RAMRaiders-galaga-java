@@ -44,7 +44,8 @@ import core.EnemyBehavior;
  * @author Brandon Mejia
  * @version 2025-05-07
  */
-public class EnterGameGroup implements IGroupAttackStrategy {
+public class EnterGameGroup implements IGroupAttackStrategy
+{
 
     private final double SPACING = 70; // Spacing between enemy positions
     private ArrayList<Ponto> positions; // Calculated positions for enemies
@@ -61,6 +62,26 @@ public class EnterGameGroup implements IGroupAttackStrategy {
             { 5, 5, 4, 4, 1, 1, 4, 4, 5, 5 }
     };
 
+
+
+    /**
+     * Validates the invariants for the `EnterGameGroup` class.
+     * Ensures that the provided list of enemies is not null or empty,
+     * and that the target object is not null.
+     * If the validation fails, an error message is printed, and the program exits.
+     *
+     * @param enemies A list of `IGameObject` instances representing the enemies. Must not be null or empty.
+     * @param target  The target `IGameObject` instance. Must not be null.
+     */
+    private void invariante(List<IGameObject> enemies, IGameObject target)
+    {
+        if(enemies != null && !enemies.isEmpty() && target != null)
+            return;
+
+        System.out.println("EnterGameGroup:iv");
+        System.exit(0);
+    }
+
     /**
      * Executes the group attack strategy by starting the relocation of enemies.
      *
@@ -69,7 +90,7 @@ public class EnterGameGroup implements IGroupAttackStrategy {
      */
     @Override
     public void execute(List<IGameObject> enemies, IGameObject target) {
-        startRelocateEnemies(enemies, target);
+        startRelocateEnemies(enemies);
     }
 
     /**
@@ -80,7 +101,9 @@ public class EnterGameGroup implements IGroupAttackStrategy {
      * @param target  The target object to base enemy positions on.
      */
     @Override
-    public void onInit(List<IGameObject> enemies, IGameObject target) {
+    public void onInit(List<IGameObject> enemies, IGameObject target)
+    {
+        invariante(enemies, target);
         this.positions = calculateEnemyPositions(target.transform().position(), this.pattern, SPACING);
     }
 
@@ -88,11 +111,12 @@ public class EnterGameGroup implements IGroupAttackStrategy {
      * Starts the process of relocating enemies in groups at fixed intervals.
      *
      * @param enemies List of enemies to be relocated.
-     * @param target  The target object to base enemy positions on.
      */
-    public void startRelocateEnemies(List<IGameObject> enemies, IGameObject target) {
-        scheduler.scheduleAtFixedRate(() -> {
-            relocateEnemies(enemies, target);
+    public void startRelocateEnemies(List<IGameObject> enemies)
+    {
+        scheduler.scheduleAtFixedRate(() ->
+        {
+            relocateEnemies(enemies);
         }, 1000, groupDelayFrames * 120, TimeUnit.MILLISECONDS);
     }
 
@@ -100,17 +124,16 @@ public class EnterGameGroup implements IGroupAttackStrategy {
      * Relocates enemies of the current group to their designated positions.
      *
      * @param enemies List of enemies to be relocated.
-     * @param target  The target object to base enemy positions on.
      */
-    private void relocateEnemies(List<IGameObject> enemies, IGameObject target) {
+    private void relocateEnemies(List<IGameObject> enemies)
+    {
         currentGroup++;
         if (currentGroup > 5) {
             scheduler.shutdown();
             return;
         }
-
-        Ponto playerPosition = target.transform().position();
-        for (int i = 0; i < groupSizes[currentGroup - 1]; i++) {
+        for (int i = 0; i < groupSizes[currentGroup - 1]; i++)
+        {
             final int enemyIndex = i + ((currentGroup - 1) * 8); // 8 enemies per group
             scheduler.schedule(() -> {
                 GameObject enemy = (GameObject) enemies.get(enemyIndex);
@@ -120,7 +143,7 @@ public class EnterGameGroup implements IGroupAttackStrategy {
                 if (enemy.transform().angle() == 270) { // Coming from above
                     EnterOverTopMovement bottom = new EnterOverTopMovement();
                     bottom.setFinalTarget(targetPosition);
-                    boolean isRightToLeft = enemy.transform().position().x() > playerPosition.x();
+                    boolean isRightToLeft = enemy.transform().position().x() > 0.0; // Check if the enemy is coming from the right
                     bottom.setDirection(isRightToLeft);
                     movement = bottom;
                 } else {

@@ -46,13 +46,10 @@ import geometry.Ponto;
  * @see GameEngine
  *
  * @author Brandon Mejia
- * @author
- *         Gabriel Pedroso
- * @author
- *         Miguel Correia
  * @version 2025-03-25
  */
-public class GameObject implements IGameObject {
+public class GameObject implements IGameObject
+{
     final private String name; // The name of the game object
     final private Transform transform; // The transform of the game object
     final private Collider collider; // The collider of the game object
@@ -63,6 +60,30 @@ public class GameObject implements IGameObject {
     protected int velocityLayer; // The velocity layer of the game object
     protected double rotateSpeed; // The rotation speed of the game object
     protected double scaleDiff; // The scale difference of the game object
+
+
+
+
+    /**
+     * Validates the invariants for the `GameObject` class.
+     * Ensures that the provided parameters are not null.
+     * If any parameter is null, an error message is printed, and the program exits.
+     *
+     * @param name      The name of the game object. Must not be null.
+     * @param transform The transform of the game object. Must not be null.
+     * @param collider  The collider of the game object. Must not be null.
+     * @param behaviour The behavior of the game object. Must not be null.
+     * @param shape     The shape of the game object. Must not be null.
+     */
+    private void invariante(String name, Transform transform, Collider collider, Behavior behaviour, Shape shape)
+    {
+        if (name == null || transform == null || collider == null || shape == null || behaviour == null)
+        {
+            System.out.println("GameObject:iv");
+            System.exit(0);
+        }
+    }
+
 
     /**
      * Constructs a GameObject instance with the specified name, transform, and
@@ -77,10 +98,11 @@ public class GameObject implements IGameObject {
      * @throws IllegalArgumentException if any of the parameters 'name',
      *                                  'transform', or 'collider' is null.
      */
-    public GameObject(String name, Transform transform, Collider collider, Behavior behaviour, Shape shape) {
-        if (name == null || transform == null || collider == null || shape == null || behaviour == null) {
-            throw new IllegalArgumentException("Parameters cannot be null");
-        }
+    public GameObject(String name, Transform transform, Collider collider, Behavior behaviour, Shape shape)
+    {
+
+        invariante(name, transform, collider, behaviour, shape);
+
         this.name = name;
         this.transform = transform;
         this.collider = collider;

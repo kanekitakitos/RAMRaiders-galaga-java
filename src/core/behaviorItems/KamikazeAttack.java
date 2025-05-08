@@ -44,11 +44,10 @@ import geometry.Ponto;
  *                  </pre>
  *
  * @author Brandon Mejia
- * @author Gabriel Pedroso
- * @author Miguel Correia
  * @version 2025-03-25
  */
-public class KamikazeAttack implements IAttackStrategy {
+public class KamikazeAttack implements IAttackStrategy
+{
     private boolean hadPath = false;
 
     /**
@@ -56,13 +55,13 @@ public class KamikazeAttack implements IAttackStrategy {
      *
      * @param attacker The GameObject performing the attack
      * @param target   The target GameObject
-     * @throws IllegalArgumentException if attacker or target is null or they are
-     *                                  the same object
      */
-    private void invariante(IGameObject attacker, IGameObject target) {
-        if (attacker == null || target == null || attacker.equals(target)) {
+    private void invariante(IGameObject attacker, IGameObject target)
+    {
+        if (attacker == null || target == null || attacker.equals(target))
+        {
             System.out.println("KamikazeAttack:vi");
-            throw new IllegalArgumentException("attacker or target is null or they are the same object");
+            System.exit(0);
         }
     }
 

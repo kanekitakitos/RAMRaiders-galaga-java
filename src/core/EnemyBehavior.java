@@ -38,11 +38,10 @@ import java.util.concurrent.TimeUnit;
  * @see core.behaviorItems.IEnemyMovement
  *
  * @Author Brandon Mejia
- * @Author Gabriel Pedroso
- * @Author Miguel Correia
  * @Version 2025-04-18
  */
-public class EnemyBehavior extends Behavior {
+public class EnemyBehavior extends Behavior
+{
 
     private IAttackStrategy attackStrategy = null; // The attack strategy used by the enemy
     private IEnemyMovement movement; // The movement strategy used by the enemy
@@ -56,7 +55,8 @@ public class EnemyBehavior extends Behavior {
      * Default constructor for `EnemyBehavior`.
      * Initializes the movement strategy to a default `ZigzagMovement`.
      */
-    public EnemyBehavior() {
+    public EnemyBehavior()
+    {
         super();
         this.movement = new ZigzagMovement();
         // TODO: Implement enemy life logic in the future
@@ -78,7 +78,8 @@ public class EnemyBehavior extends Behavior {
      * @return The game object resulting from the attack, or null if no strategy is
      *         set.
      */
-    public IGameObject attack(InputEvent ie) {
+    public IGameObject attack(InputEvent ie)
+    {
         if (this.attackStrategy != null && !this.isAttacking && this.isEnabled()) {
             // Schedule to reset the attack flag after the specified attack duration
             localScheduler.schedule(this::stopAttack, this.attackDuration, TimeUnit.MILLISECONDS);
@@ -107,7 +108,8 @@ public class EnemyBehavior extends Behavior {
      *
      * @param value `true` to activate movement, `false` to deactivate it.
      */
-    public void activateMovement(boolean value) {
+    public void activateMovement(boolean value)
+    {
         if (this.movement != null)
             this.movement.setActive(value);
     }
@@ -138,7 +140,8 @@ public class EnemyBehavior extends Behavior {
      * If the movement strategy is active, it updates the enemy's position.
      */
     @Override
-    public void move() {
+    public void move()
+    {
         if (movement.isActive())
             movement.move(this.go);
 

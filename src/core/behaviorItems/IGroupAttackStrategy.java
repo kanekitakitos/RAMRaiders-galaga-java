@@ -35,6 +35,9 @@ import core.objectsInterface.IGameObject;
  *                  of the enemies and/or the target.
  *
  * @see IGameObject
+ *
+ * @author Brandon Mejia
+ * @version 2025-05-07
  */
 public interface IGroupAttackStrategy {
     /**

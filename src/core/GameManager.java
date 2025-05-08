@@ -36,11 +36,32 @@ import java.util.function.Function;
  * @author Brandon Mejia
  * @version 2025-04-20
  */
-public class GameManager {
+public class GameManager
+{
     private ArrayList<IGameObject> enemies = new ArrayList<>(); // List of enemy game objects
     private GameEngine engine; // The game engine managing game objects
     private IGameObject player; // The player game object
     private IGroupAttackStrategy groupAttackStrategy; // Strategy for group attacks
+
+
+
+
+    /**
+     * Validates the invariants for the `GameManager` class.
+     * Ensures that the provided `GameEngine` and `IGameObject` instances are not null.
+     * If the validation fails, an error message is printed, and the program exits.
+     *
+     * @param engine The `GameEngine` instance managing game objects. Must not be null.
+     * @param player The `IGameObject` instance representing the player. Must not be null.
+     */
+    private void invariante(GameEngine engine, IGameObject player)
+    {
+        if(engine != null && player != null)
+            return;
+
+        System.out.println("GameManager:iv");
+        System.exit(0);
+    }
 
     /**
      * Constructs a `GameManager` instance.
@@ -48,7 +69,10 @@ public class GameManager {
      * @param engine The game engine to manage game objects.
      * @param player The player game object.
      */
-    public GameManager(GameEngine engine, IGameObject player) {
+    public GameManager(GameEngine engine, IGameObject player)
+    {
+        invariante(engine,player);
+
         this.engine = engine;
         this.enemies = new ArrayList<>();
         this.player = player;
@@ -73,7 +97,12 @@ public class GameManager {
      * @param spawnIndexFunction A function to determine the spawn index for each
      *                           enemy.
      */
-    public void generateEnemies(int count, Function<Integer, Integer> spawnIndexFunction) {
+    public void generateEnemies(int count, Function<Integer, Integer> spawnIndexFunction)
+    {
+
+        if(spawnIndexFunction == null || count <= 0)
+            throw new IllegalArgumentException("Invalid parameters for enemy generation");
+
         // Spawn constants
         double scale = 4;
         int layer = 1;
@@ -132,7 +161,7 @@ public class GameManager {
      * @param pattern          A 2D array representing the movement pattern.
      * @param movementStrategy The movement strategy to assign.
      */
-    public void assignMovementPatterns(int[][] pattern, IEnemyMovement movementStrategy) {
+    private void assignMovementPatterns(int[][] pattern, IEnemyMovement movementStrategy) {
         int index = 0;
         for (int row = 0; row < pattern.length; row++) {
             for (int col = 0; col < pattern[row].length; col++) {
@@ -153,7 +182,7 @@ public class GameManager {
      * @param pattern        A 2D array representing the attack pattern.
      * @param attackStrategy The attack strategy to assign.
      */
-    public void assignAttackPatterns(int[][] pattern, IAttackStrategy attackStrategy) {
+    private void assignAttackPatterns(int[][] pattern, IAttackStrategy attackStrategy) {
         int index = 0;
         for (int row = 0; row < pattern.length; row++) {
             for (int col = 0; col < pattern[row].length; col++) {
@@ -171,8 +200,10 @@ public class GameManager {
     /**
      * Enables all enemies in the game engine.
      */
-    public void enableEnemiesToEngine() {
-        for (IGameObject enemy : enemies) {
+    public void enableEnemiesToEngine()
+    {
+        for (IGameObject enemy : enemies)
+        {
             engine.addEnable(enemy);
         }
     }

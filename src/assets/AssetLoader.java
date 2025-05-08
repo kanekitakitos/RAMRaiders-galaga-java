@@ -34,8 +34,6 @@ package assets;
   * - All resources will be properly closed after loading.
   *
   * @author Brandon Mejia
-  * @author Gabriel Pedroso
-  * @author Miguel
   * @version 2025-05-06
   */
  public class AssetLoader {

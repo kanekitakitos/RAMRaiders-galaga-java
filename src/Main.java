@@ -13,8 +13,11 @@ import gui.InputEvent;
 /**
  * Main class to initialize and run the game.
  * Contains methods to create the player, set up the game engine, handle input, and start the game.
+ * @author Brandon Mejia
+ * @version 2025/05/07
  */
-public class Main {
+public class Main
+{
 
     /**
      * Creates the player game object with its properties, collider, behavior, and shape.

@@ -12,8 +12,6 @@ import java.awt.Graphics2D;
  * objects.
  *
  * @author Brandon Mejia
- * @author Gabriel Pedroso
- * @author Miguel Correia
  *
  * @version 2025-03-25
  */

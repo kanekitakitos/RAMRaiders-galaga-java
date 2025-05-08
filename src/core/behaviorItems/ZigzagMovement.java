@@ -30,9 +30,28 @@ import geometry.Ponto;
  * @author Brandon Mejia
  * @version 2025-04-03
  */
-public class ZigzagMovement implements IEnemyMovement {
+public class ZigzagMovement implements IEnemyMovement
+{
     private boolean isActive = false; // Indicates whether the movement is active
     private double time = 0; // Tracks the time for calculating the zigzag pattern
+
+
+    /**
+     * Validates the invariant for the `ZigzagMovement` class.
+     * Ensures that the provided `GameObject` instance is not null.
+     * If the validation fails, an error message is printed, and the program exits.
+     *
+     * @param enemy The `GameObject` instance to validate. Must not be null.
+     */
+    private void invariante(GameObject enemy)
+    {
+        if (enemy != null)
+            return;
+
+        System.out.println("ZigzagMovement:iv");
+        System.exit(0);
+    }
+
 
     /**
      * Moves the enemy object in a zigzag pattern if the movement is active.
@@ -41,7 +60,10 @@ public class ZigzagMovement implements IEnemyMovement {
      * @param enemy The `GameObject` representing the enemy to be moved.
      */
     @Override
-    public void move(GameObject enemy) {
+    public void move(GameObject enemy)
+    {
+        invariante(enemy);
+
         if (!isActive)
             return;
 

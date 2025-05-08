@@ -31,13 +31,10 @@ import java.util.List;
  *                  frames exist.
  *
  * @author Brandon Mejia
- * @author
- *         Gabriel Pedroso
- * @author
- *         Miguel Correia
  * @version 2025-03-25
  */
-public class Shape implements IShape {
+public class Shape implements IShape
+{
 
     private List<BufferedImage> frames; // List of frames for the animation
     private int currentFrameIndex; // Index of the current frame being displayed
@@ -48,6 +45,39 @@ public class Shape implements IShape {
     private double logicalWidth; // Logical width of the shape
     private double logicalHeight; // Logical height of the shape
 
+
+
+    /**
+     * Validates the invariant for the `Shape` class.
+     * Ensures that the provided list of frames is not null or empty.
+     *
+     * @param frames A list of `BufferedImage` objects representing the animation frames. Must not be null or empty.
+     *
+     * @throws IllegalArgumentException if the frames list is null or empty.
+     */
+    private void invariante(List<BufferedImage> frames)
+    {
+        if(frames == null || frames.isEmpty())
+        {
+            throw new IllegalArgumentException("Frames list cannot be null or empty.");
+        }
+    }
+
+
+    /**
+     * Constructs a `Shape` with a list of frames and a frame delay.
+     *
+     * @param other A `Shape` object to copy frames from.
+     */
+    public Shape(Shape other)
+    {
+
+        this.frames = new ArrayList<>(other.frames);
+        this.currentFrameIndex = other.currentFrameIndex;
+        this.frameDelayMillis = other.frameDelayMillis;
+        this.lastFrameTime = other.lastFrameTime;
+    }
+
     /**
      * Constructs a `Shape` with a list of frames and a frame delay.
      *
@@ -55,12 +85,13 @@ public class Shape implements IShape {
      *                         animation frames.
      * @param frameDelayMillis The delay between frames in milliseconds.
      */
-    public Shape(List<BufferedImage> frames, int frameDelayMillis) {
-        if (frames == null || frames.isEmpty()) {
-            this.frames = new ArrayList<>();
-        } else {
-            this.frames = frames;
-        }
+    public Shape(List<BufferedImage> frames, int frameDelayMillis)
+    {
+        invariante(frames);
+
+        this.frames = new ArrayList<>();
+        this.frames = frames;
+
         this.currentFrameIndex = 0;
         this.frameDelayMillis = frameDelayMillis;
         this.lastFrameTime = System.currentTimeMillis();
@@ -73,21 +104,17 @@ public class Shape implements IShape {
      *                         frame.
      * @param frameDelayMillis The delay between frames in milliseconds.
      */
-    public Shape(BufferedImage frames, int frameDelayMillis) {
+    public Shape(BufferedImage frames, int frameDelayMillis)
+    {
+        if (frames == null)
+        {
+            throw new IllegalArgumentException("Frame cannot be null.");
+        }
+
         this.frames = new ArrayList<>();
         this.frames.add(frames);
         this.currentFrameIndex = 0;
         this.frameDelayMillis = frameDelayMillis;
-        this.lastFrameTime = System.currentTimeMillis();
-    }
-
-    /**
-     * Constructs a `Shape` with no frames and no frame delay.
-     */
-    public Shape() {
-        this.frames = new ArrayList<>();
-        this.currentFrameIndex = 0;
-        this.frameDelayMillis = 0;
         this.lastFrameTime = System.currentTimeMillis();
     }
 

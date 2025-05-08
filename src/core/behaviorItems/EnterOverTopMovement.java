@@ -1,7 +1,10 @@
 package core.behaviorItems;
 
 import core.GameObject;
+import core.objectsInterface.IGameObject;
 import geometry.Ponto;
+
+import java.sql.SQLOutput;
 
 /**
  * The EnterOverTopMovement class implements a movement pattern for enemies
@@ -41,11 +44,10 @@ import geometry.Ponto;
  *                  direction.
  *
  * @author Brandon Mejia
- * @author Gabriel Pedroso
- * @author Miguel
  * @version 2025-04-25
  */
-public class EnterOverTopMovement implements IEnemyMovement {
+public class EnterOverTopMovement implements IEnemyMovement
+{
 
     private boolean active = false; // Indicates whether the movement is active
     private boolean goRightToLeft = false; // Direction of the movement (right-to-left or left-to-right)
@@ -67,13 +69,25 @@ public class EnterOverTopMovement implements IEnemyMovement {
     private Ponto circleCenter; // Center of the circular phase
     private Ponto finalApproachStart; // Starting position of the final approach phase
 
+
+    private void invariante(IGameObject go)
+    {
+        if(go != null)
+            return;
+
+        System.out.println("EnterOverTopMovement:iv");
+        System.exit(0);
+    }
+
     /**
      * Sets the final target position for the movement.
      *
      * @param target The target position as a `Ponto` object.
      */
-    public void setFinalTarget(Ponto target) {
-        this.finalTarget = target;
+    public void setFinalTarget(Ponto target)
+    {
+        if(target != null)
+            this.finalTarget = target;
     }
 
     /**
@@ -94,7 +108,8 @@ public class EnterOverTopMovement implements IEnemyMovement {
      * @throws IllegalStateException If the final target is not set when activating.
      */
     @Override
-    public void setActive(boolean active) {
+    public void setActive(boolean active)
+    {
         this.active = active;
         if (!active) {
             t = 0.0;
@@ -126,7 +141,10 @@ public class EnterOverTopMovement implements IEnemyMovement {
      * @param enemy The enemy `GameObject` to move.
      */
     @Override
-    public void move(GameObject enemy) {
+    public void move(GameObject enemy)
+    {
+        invariante(enemy);
+
         if (!active)
             return;
 

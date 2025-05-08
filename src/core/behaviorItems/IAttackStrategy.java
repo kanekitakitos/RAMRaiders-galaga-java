@@ -32,6 +32,9 @@ import core.objectsInterface.IGameObject;
  *                  result of the attack (e.g., a projectile or effect).
  *
  * @see IGameObject
+ *
+ * @author Brandon Mejia
+ * @version 2025-05-07
  */
 public interface IAttackStrategy {
 

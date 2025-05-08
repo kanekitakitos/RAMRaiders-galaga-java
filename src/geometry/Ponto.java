@@ -9,7 +9,8 @@ package geometry;
  * @author Brandon Mejia
  * @version 2025-02-10
  */
-public class Ponto {
+public class Ponto
+{
     private double x; // The x coordinate of the point
     private double y; // The y coordinate of the point
 
@@ -19,7 +20,8 @@ public class Ponto {
      * @param x The x coordinate of the point.
      * @param y The y coordinate of the point.
      */
-    public Ponto(double x, double y) {
+    public Ponto(double x, double y)
+    {
         this.x = x;
         this.y = y;
     }

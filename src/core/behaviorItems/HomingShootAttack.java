@@ -1,5 +1,6 @@
 package core.behaviorItems;
 
+import assets.AssetLoader;
 import core.Behavior;
 import core.GameObject;
 import core.Shape;
@@ -42,14 +43,14 @@ import geometry.Poligono;
  * @see IAttackStrategy
  *
  * @author Brandon Mejia
- * @author Gabriel Pedroso
- * @author Miguel Correia
  *
  * @version 2025-04-21
  */
 public class HomingShootAttack implements IAttackStrategy {
     // Static index to ensure unique naming for bullets
     private static int index = 0;
+    private final Shape shape = new Shape(AssetLoader.loadImage("laser.png"), 100); // Default shape of the bullet
+
 
     /**
      * Validates the invariants for the attack.
@@ -61,10 +62,12 @@ public class HomingShootAttack implements IAttackStrategy {
      * @throws IllegalArgumentException if the attacker or target is null, or if
      *                                  they are the same object.
      */
-    private void invariante(IGameObject attacker, IGameObject target) {
-        if (attacker == null || target == null || attacker.equals(target)) {
+    private void invariante(IGameObject attacker, IGameObject target)
+    {
+        if (attacker == null || target == null || attacker.equals(target))
+        {
             System.out.println("HomingShootAttack:vi");
-            throw new IllegalArgumentException("attacker is null");
+            System.exit(0);
         }
     }
 
@@ -135,7 +138,8 @@ public class HomingShootAttack implements IAttackStrategy {
      * @param theta            The angle of the bullet's trajectory.
      * @return The starting position of the bullet as a Ponto.
      */
-    private Ponto calculateBulletStartPosition(Ponto attackerPosition, double theta) {
+    private Ponto calculateBulletStartPosition(Ponto attackerPosition, double theta)
+    {
         double offsetDistance = 2;
         return new Ponto(
                 attackerPosition.x() + offsetDistance * Math.cos(theta),
@@ -164,7 +168,8 @@ public class HomingShootAttack implements IAttackStrategy {
         Poligono rectangle = new Poligono(rPoints, transform);
         Ponto velocity = new Ponto(Math.cos(theta) * speed, Math.sin(theta) * speed);
 
-        Shape shape = new Shape();
+        Shape shape = new Shape(this.shape);
+
         Behavior behavior = new Behavior();
 
         GameObject bullet = new GameObject(

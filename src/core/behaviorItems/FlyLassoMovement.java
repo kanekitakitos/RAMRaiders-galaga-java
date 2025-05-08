@@ -55,7 +55,8 @@ import geometry.Ponto;
  * @author Brandon Mejia
  * @version 2025-04-23
  */
-public class FlyLassoMovement implements IEnemyMovement {
+public class FlyLassoMovement implements IEnemyMovement
+{
     private boolean active = false; // Indicates whether the movement is active
     private double t = 0.0; // Time variable for movement progression
     private Ponto initialPosition; // The initial position of the GameObject

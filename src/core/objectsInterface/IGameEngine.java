@@ -4,6 +4,9 @@ package core.objectsInterface;
  * The IGameEngine interface provides methods to manage game objects,
  * handle their states, and perform game operations such as running
  * the game loop and checking for collisions.
+ *
+ * @author Brandon Mejia
+ * @version 2025-05-07
  */
 public interface IGameEngine
 {

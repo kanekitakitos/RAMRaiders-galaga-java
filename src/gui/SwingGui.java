@@ -39,10 +39,31 @@ import javax.swing.SwingUtilities;
  * @author Brandon Mejia
  * @version 2025-03-25
  */
-public class SwingGui implements IGuiBridge {
+public class SwingGui implements IGuiBridge
+{
     private JFrame frame; // The main game window
     private GamePanel panel; // Custom panel for rendering game objects
     private IInputEvent inputState; // Input event handler
+
+
+    /**
+    * Validates the invariants for the SwingGui class.
+    * Ensures that the width and height parameters are positive integers.
+    * If the validation fails, an error message is printed, and the program exits.
+    *
+    * @param width  The width of the game window in pixels. Must be greater than 0.
+    * @param height The height of the game window in pixels. Must be greater than 0.
+    *
+    */
+    private void invariante(int width, int height)
+    {
+        if(width > 0 && height > 0)
+            return;
+
+        System.out.println("SwingGui:iv");
+        System.exit(0);
+    }
+
 
     /**
      * Constructs a SwingGui with the specified dimensions.
@@ -50,7 +71,10 @@ public class SwingGui implements IGuiBridge {
      * @param width  The width of the game window in pixels.
      * @param height The height of the game window in pixels.
      */
-    public SwingGui(int width, int height) {
+    public SwingGui(int width, int height)
+    {
+        invariante(width, height);
+
         this.frame = new JFrame("Galaga - RAMRaiders");
         panel = new GamePanel(width, height);
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -59,8 +83,6 @@ public class SwingGui implements IGuiBridge {
         this.frame.setLocationRelativeTo(null);
         this.frame.setVisible(true);
         this.frame.setResizable(false);
-
-        this.inputState = new HandlerInputPlayer();
         this.inputState.registerInputHandlers(this.frame);
     }
 
@@ -71,7 +93,10 @@ public class SwingGui implements IGuiBridge {
      * @param height          The height of the game window in pixels.
      * @param backgroundShape The shape to use as the background.
      */
-    public SwingGui(int width, int height, Shape backgroundShape) {
+    public SwingGui(int width, int height, Shape backgroundShape)
+    {
+        invariante(width, height);
+
         this.frame = new JFrame("Galaga - RAMRaiders");
         panel = new GamePanel(width, height, backgroundShape);
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -87,7 +112,11 @@ public class SwingGui implements IGuiBridge {
      *
      * @param inputState The input event handler to set.
      */
-    public void setInput(IInputEvent inputState) {
+    public void setInput(IInputEvent inputState)
+    {
+        if (inputState == null)
+            throw new IllegalArgumentException("Input state cannot be null");
+
         this.inputState = inputState;
         this.inputState.registerInputHandlers(this.frame);
         this.frame.setFocusable(true);
@@ -99,7 +128,8 @@ public class SwingGui implements IGuiBridge {
      * @param objects A thread-safe list of game objects to render.
      */
     @Override
-    public void draw(CopyOnWriteArrayList<IGameObject> objects) {
+    public void draw(CopyOnWriteArrayList<IGameObject> objects)
+    {
         SwingUtilities.invokeLater(() -> panel.updateGameObjects(objects));
     }
 
@@ -118,7 +148,8 @@ public class SwingGui implements IGuiBridge {
      *
      * @param hitbox True to show hitboxes, false to hide them.
      */
-    public void setHitbox(boolean hitbox) {
+    public void setHitbox(boolean hitbox)
+    {
         this.panel.setHitbox(hitbox);
     }
 }

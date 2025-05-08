@@ -1,6 +1,7 @@
 package core.behaviorItems;
 
 import core.GameObject;
+import core.objectsInterface.IGameObject;
 import geometry.Ponto;
 
 /**
@@ -60,6 +61,23 @@ public class EnterSideMovement implements IEnemyMovement {
     private final double baseHorizontalDistance = 140.0; // Horizontal distance for entry
     private final double baseCircleRadius = 40; // Radius of the circular lasso
 
+
+    /**
+     * Validates the invariant for the `EnterSideMovement` class.
+     * Ensures that the provided `IGameObject` instance is not null.
+     * If the validation fails, an error message is printed, and the program exits.
+     *
+     * @param go The `IGameObject` instance to validate. Must not be null.
+     */
+    private void invariante(IGameObject go)
+    {
+        if(go != null)
+            return;
+
+        System.out.println("EnterSideMovement:iv");
+        System.exit(0);
+    }
+
     /**
      * Sets the direction of the movement.
      *
@@ -76,7 +94,8 @@ public class EnterSideMovement implements IEnemyMovement {
      * @param target The target position as a `Ponto` object.
      */
     public void setFinalTarget(Ponto target) {
-        this.finalTarget = target;
+        if(target != null)
+            this.finalTarget = target;
     }
 
     /**
@@ -85,9 +104,11 @@ public class EnterSideMovement implements IEnemyMovement {
      * @param active True to activate the movement, false to deactivate it.
      */
     @Override
-    public void setActive(boolean active) {
+    public void setActive(boolean active)
+    {
         this.active = active;
-        if (!active) {
+        if (!active)
+        {
             t = 0.0; // Reset time
             initialPosition = null; // Clear initial position
         }
@@ -110,7 +131,10 @@ public class EnterSideMovement implements IEnemyMovement {
      * @param enemy The `GameObject` representing the enemy.
      */
     @Override
-    public void move(GameObject enemy) {
+    public void move(GameObject enemy)
+    {
+        invariante(enemy);
+
         if (!active)
             return;
 
@@ -233,7 +257,7 @@ public class EnterSideMovement implements IEnemyMovement {
      * @param nextPoint The next position of the enemy.
      * @return The angle for the enemy's rotation.
      */
-    public double calculateAngle(GameObject enemy, Ponto nextPoint) {
+    private double calculateAngle(GameObject enemy, Ponto nextPoint) {
         Ponto shipCenter = enemy.transform().position();
         double dx = nextPoint.x() - shipCenter.x();
         double dy = nextPoint.y() - shipCenter.y();

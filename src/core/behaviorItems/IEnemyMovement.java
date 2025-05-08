@@ -24,8 +24,7 @@ import core.GameObject;
  * </pre>
  *
  * @author Brandon Mejia
- * @author Gabriel Pedroso
- * @author Miguel Correia
+ * 
  * @version 2025-03-25
  */
 public interface IEnemyMovement {
