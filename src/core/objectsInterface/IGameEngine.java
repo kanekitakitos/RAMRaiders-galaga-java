@@ -76,4 +76,7 @@ public interface IGameEngine
      * passing in the list of objects that collided with each game object.
      */
     void checkCollision();
+
+
+    void enableAll();
 }

@@ -116,7 +116,7 @@ public class SwingGui implements IGuiBridge
     public void setInput(IInputEvent inputState)
     {
         if (inputState == null)
-            throw new IllegalArgumentException("Input state cannot be null");
+            return;
 
         this.inputState = inputState;
         this.inputState.registerInputHandlers(this.frame);

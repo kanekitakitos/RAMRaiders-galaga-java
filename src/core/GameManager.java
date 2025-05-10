@@ -12,6 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
+import gui.IInputEvent;
 
 /**
  * The `GameManager` class is responsible for managing the game's enemies,
@@ -48,6 +49,7 @@ public class GameManager
     private GameEngine engine; // The game engine managing game objects
     private IGameObject player; // The player game object
     private IGroupAttackStrategy groupAttackStrategy; // Strategy for group attacks
+    private IInputEvent input; // Input event mapping for keys and mouse buttons
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
 
@@ -81,8 +83,6 @@ public class GameManager
         invariante(engine,player);
 
         this.engine = engine;
-        this.engine.getGui().setInput(this.getInput());
-
         this.enemies = new CopyOnWriteArrayList<>();
         this.player = player;
 
@@ -120,7 +120,7 @@ public class GameManager
 
         // Spawn constants
         double scale = 4;
-        int layer = 1;
+        int layer = this.player.transform().layer() + 1;
         double defaultY = this.player.transform().position().y() * 0.5;
 
         // Spawn positions and angles
@@ -217,14 +217,16 @@ public class GameManager
     }
 
     /**
-     * Enables all enemies in the game engine.
+     * Enables all gameObjects in the game engine.
      */
-    public void enableEnemiesToEngine()
+    public void enableObjectsToEngine()
     {
         for (IGameObject enemy : enemies)
         {
-            engine.addEnable(enemy);
+            engine.add(enemy);
         }
+
+        this.engine.enableAll();
     }
 
     public void shutdown()
@@ -241,28 +243,17 @@ public class GameManager
      *
      * @return InputEvent The input event mapping for keys and mouse buttons.
      */
-    public InputEvent getInput()
+    public IInputEvent getInput()
     {
-        Map<Integer, String> customKeyMap = new HashMap<>(); // Map for custom key bindings
-        customKeyMap.put(KeyEvent.VK_A, "LEFT");
-        customKeyMap.put(KeyEvent.VK_LEFT, "LEFT");
-        customKeyMap.put(KeyEvent.VK_RIGHT, "RIGHT");
-        customKeyMap.put(KeyEvent.VK_D, "RIGHT");
-        customKeyMap.put(KeyEvent.VK_C, "ATTACK");
-        customKeyMap.put(KeyEvent.VK_X, "EVASIVE");
-
-        Map<Integer, String> customMouseMap = new HashMap<>(); // Map for custom mouse bindings
-        customMouseMap.put(MouseEvent.BUTTON1, "ATTACK");
-        customMouseMap.put(MouseEvent.BUTTON3, "EVASIVE");
-
-        return new InputEvent(customKeyMap, customMouseMap); // Return the input event mapping
+        
+        return this.input; // Return the input event mapping
     }
 
 
     public void startGame()
     {
-        this.enableEnemiesToEngine();
+        this.enableObjectsToEngine();
         this.startRelocateEnemies();
-        engine.run();
+        this.engine.run();
     }
 }

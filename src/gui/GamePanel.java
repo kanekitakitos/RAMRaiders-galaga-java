@@ -11,6 +11,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -118,19 +119,21 @@ public class GamePanel extends JPanel
      */
     public void updateGameObjects(List<IGameObject> newObjects)
     {
-        this.objectsToRender = newObjects;
-        repaint();
-    }
 
-    /**
-     * Updates the list of Info objects to be rendered.
-     * Triggers a repaint of the panel.
-     *
-     * @param newObjects The new list of game objects to render
-     */
-    public void updateInfoObjects(List<IGameObject> newObjects)
-    {
-        this.objectsToRender = newObjects;
+        List<IGameObject> layerZero = new ArrayList<>();
+        List<IGameObject> otherLayers = new ArrayList<>();
+
+        for (IGameObject go : newObjects)
+        {
+            if (go.transform().layer() == 0)
+                layerZero.add(go);
+            else
+                otherLayers.add(go);
+
+        }
+
+        this.infoToRender = layerZero;
+        this.objectsToRender = otherLayers;
         repaint();
     }
 
@@ -213,19 +216,6 @@ public class GamePanel extends JPanel
             go.collider().draw(g2d, panelWidth / 2.0 - panelWidth / 6.0, panelHeight / 2.0);
     }
 
-    /**
-     * Draws the information panel on the right side of the screen.
-     *
-     * @param g2d The graphics context to draw on
-     */
-    private void drawInfoStats(Graphics2D g2d, IGameObject go, int panelWidth, int panelHeight)
-    {
-        g2d.setColor(Color.BLACK);
-        g2d.fillRect(getWidth() - getWidth() / 3, 0, getWidth() / 3, getHeight());
-        drawGameObject(g2d, go, panelWidth, panelHeight);
-    }
-
-
 
     private void drawGame(Graphics2D g2d)
     {
@@ -238,15 +228,17 @@ public class GamePanel extends JPanel
             drawGameObject(g2d, go, getWidth(), getHeight());
         }
 
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(getWidth() - getWidth() / 3, 0, getWidth() / 3, getHeight());
+
         for (IGameObject go : infoToRender)
         {
             if (go.transform() == null || go.shape() == null)
                 continue;
 
-            drawInfoStats(g2d, go, getWidth(), getHeight());
+            drawGameObject(g2d, go, getWidth(), getHeight());
         }
 
-        
     }
 
 

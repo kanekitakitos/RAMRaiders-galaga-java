@@ -299,12 +299,34 @@ public class GameEngine implements IGameEngine
      * Iterates through all layers and removes all `GameObject`s.
      */
     @Override
-    public void destroyAll() {
-        for (CopyOnWriteArrayList<IGameObject> layerObjects : layeredGameObjects.values()) {
+    public void destroyAll()
+    {
+        for (CopyOnWriteArrayList<IGameObject> layerObjects : layeredGameObjects.values())
+        {
             if (layerObjects == null || layerObjects.isEmpty())
                 continue;
-            for (IGameObject go : layerObjects) {
+            for (IGameObject go : layerObjects)
+            {
                 destroy(go);
+            }
+        }
+    }
+
+
+    /**
+     * enable all `GameObject`s in the engine.
+     * Iterates through all layers and enable all `GameObject`s.
+     */
+    @Override
+    public void enableAll()
+    {
+        for (CopyOnWriteArrayList<IGameObject> layerObjects : layeredGameObjects.values())
+        {
+            if (layerObjects == null || layerObjects.isEmpty())
+                continue;
+            for (IGameObject go : layerObjects)
+            {
+                this.enable(go);
             }
         }
     }
