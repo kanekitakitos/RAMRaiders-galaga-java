@@ -207,7 +207,7 @@ public class PlayerBehavior extends Behavior
         double deltaY = 0;
 
         // Define the step size for movement
-        double moveStep = 2.5;
+        double moveStep = 3.2;
 
         // Adjust movement deltas based on input actions
         if (ie.isActionActive("RIGHT"))

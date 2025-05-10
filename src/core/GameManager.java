@@ -143,7 +143,14 @@ public class GameManager
             Transform t = new Transform(spawnPoint, layer, spawnAngle, scale);
             Poligono collider = new Poligono(pointsTriangulo, t);
             EnemyBehavior behavior = new EnemyBehavior();
-            Shape shape = new Shape(AssetLoader.loadAnimationFrames("nave.png"), 550);
+            Shape shape;
+
+            if( i > 7 && i <12 ) // the first 4 enemys
+                shape = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 150);
+            else if ( (i >= 0 && i <4) || (i >= 12 && i <= 23))
+                shape = new Shape(AssetLoader.loadAnimationFrames("inimigo2.gif"), 150);
+            else
+                shape = new Shape(AssetLoader.loadAnimationFrames("inimigo1.gif"), 150);
 
             GameObject enemy = new GameObject("Enemy " + i, t, collider, behavior, shape);
             enemy.onInit();
@@ -170,7 +177,7 @@ public class GameManager
         Ponto position = this.player.transform().position();
         for (int i = 0; i < lives; i++)
         {
-            Shape shape = new Shape(AssetLoader.loadAnimationFrames("nave.gif"), 0);
+            Shape shape = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0);
             Transform transform = new Transform(new Ponto(position.x()+450 + i * 100, position.y()-20 ), layer, 90, scale);
             Poligono collider = new Poligono(pointsQuadrado, transform);
             
@@ -246,25 +253,20 @@ public class GameManager
     private void monitorarVidas()
     {
         ArrayList<GameObject> lifeDisplays = generateInfoStat();
-        this.scheduler.scheduleAtFixedRate(() ->
-        {
-            PlayerBehavior playerBehavior = (PlayerBehavior) this.player.behavior();
-
-            // Remove os objetos de vida que não são mais necessários
-            while (true)
+        Runnable monitorTask = () -> {
+            synchronized (lifeDisplays)
             {
-                if(lifeDisplays.size() > playerBehavior.getLife())
+                PlayerBehavior playerBehavior = (PlayerBehavior) this.player.behavior();
+                int vidasAtuais = playerBehavior.getLife();
+                
+                while (lifeDisplays.size() > vidasAtuais)
                 {
                     GameObject lifeDisplay = lifeDisplays.remove(lifeDisplays.size() - 1);
-                    System.out.println(playerBehavior.getLife());
-                    engine.disable(lifeDisplay); // Remove o objeto do motor de jogo
+                    engine.disable(lifeDisplay);
                 }
-                else if(lifeDisplays.size() == 0)
-                    break;
-                else
-                    continue;
-                
             }
-        }, 10, 1, TimeUnit.SECONDS); // Verifica a cada segundo
+        };
+        
+        this.scheduler.scheduleAtFixedRate(monitorTask, 0, 1, TimeUnit.SECONDS);
     }
 }

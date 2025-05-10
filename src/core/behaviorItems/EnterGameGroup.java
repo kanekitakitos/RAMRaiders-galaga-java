@@ -113,11 +113,14 @@ public class EnterGameGroup implements IGroupAttackStrategy
      *
      * @param enemies List of enemies to be relocated.
      */
-    public void startRelocateEnemies(List<IGameObject> enemies)
+    public synchronized void startRelocateEnemies(List<IGameObject> enemies)
     {
         scheduler.scheduleAtFixedRate(() ->
         {
-            relocateEnemies(enemies);
+            synchronized(enemies)
+            {
+                relocateEnemies(enemies);
+            }
         }, 1000, groupDelayFrames * 120, TimeUnit.MILLISECONDS);
     }
 

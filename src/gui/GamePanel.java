@@ -204,8 +204,8 @@ public class GamePanel extends JPanel
         g2d.translate(screenX, screenY);
         g2d.rotate(Math.toRadians(-angle));
 
-        double logicalWidth = shape.getLogicalWidth() * 1.5;
-        double logicalHeight = shape.getLogicalHeight() * 1.5;
+        double logicalWidth = shape.getLogicalWidth() * 2;
+        double logicalHeight = shape.getLogicalHeight() * 2;
 
         g2d.drawImage(img, (int) (-logicalWidth / 2), (int) (-logicalHeight / 2),
                 (int) logicalWidth, (int) logicalHeight, null);

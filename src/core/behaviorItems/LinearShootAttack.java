@@ -46,7 +46,7 @@ import java.util.Random;
 public class LinearShootAttack implements IAttackStrategy {
     private static int index = 0; // Counter for unique bullet naming
     private double SPEED = 10.0; // Default speed of the bullet
-    private final Shape shape = new Shape(AssetLoader.loadImage("laser.png"), 100); // Default shape of the bullet
+    private final Shape shape = new Shape(AssetLoader.loadImage("laser1.gif"), 100); // Default shape of the bullet
 
     /**
      * Validates the attacker parameter to ensure it is not null.
