@@ -38,7 +38,7 @@ public class Main
         Transform t1 = new Transform(position, layer, angle, scale); // Transform for the player
         Poligono collider = new Poligono(points, t1); // Polygon collider for the player
         // Circulo collider = new Circulo(5, t1); // Alternative circular collider (commented out)
-        Shape shape = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 550); // Shape with animation frames
+        Shape shape = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 150); // Shape with animation frames
         PlayerBehavior behavior = new PlayerBehavior(); // Behavior of the player
         GameObject player = new GameObject("Player", t1, collider, behavior, shape); // Create the player game object
         player.onInit(); // Initialize the player

@@ -89,6 +89,7 @@ public class GameManager
 
         Function<Integer, Integer> spawnIndexFunction = (Integer i) ->
         {
+            
             int groupSize = 8;
             int groupNumber = i / groupSize;
             int patternIndex = groupNumber % 4;
@@ -131,7 +132,6 @@ public class GameManager
         double[] spawnYCoords = { defaultY, defaultY, bottomY, bottomY };
 
         Ponto[] pointsTriangulo = { new Ponto(0, 0), new Ponto(0, 12), new Ponto(12, 6) };
-        //Ponto[] pointsQuadrado = { new Ponto(-5, 5), new Ponto(5, 5), new Ponto(5, -5), new Ponto(-5, -5)};
 
         for (int i = 0; i < count; i++)
         {
@@ -149,7 +149,7 @@ public class GameManager
                 shape = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 150);
             else if ( (i >= 0 && i <4) || (i >= 12 && i <= 23))
                 shape = new Shape(AssetLoader.loadAnimationFrames("inimigo2.gif"), 150);
-            else
+            else // final two lines
                 shape = new Shape(AssetLoader.loadAnimationFrames("inimigo1.gif"), 150);
 
             GameObject enemy = new GameObject("Enemy " + i, t, collider, behavior, shape);
@@ -254,16 +254,16 @@ public class GameManager
     {
         ArrayList<GameObject> lifeDisplays = generateInfoStat();
         Runnable monitorTask = () -> {
-            synchronized (lifeDisplays)
             {
+                System.out.println("HOLAAA");
                 PlayerBehavior playerBehavior = (PlayerBehavior) this.player.behavior();
                 int vidasAtuais = playerBehavior.getLife();
-                
-                while (lifeDisplays.size() > vidasAtuais)
-                {
-                    GameObject lifeDisplay = lifeDisplays.remove(lifeDisplays.size() - 1);
-                    engine.disable(lifeDisplay);
-                }
+
+                    if (lifeDisplays.size() > vidasAtuais)
+                    {
+                        GameObject lifeDisplay = lifeDisplays.remove(lifeDisplays.size() - 1);
+                        engine.disable(lifeDisplay);
+                    }
             }
         };
         

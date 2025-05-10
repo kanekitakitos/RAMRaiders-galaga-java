@@ -121,7 +121,7 @@ public class EnterGameGroup implements IGroupAttackStrategy
             {
                 relocateEnemies(enemies);
             }
-        }, 1000, groupDelayFrames * 120, TimeUnit.MILLISECONDS);
+        }, 1000, groupDelayFrames * 100, TimeUnit.MILLISECONDS);
     }
 
     

@@ -54,8 +54,8 @@ public class EnterSideMovement implements IEnemyMovement {
     private final double scale = 2; // Global scale factor for the movement
     private final double tIncrement = 0.018; // Time increment for each movement step
 
-    private final double t1 = 2.0; // Duration of the entry and lasso phases
-    private final double t2 = 2.0; // Duration of the final approach phase
+    private final double t1 = 2.2; // Duration of the entry and lasso phases
+    private final double t2 = 1.3; // Duration of the final approach phase
 
     // Base distances (in units before applying the scale)
     private final double baseHorizontalDistance = 140.0; // Horizontal distance for entry

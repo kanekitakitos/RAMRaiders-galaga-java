@@ -4,8 +4,6 @@ import core.GameObject;
 import core.objectsInterface.IGameObject;
 import geometry.Ponto;
 
-import java.sql.SQLOutput;
-
 /**
  * The EnterOverTopMovement class implements a movement pattern for enemies
  * that involves an arc-like path over the top of the screen, followed by a
@@ -62,7 +60,7 @@ public class EnterOverTopMovement implements IEnemyMovement
 
     private final double tIncrement = 0.018; // Time increment for each movement step
     private final double t1 = 0.8; // Duration of the arc phase
-    private final double t2 = 1.3; // Duration of the circular phase
+    private final double t2 = 1.5; // Duration of the circular phase
     private final double t3 = 1.0; // Duration of the final approach phase
 
     private Ponto arcEnd; // End position of the arc phase
