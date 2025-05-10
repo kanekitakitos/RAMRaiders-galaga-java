@@ -81,7 +81,8 @@ public class ZigzagMovement implements IEnemyMovement
      * @param active `true` to activate the movement, `false` to deactivate it.
      */
     @Override
-    public void setActive(boolean active) {
+    public void setActive(boolean active)
+    {
         this.isActive = active;
         if (active)
             time = 0; // Reset time when movement is activated

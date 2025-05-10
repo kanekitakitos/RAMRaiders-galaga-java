@@ -70,25 +70,6 @@ public class Main
      */
     public static void createGameEngine(SwingGui GUI)
     {
-        //Ponto position = new Ponto(0,200); // Initial position of the player object
-        //Ponto[] points = {new Ponto(-5, 5), new Ponto(5, 5), new Ponto(5, -5), new Ponto(-5, -5)}; // Points for the collider
-
-        //Transform t1 = new Transform(position, 1, 90, 4); // Transform for the player
-        //Poligono collider = new Poligono(points, t1); // Polygon collider for the player
-        // Circulo collider = new Circulo(5, t1); // Alternative circular collider (commented out)
-        //Shape shape = new Shape(AssetLoader.loadAnimationFrames("nave.png"), 550); // Shape with animation frames
-        //EnemyBehavior behavior = new EnemyBehavior(); // Behavior of the player
-        //GameObject enemy = new GameObject("Enemy", t1, collider, behavior, shape); // Create the player game object
-        //enemy.onInit();
-
-        //FlyCircleMovement movement = new FlyCircleMovement();
-        //movement.setIsLeft(false);
-        //behavior.setMovement(movement);
-        //movement.setActive(true);
-        //engine.addEnable(enemy); // Add the player to the engine
-
-
-
         GameEngine engine = new GameEngine(GUI); // Initialize the game engine with the GUI
         IGameObject player = createPlayer(); // Create the player object
 

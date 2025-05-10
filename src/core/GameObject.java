@@ -1,6 +1,6 @@
 package core;
 
-import core.objectsInterface.IBehavior;
+import core.objectsInterface.*;
 import core.objectsInterface.ICollider;
 import core.objectsInterface.IGameObject;
 import geometry.Ponto;
@@ -75,7 +75,7 @@ public class GameObject implements IGameObject
      * @param behaviour The behavior of the game object. Must not be null.
      * @param shape     The shape of the game object. Must not be null.
      */
-    private void invariante(String name, Transform transform, Collider collider, Behavior behaviour, Shape shape)
+    private void invariante(String name, ITransform transform, ICollider collider, IBehavior behaviour, IShape shape)
     {
         if (name == null || transform == null || collider == null || shape == null || behaviour == null)
         {

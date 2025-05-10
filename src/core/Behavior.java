@@ -124,9 +124,15 @@ public class Behavior implements IBehavior
      * @param collisions A list of GameObjects that this behavior collided with.
      */
     @Override
-    public void onCollision(ArrayList<IGameObject> collisions) {
+    public void onCollision(ArrayList<IGameObject> collisions)
+    {
         for (IGameObject go : collisions)
-            go.behavior().onDestroy();
+                {
+                    if(go.name().contains("Player") && go.behavior().isEnabled())
+                        continue;
+                    else
+                        go.behavior().onDisabled(); // Destroy the enemy if it collides with the player or other object
+                }
 
         this.onDestroy();
     }
@@ -152,7 +158,9 @@ public class Behavior implements IBehavior
      *
      * @return True if the behavior is enabled, false otherwise.
      */
-    public boolean isEnabled() {
+    @Override
+    public boolean isEnabled()
+    {
         return this.isEnabled;
     }
 

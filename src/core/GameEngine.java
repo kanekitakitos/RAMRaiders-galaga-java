@@ -104,7 +104,8 @@ public class GameEngine implements IGameEngine
      * @param go The `GameObject` to remove.
      */
     @Override
-    public void destroy(IGameObject go) {
+    public void destroy(IGameObject go)
+    {
         int layer = go.transform().layer();
         if (layeredGameObjects.containsKey(layer)) {
             layeredGameObjects.get(layer).remove(go);
@@ -148,7 +149,8 @@ public class GameEngine implements IGameEngine
      *
      * @param dt The time delta for the update.
      */
-    public void onUpdate(double dt) {
+    public void onUpdate(double dt)
+    {
         ArrayList<IGameObject> objectsToMove = new ArrayList<>();
         ArrayList<IGameObject> attacksToAdd = new ArrayList<>();
 
@@ -157,7 +159,14 @@ public class GameEngine implements IGameEngine
             if (layerObjects == null)
                 continue;
 
-            for (IGameObject go : layerObjects) {
+            for (IGameObject go : layerObjects)
+            {
+
+                if(this.isDisabled(go))
+                {
+                    this.disabledGameObjects.add(go);
+                    continue; // Skip this object if it is disabled
+                }
                 int originalLayer = entry.getKey();
 
                 if (go.transform() != null)
@@ -175,7 +184,8 @@ public class GameEngine implements IGameEngine
             }
         }
 
-        for (IGameObject go : objectsToMove) {
+        for (IGameObject go : objectsToMove)
+        {
             destroy(go);
             add(go);
         }
@@ -183,7 +193,10 @@ public class GameEngine implements IGameEngine
             addEnable(go);
 
         for (IGameObject go : this.disabledGameObjects)
-            this.destroy(go);
+            {
+                this.destroy(go);
+            }
+            this.disabledGameObjects.clear();
     }
 
     /**
@@ -192,7 +205,8 @@ public class GameEngine implements IGameEngine
      * passing in the list of all the objects that collided with each `IGameObject`.
      */
     @Override
-    public void checkCollision() {
+    public void checkCollision()
+    {
         ArrayList<IGameObject> output = new ArrayList<>();
         IGameObject currentObject = null;
 
@@ -203,7 +217,8 @@ public class GameEngine implements IGameEngine
             int size = layerObjects.size();
             for (int i = 0; i < size; i++) {
                 currentObject = layerObjects.get(i);
-                for (int j = 0; j < size; j++) {
+                for (int j = 0; j < size; j++)
+                {
                     if (i == j)
                         continue;
 
@@ -212,17 +227,16 @@ public class GameEngine implements IGameEngine
                     if (currentObject.name().contains("Enemy") && other.name().contains("Enemy"))
                         continue;
 
-                    //if (currentObject.name().contains("Bullet") && other.name().contains("Bullet"))
-                    //    continue;
+                    if (currentObject.name().contains("Bullet") && other.name().contains("Bullet"))
+                        continue;
 
                     if (currentObject.collider().colision(other.collider()))
                         output.add(other);
                 }
 
-                if (!output.isEmpty()) {
+                if (!output.isEmpty())
+                {
                     currentObject.behavior().onCollision(output);
-                    this.disabledGameObjects.addAll(output);
-                    this.disabledGameObjects.add(currentObject);
                 }
 
                 output.clear();
@@ -268,7 +282,8 @@ public class GameEngine implements IGameEngine
      * @param go The `GameObject` to disable.
      */
     @Override
-    public void disable(IGameObject go) {
+    public void disable(IGameObject go)
+    {
         go.behavior().onDisabled();
     }
 

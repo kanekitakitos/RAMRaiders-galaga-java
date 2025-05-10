@@ -96,4 +96,7 @@ public interface IBehavior {
      *         performed.
      */
     IGameObject attack(IInputEvent ie);
+
+
+     boolean isEnabled();
 }

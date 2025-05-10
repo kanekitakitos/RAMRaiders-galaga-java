@@ -96,7 +96,7 @@ public class PlayerBehavior extends Behavior
      *
      * @return The number of lives the player has.
      */
-    public int life()
+    public int getLife()
     {
         return this.life;
     }
@@ -179,7 +179,10 @@ public class PlayerBehavior extends Behavior
         }
 
         if (this.life <= 0 && this.isEnabled())
-            this.onDestroy();
+            {
+                System.out.println("Player destroyed!");
+                this.onDestroy();
+            }
     }
 
 

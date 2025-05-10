@@ -7,11 +7,6 @@ import geometry.*;
 import assets.*;
 import java.util.function.Function;
 import java.util.concurrent.*;
-import gui.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.util.HashMap;
-import java.util.Map;
 import gui.IInputEvent;
 
 /**
@@ -46,9 +41,10 @@ import gui.IInputEvent;
 public class GameManager
 {
     private CopyOnWriteArrayList<IGameObject> enemies = new CopyOnWriteArrayList<>(); // List of enemy game objects
-    private GameEngine engine; // The game engine managing game objects
     private IGameObject player; // The player game object
     private IGroupAttackStrategy groupAttackStrategy; // Strategy for group attacks
+
+    private GameEngine engine; // The game engine managing game objects
     private IInputEvent input; // Input event mapping for keys and mouse buttons
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -154,7 +150,38 @@ public class GameManager
             enemy.behavior().subscribe(this.player);
             enemies.add(enemy);
         }
+
     }
+
+
+    public ArrayList<GameObject> generateInfoStat()
+    {
+        // Spawn constants
+        double scale = 4;
+        int layer = 0; // this layer is only for the info stat
+
+        Ponto[] pointsQuadrado = { new Ponto(-5, 5), new Ponto(5, 5), new Ponto(5, -5), new Ponto(-5, -5)};
+
+
+        ArrayList<GameObject> lifeDisplays = new ArrayList<>();
+        // Example of life display
+        PlayerBehavior playerBehavior = (PlayerBehavior) this.player.behavior();
+        int lives = playerBehavior.getLife(); // This should be updated with the actual number of lives
+        Ponto position = this.player.transform().position();
+        for (int i = 0; i < lives; i++)
+        {
+            Shape shape = new Shape(AssetLoader.loadAnimationFrames("nave.gif"), 0);
+            Transform transform = new Transform(new Ponto(position.x()+450 + i * 100, position.y()-20 ), layer, 90, scale);
+            Poligono collider = new Poligono(pointsQuadrado, transform);
+            
+            GameObject lifeDisplay = new GameObject("Life "+(i+1), transform, collider, new Behavior(), shape);
+            lifeDisplay.onInit();
+            engine.add(lifeDisplay);
+            lifeDisplays.add(lifeDisplay);
+        }
+        return lifeDisplays;
+    }
+
 
     /**
      * Retrieves the list of enemy game objects.
@@ -172,48 +199,6 @@ public class GameManager
     private void startRelocateEnemies()
     {
         this.groupAttackStrategy.execute(this.enemies, this.player);
-    }
-
-    /**
-     * Assigns movement patterns to enemies based on a given pattern matrix.
-     *
-     * @param pattern          A 2D array representing the movement pattern.
-     * @param movementStrategy The movement strategy to assign.
-     */
-    private void assignMovementPatterns(int[][] pattern, IEnemyMovement movementStrategy) {
-        int index = 0;
-        for (int row = 0; row < pattern.length; row++) {
-            for (int col = 0; col < pattern[row].length; col++) {
-                if (pattern[row][col] == 1 && index < enemies.size()) {
-                    GameObject enemy = (GameObject) enemies.get(index);
-                    EnemyBehavior enemyBehavior = (EnemyBehavior) enemy.behavior();
-
-                    enemyBehavior.setMovement(movementStrategy);
-                    index++;
-                }
-            }
-        }
-    }
-
-    /**
-     * Assigns attack patterns to enemies based on a given pattern matrix.
-     *
-     * @param pattern        A 2D array representing the attack pattern.
-     * @param attackStrategy The attack strategy to assign.
-     */
-    private void assignAttackPatterns(int[][] pattern, IAttackStrategy attackStrategy) {
-        int index = 0;
-        for (int row = 0; row < pattern.length; row++) {
-            for (int col = 0; col < pattern[row].length; col++) {
-                if (pattern[row][col] == 1 && index < enemies.size()) {
-                    GameObject enemy = (GameObject) enemies.get(index);
-                    EnemyBehavior enemyBehavior = (EnemyBehavior) enemy.behavior();
-
-                    enemyBehavior.setAttack(attackStrategy);
-                    index++;
-                }
-            }
-        }
     }
 
     /**
@@ -252,8 +237,34 @@ public class GameManager
 
     public void startGame()
     {
+        this.generateInfoStat();
         this.enableObjectsToEngine();
         this.startRelocateEnemies();
+        this.monitorarVidas(); // Inicia a monitorização das vidas
         this.engine.run();
+    }
+    private void monitorarVidas()
+    {
+        ArrayList<GameObject> lifeDisplays = generateInfoStat();
+        this.scheduler.scheduleAtFixedRate(() ->
+        {
+            PlayerBehavior playerBehavior = (PlayerBehavior) this.player.behavior();
+
+            // Remove os objetos de vida que não são mais necessários
+            while (true)
+            {
+                if(lifeDisplays.size() > playerBehavior.getLife())
+                {
+                    GameObject lifeDisplay = lifeDisplays.remove(lifeDisplays.size() - 1);
+                    System.out.println(playerBehavior.getLife());
+                    engine.disable(lifeDisplay); // Remove o objeto do motor de jogo
+                }
+                else if(lifeDisplays.size() == 0)
+                    break;
+                else
+                    continue;
+                
+            }
+        }, 10, 1, TimeUnit.SECONDS); // Verifica a cada segundo
     }
 }

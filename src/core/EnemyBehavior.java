@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import gui.IInputEvent;
+import java.util.ArrayList;
 
 /**
  * The `EnemyBehavior` class defines the behavior of an enemy in the game.
