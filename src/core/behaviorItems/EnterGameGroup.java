@@ -133,9 +133,7 @@ public class EnterGameGroup implements IGroupAttackStrategy
             this.assignAttackPatterns(enemies);
             this.assignMovementPatterns(enemies);
 
-            scheduler.shutdown();
             isGroupAttackComplete = true;
-
 
             return;
         }
@@ -236,8 +234,8 @@ public class EnterGameGroup implements IGroupAttackStrategy
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 1, 0, 0, 0, 1, 0, 1, 0, 0, 1 }
+            { 0, 0, 0, 1, 0, 0, 1, 0, 0, 0 },
+            { 0, 1, 0, 0, 0, 0, 0, 0, 0, 1 }
         };
 
         // Mapeia as posições do pattern para os índices dos inimigos
@@ -248,7 +246,6 @@ public class EnterGameGroup implements IGroupAttackStrategy
             {
                 if (movementPattern[row][col] > 0)
                 {
-                    // Calcula o índice real do inimigo baseado na sua posição no pattern original
                     int realIndex = findEnemyIndexInOriginalPattern(row, col);
                     if (realIndex >= 0 && realIndex < enemies.size())
                     {
@@ -258,7 +255,6 @@ public class EnterGameGroup implements IGroupAttackStrategy
             }
         }
 
-        // Aplica os movimentos aos inimigos encontrados
         for (int i = 0; i < enemyIndices.size(); i++)
         {
             final int currentIndex = enemyIndices.get(i);
@@ -289,9 +285,9 @@ public class EnterGameGroup implements IGroupAttackStrategy
     private void assignAttackPatterns(List<IGameObject> enemies) {
         int[][] attackPattern = {
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 1, 0, 1, 0, 0, 0, 0 },
+            { 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 },
             { 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
-            { 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
         };
 
@@ -331,7 +327,6 @@ public class EnterGameGroup implements IGroupAttackStrategy
         }
     }
 
-    // Método auxiliar para encontrar o índice do inimigo no pattern original
     private int findEnemyIndexInOriginalPattern(int row, int col)
     {
         int count = 0;

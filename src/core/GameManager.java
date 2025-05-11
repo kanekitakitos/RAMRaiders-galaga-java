@@ -99,6 +99,7 @@ public class GameManager
 
         this.generateEnemies(groupAttackStrategy.getNumberOfEnemies(), spawnIndexFunction);
         this.groupAttackStrategy.onInit(this.enemies, player);
+        this.generateInfoStat();
     }
 
 
@@ -161,7 +162,7 @@ public class GameManager
     }
 
 
-    public ArrayList<GameObject> generateInfoStat()
+    public void generateInfoStat()
     {
         // Spawn constants
         double scale = 4;
@@ -170,7 +171,6 @@ public class GameManager
         Ponto[] pointsQuadrado = { new Ponto(-5, 5), new Ponto(5, 5), new Ponto(5, -5), new Ponto(-5, -5)};
 
 
-        ArrayList<GameObject> lifeDisplays = new ArrayList<>();
         // Example of life display
         PlayerBehavior playerBehavior = (PlayerBehavior) this.player.behavior();
         int lives = playerBehavior.getLife(); // This should be updated with the actual number of lives
@@ -181,12 +181,10 @@ public class GameManager
             Transform transform = new Transform(new Ponto(position.x()+450 + i * 100, position.y()-20 ), layer, 90, scale);
             Poligono collider = new Poligono(pointsQuadrado, transform);
             
-            GameObject lifeDisplay = new GameObject("Life "+(i+1), transform, collider, new Behavior(), shape);
+            GameObject lifeDisplay = new GameObject("Life "+(i+1), transform, collider, new EnemyBehavior(), shape);
             lifeDisplay.onInit();
-            engine.add(lifeDisplay);
-            lifeDisplays.add(lifeDisplay);
+            this.engine.add(lifeDisplay);
         }
-        return lifeDisplays;
     }
 
 
@@ -244,29 +242,34 @@ public class GameManager
 
     public void startGame()
     {
-        this.generateInfoStat();
+        
         this.enableObjectsToEngine();
         this.startRelocateEnemies();
-        this.monitorarVidas(); // Inicia a monitorização das vidas
+        this.monitorPlayerLives();
         this.engine.run();
     }
-    private void monitorarVidas()
+
+    private void monitorPlayerLives()
     {
-        ArrayList<GameObject> lifeDisplays = generateInfoStat();
-        Runnable monitorTask = () -> {
+        ArrayList<IGameObject> lifeDisplays = new ArrayList<>(this.engine.get(0));
+        this.scheduler.scheduleAtFixedRate(
+            () ->
             {
-                System.out.println("HOLAAA");
                 PlayerBehavior playerBehavior = (PlayerBehavior) this.player.behavior();
                 int vidasAtuais = playerBehavior.getLife();
+                int lifes = lifeDisplays.size();
 
-                    if (lifeDisplays.size() > vidasAtuais)
-                    {
-                        GameObject lifeDisplay = lifeDisplays.remove(lifeDisplays.size() - 1);
-                        engine.disable(lifeDisplay);
-                    }
-            }
-        };
-        
-        this.scheduler.scheduleAtFixedRate(monitorTask, 0, 1, TimeUnit.SECONDS);
+                if (lifes > vidasAtuais)
+                {
+                    IGameObject lifeDisplay = lifeDisplays.remove(lifeDisplays.size() - 1);
+                    this.engine.destroy(lifeDisplay);
+                }
+
+                if (vidasAtuais <= 0) 
+                {
+                    shutdown();
+                    return;
+                }
+            }, 1, 100, TimeUnit.MILLISECONDS);
     }
 }

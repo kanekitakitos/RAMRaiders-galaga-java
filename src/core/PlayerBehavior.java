@@ -166,7 +166,6 @@ public class PlayerBehavior extends Behavior
         if (this.life > 0 && !this.isInvincible && this.isEnabled())
         {
             this.life--;
-
             this.isInvincible = true;
 
             // Schedule to reset the invincibility flag after the invincibility duration

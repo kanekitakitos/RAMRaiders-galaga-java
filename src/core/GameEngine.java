@@ -88,7 +88,8 @@ public class GameEngine implements IGameEngine
      *
      * @param go The `GameObject` to add.
      */
-    public void add(IGameObject go) {
+    public void add(IGameObject go)
+    {
         int layer = go.transform().layer();
         if (!layeredGameObjects.containsKey(layer))
             layeredGameObjects.put(layer, new CopyOnWriteArrayList<>());
@@ -107,7 +108,8 @@ public class GameEngine implements IGameEngine
     public void destroy(IGameObject go)
     {
         int layer = go.transform().layer();
-        if (layeredGameObjects.containsKey(layer)) {
+        if (layeredGameObjects.containsKey(layer))
+        {
             layeredGameObjects.get(layer).remove(go);
             this.totalObjects--;
             if (layeredGameObjects.get(layer).isEmpty()) // Remove the list if it is empty
@@ -115,19 +117,13 @@ public class GameEngine implements IGameEngine
         }
     }
 
-    /**
-     * Retrieves a `GameObject` from a specific layer and index.
-     *
-     * @param layer           The layer of the `GameObject`.
-     * @param indexGameObject The index of the `GameObject` within the layer.
-     * @return The `GameObject` if found, otherwise null.
-     */
-    public IGameObject get(int layer, int indexGameObject) {
-        if (!layeredGameObjects.containsKey(layer) || indexGameObject < 0 || indexGameObject > this.totalObjects)
+    public CopyOnWriteArrayList<IGameObject> get(int layer)
+    {
+        if (!layeredGameObjects.containsKey(layer) )
             return null;
 
-        CopyOnWriteArrayList<IGameObject> layerObjects = layeredGameObjects.get(layer);
-        return layerObjects.get(indexGameObject);
+            
+        return layeredGameObjects.get(layer);
     }
 
     /**
@@ -392,11 +388,5 @@ public class GameEngine implements IGameEngine
             }
             return snapshot;
         }
-    }
-
-
-    public IGuiBridge getGui()
-    {
-        return gui;
     }
 }

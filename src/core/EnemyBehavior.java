@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import gui.IInputEvent;
-import java.util.ArrayList;
+
 
 /**
  * The `EnemyBehavior` class defines the behavior of an enemy in the game.
@@ -46,9 +46,7 @@ public class EnemyBehavior extends Behavior
 
     private IAttackStrategy attackStrategy = null; // The attack strategy used by the enemy
     private IEnemyMovement movement; // The movement strategy used by the enemy
-    private static final ScheduledExecutorService localScheduler = Executors.newScheduledThreadPool(1); // Scheduler for
-                                                                                                        // timed tasks
-
+    private static final ScheduledExecutorService localScheduler = Executors.newScheduledThreadPool(1);
     private boolean isAttacking = false; // Indicates whether the enemy is currently attacking
 
     /**

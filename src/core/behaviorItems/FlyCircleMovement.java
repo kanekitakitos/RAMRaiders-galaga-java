@@ -41,7 +41,8 @@ import geometry.Ponto;
  *
  * @version 2025-04-19
  */
-public class FlyCircleMovement implements IEnemyMovement {
+public class FlyCircleMovement implements IEnemyMovement
+{
 
     private Ponto currentPosition; // Current position of the enemy
     private Ponto circleCenter; // Center of the current circle
