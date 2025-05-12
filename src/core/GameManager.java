@@ -77,7 +77,7 @@ public class GameManager
     {
         invariante(engine);
         this.engine = engine;
-        this.player = createPlayer( new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0));
+        this.player = createPlayer( new Shape(AssetLoader.loadAnimationFrames("player.gif"), 150));
         this.input = engine.getGui().getInput();
 
         this.engine.disable(player);
@@ -101,7 +101,6 @@ public class GameManager
         this.groupAttackStrategy.onInit(this.gameObjects, player);
 
         this.generateMenuObjects();
-        this.player = null;
     }
 
 
@@ -321,45 +320,43 @@ public class GameManager
 
     public void handlerSelectPlayer()
     {
-        if(input.isActionActive("PLAYER1") && this.player == null)
+        while(true)
+        {
+            if(input.isActionActive("PLAYER1") )
             {
-                this.player = createPlayer( new Shape(AssetLoader.loadAnimationFrames("player.gif"), 150)); // Shape with animation frames
                 this.engine.destroyAll();
-                
+                break;
             }
 
-        if(input.isActionActive("PLAYER2")&& this.player == null)
+        if(input.isActionActive("PLAYER2"))
             {
-                this.player = createPlayer( new Shape(AssetLoader.loadAnimationFrames("nave-HanSolo.png"), 150)); // Shape with animation frames
+                this.player.shape().setFrames(AssetLoader.loadAnimationFrames("nave-HanSolo.png"), 150); // Shape with animation frames
                 this.engine.destroyAll();
+                break;
             }
-
-
-        
+        }
     }
 
     public void startGame()
     {
-        if(!this.engine.getGui().isMenu())
+        if(this.engine.getGui().isMenu())
         {
             this.handlerSelectPlayer();
+            this.engine.getGui().setMenu(false);
         }
 
-        if(this.player != null)
-            {
 
-           for (int i = 0; i < this.gameObjects.size(); i++)
-                        {
-                            this.engine.add(this.gameObjects.get(i));
-                        }
-                        this.engine.add(player);
-                        this.engine.getGui().setMenu(false);
-                        this.engine.enableAll();
-                        this.startRelocateEnemies();
-                        this.monitorPlayer();
-                        return;
-                    }
-                    
+        if(!this.engine.getGui().isMenu())
+        {
+            for (int i = 0; i < this.gameObjects.size(); i++)
+                    this.engine.add(this.gameObjects.get(i));
+
+                this.engine.add(player);
+                this.engine.enableAll();
+                this.startRelocateEnemies();
+                this.monitorPlayer();
+            }
+
 
 
                     this.engine.run();

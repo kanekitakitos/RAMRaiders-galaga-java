@@ -173,7 +173,8 @@ public class Shape implements IShape
      *                         animation frames.
      * @param frameDelayMillis The delay between frames in milliseconds.
      */
-    public void setFrames(List<BufferedImage> frames, int frameDelayMillis) {
+    public void setFrames(List<BufferedImage> frames, int frameDelayMillis)
+    {
         this.frames = frames;
         this.currentFrameIndex = 0;
         this.frameDelayMillis = frameDelayMillis;
