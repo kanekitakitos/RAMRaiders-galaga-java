@@ -140,18 +140,22 @@ public class EnterGameGroup implements IGroupAttackStrategy
         for (int i = 0; i < groupSizes[currentGroup - 1]; i++)
         {
             final int enemyIndex = i + ((currentGroup - 1) * 8); // 8 enemies per group
-            scheduler.schedule(() -> {
+            scheduler.schedule(() ->
+            {
                 GameObject enemy = (GameObject) enemies.get(enemyIndex);
                 Ponto targetPosition = positions.get(enemyIndex);
 
                 IEnemyMovement movement;
-                if (enemy.transform().angle() == 270) { // Coming from above
+                if (enemy.transform().angle() == 270)
+                { // Coming from above
                     EnterOverTopMovement bottom = new EnterOverTopMovement();
                     bottom.setFinalTarget(targetPosition);
                     boolean isRightToLeft = enemy.transform().position().x() > 0.0; // Check if the enemy is coming from the right
                     bottom.setDirection(isRightToLeft);
                     movement = bottom;
-                } else {
+                }
+                else
+                {
                     EnterSideMovement leftOrRight = new EnterSideMovement();
                     leftOrRight.setFinalTarget(targetPosition);
                     boolean isRightToLeft = enemy.transform().angle() == 180;
@@ -185,9 +189,11 @@ public class EnterGameGroup implements IGroupAttackStrategy
         double startY = playerPosition.y() + 660;
 
         for (int row = 0; row < pattern.length; row++) {
-            for (int col = 0; col < pattern[0].length; col++) {
+            for (int col = 0; col < pattern[0].length; col++)
+            {
                 int priority = pattern[row][col];
-                if (priority > 0) {
+                if (priority > 0)
+                {
                     double x = startX + col * spacing;
                     double y = startY - row * spacing;
                     priorityGroups[priority].add(new Ponto(x, y));
@@ -196,7 +202,8 @@ public class EnterGameGroup implements IGroupAttackStrategy
         }
 
         ArrayList<Ponto> positions = new ArrayList<>();
-        for (int priority = 1; priority <= 5; priority++) {
+        for (int priority = 1; priority <= 5; priority++)
+        {
             positions.addAll(priorityGroups[priority]);
         }
 

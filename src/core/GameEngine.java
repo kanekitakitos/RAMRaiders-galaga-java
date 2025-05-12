@@ -248,7 +248,7 @@ public class GameEngine implements IGameEngine
     @Override
     public void addEnable(IGameObject go) {
         this.enable(go);
-        add((GameObject) go);
+        add(go);
     }
 
     /**
@@ -291,7 +291,7 @@ public class GameEngine implements IGameEngine
      */
     @Override
     public boolean isEnabled(IGameObject go) {
-        return ((Behavior) go.behavior()).isEnabled();
+        return (go.behavior()).isEnabled();
     }
 
     /**
@@ -302,7 +302,7 @@ public class GameEngine implements IGameEngine
      */
     @Override
     public boolean isDisabled(IGameObject go) {
-        return !((Behavior) go.behavior()).isEnabled();
+        return !( go.behavior()).isEnabled();
     }
 
     /**
@@ -377,7 +377,8 @@ public class GameEngine implements IGameEngine
      *
      * @return A `CopyOnWriteArrayList` of enabled `GameObject`s.
      */
-    public CopyOnWriteArrayList<IGameObject> getEnabledObjectsSnapshot() {
+    public CopyOnWriteArrayList<IGameObject> getEnabledObjectsSnapshot()
+    {
         CopyOnWriteArrayList<IGameObject> snapshot = new CopyOnWriteArrayList<>();
         synchronized (layeredGameObjects) {
             for (CopyOnWriteArrayList<IGameObject> layer : layeredGameObjects.values()) {
@@ -388,5 +389,11 @@ public class GameEngine implements IGameEngine
             }
             return snapshot;
         }
+    }
+
+
+    public IGuiBridge getGui()
+    {
+        return this.gui;
     }
 }

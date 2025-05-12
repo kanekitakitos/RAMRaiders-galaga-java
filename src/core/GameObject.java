@@ -122,7 +122,8 @@ public class GameObject implements IGameObject
      * It sets the game object to be enabled and calls the onInit method of its
      * behavior.
      */
-    public void onInit() {
+    public void onInit()
+    {
         this.collider.onUpdateCollider();
         this.behaviour.gameObject(this);
         this.shape.setlogicalWidthAndHeight(this.collider.getLogicalWidth(), this.collider.getLogicalHeight());

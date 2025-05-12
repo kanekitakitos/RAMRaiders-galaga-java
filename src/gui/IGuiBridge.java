@@ -54,4 +54,13 @@ public interface IGuiBridge {
      * @param inputState The input event handler to set.
      */
     void setInput(IInputEvent inputState);
+
+    boolean isMenu();
+
+    /**
+     * Toggles the display of hitboxes for game objects.
+     *
+     * @param hitbox True to show hitboxes, false to hide them.
+     */
+    void setMenu(boolean Menu);
 }

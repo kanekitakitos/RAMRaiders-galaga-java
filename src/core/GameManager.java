@@ -40,13 +40,14 @@ import gui.IInputEvent;
  */
 public class GameManager
 {
-    private CopyOnWriteArrayList<IGameObject> enemies = new CopyOnWriteArrayList<>(); // List of enemy game objects
+    private CopyOnWriteArrayList<IGameObject> gameObjects = new CopyOnWriteArrayList<>(); // List of enemy game objects
     private IGameObject player; // The player game object
     private IGroupAttackStrategy groupAttackStrategy; // Strategy for group attacks
 
     private GameEngine engine; // The game engine managing game objects
     private IInputEvent input; // Input event mapping for keys and mouse buttons
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private final double scale =4;
 
 
 
@@ -57,11 +58,10 @@ public class GameManager
      * If the validation fails, an error message is printed, and the program exits.
      *
      * @param engine The `GameEngine` instance managing game objects. Must not be null.
-     * @param player The `IGameObject` instance representing the player. Must not be null.
      */
-    private void invariante(GameEngine engine, IGameObject player)
+    private void invariante(GameEngine engine)
     {
-        if(engine != null && player != null)
+        if(engine != null)
             return;
 
         System.out.println("GameManager:iv");
@@ -72,15 +72,15 @@ public class GameManager
      * Constructs a `GameManager` instance.
      *
      * @param engine The game engine to manage game objects.
-     * @param player The player game object.
      */
-    public GameManager(GameEngine engine, IGameObject player)
+    public GameManager(GameEngine engine)
     {
-        invariante(engine,player);
-
+        invariante(engine);
         this.engine = engine;
-        this.enemies = new CopyOnWriteArrayList<>();
-        this.player = player;
+        this.player = createPlayer( new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0));
+        this.input = engine.getGui().getInput();
+
+        this.engine.disable(player);
 
 
         this.groupAttackStrategy = new EnterGameGroup();
@@ -98,8 +98,10 @@ public class GameManager
         };
 
         this.generateEnemies(groupAttackStrategy.getNumberOfEnemies(), spawnIndexFunction);
-        this.groupAttackStrategy.onInit(this.enemies, player);
-        this.generateInfoStat();
+        this.groupAttackStrategy.onInit(this.gameObjects, player);
+
+        this.generateMenuObjects();
+        this.player = null;
     }
 
 
@@ -117,7 +119,6 @@ public class GameManager
             throw new IllegalArgumentException("Invalid parameters for enemy generation");
 
         // Spawn constants
-        double scale = 4;
         int layer = this.player.transform().layer() + 1;
         double defaultY = this.player.transform().position().y() * 0.5;
 
@@ -156,7 +157,7 @@ public class GameManager
             GameObject enemy = new GameObject("Enemy " + i, t, collider, behavior, shape);
             enemy.onInit();
             enemy.behavior().subscribe(this.player);
-            enemies.add(enemy);
+            gameObjects.add(enemy);
         }
 
     }
@@ -165,15 +166,12 @@ public class GameManager
     public void generateInfoStat()
     {
         // Spawn constants
-        double scale = 4;
         int layer = 0; // this layer is only for the info stat
 
         Ponto[] pointsQuadrado = { new Ponto(-5, 5), new Ponto(5, 5), new Ponto(5, -5), new Ponto(-5, -5)};
-
-
         // Example of life display
         PlayerBehavior playerBehavior = (PlayerBehavior) this.player.behavior();
-        int lives = playerBehavior.getLife(); // This should be updated with the actual number of lives
+        int lives = playerBehavior.getLife()-1; // This should be updated with the actual number of lives
         Ponto position = this.player.transform().position();
         for (int i = 0; i < lives; i++)
         {
@@ -188,6 +186,80 @@ public class GameManager
     }
 
 
+    public void generateMenuObjects()
+    {
+        ArrayList<IGameObject> objects = new ArrayList<>();
+        
+        // Spawn constants
+        double scale = 32;
+        double raio = 0.0001;
+        int layer = 0;
+        // Start Game
+        Shape s1 = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0);
+        Transform t1 = new Transform(new Ponto(0.0, 0.0), layer, 0.0, scale);
+        Circulo p1 = new Circulo(raio, t1);
+        GameObject startGame = new GameObject("Start Game", t1, p1, new Behavior(), s1);
+        startGame.onInit();
+        objects.add(startGame);
+
+        // RAMRaiders
+        scale = 64;
+        s1 = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0);
+        t1 = new Transform(new Ponto(0.0, startGame.transform().position().y()+140), layer, 0.0, scale); // posição Y diferente
+        p1 = new Circulo(raio, t1);
+        GameObject nomeGrupo = new GameObject("RAM-Raiders", t1, p1, new Behavior(), s1);
+        nomeGrupo.onInit();
+        objects.add(nomeGrupo);
+
+        // Nome do grupo
+        scale = 15;
+        s1 = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0);
+        t1 = new Transform(new Ponto(0.0, startGame.transform().position().y()-370), layer, 0.0, scale); // posição Y diferente
+        p1 = new Circulo(raio, t1);
+        GameObject grupo = new GameObject("Gabriel Pedroso                      Brandon Mejia                      Miguel Correia", t1, p1, new Behavior(), s1);
+        grupo.onInit();
+        objects.add(grupo);
+        
+
+        // Skin 1 e 2
+        scale = 20;
+        s1 = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0);
+        t1 = new Transform(new Ponto(-150, startGame.transform().position().y()-80), layer, 180, scale); // posição Y diferente
+        p1 = new Circulo(raio, t1);
+        GameObject skin1 = new GameObject("Press 1", t1, p1, new Behavior(), s1);
+        skin1.onInit();
+        objects.add(skin1);
+
+        s1 = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0);
+        t1 = new Transform(new Ponto(150.0, startGame.transform().position().y()-80), layer, 180, scale); // posição Y diferente
+        p1 = new Circulo(raio, t1);
+        GameObject skin2 = new GameObject("Press 2", t1, p1, new Behavior(), s1);
+        skin2.onInit();
+        objects.add(skin2);
+
+        double offset = 90;
+        raio = 10;
+        s1 = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 150);
+        t1 = new Transform(new Ponto(skin1.transform().position().x(), skin1.transform().position().y()-offset), layer+1, 90, this.scale); // posição Y diferente
+        p1 = new Circulo(raio, t1);
+        GameObject nave1 = new GameObject("nave", t1, p1, new Behavior(), s1);
+        nave1.onInit();
+        objects.add(nave1);
+
+        s1 = new Shape(AssetLoader.loadAnimationFrames("nave-HanSolo.png"), 0);
+        t1 = new Transform(new Ponto(skin2.transform().position().x(), skin2.transform().position().y()-offset), layer+1, 90, this.scale); // posição Y diferente
+        p1 = new Circulo(raio-1, t1);
+        GameObject nave2 = new GameObject("nave", t1, p1, new Behavior(), s1);
+        nave2.onInit();
+        objects.add(nave2);
+
+
+
+        for (int i = 0; i < objects.size(); i++)
+            this.engine.addEnable(objects.get(i));
+
+    }
+
     /**
      * Retrieves the list of enemy game objects.
      *
@@ -195,7 +267,7 @@ public class GameManager
      */
     public ArrayList<IGameObject> getEnemys()
     {
-        return new ArrayList<>(enemies);
+        return new ArrayList<>(gameObjects);
     }
 
     /**
@@ -203,20 +275,27 @@ public class GameManager
      */
     private void startRelocateEnemies()
     {
-        this.groupAttackStrategy.execute(this.enemies, this.player);
-    }
+        this.groupAttackStrategy.execute(this.gameObjects, this.player);
 
-    /**
-     * Enables all gameObjects in the game engine.
-     */
-    public void enableObjectsToEngine()
-    {
-        for (IGameObject enemy : enemies)
-        {
-            engine.add(enemy);
-        }
+        // Verifica periodicamente se o movimento foi completado, mas só executa o ataque uma vez
+        //this.scheduler.scheduleAtFixedRate(new Runnable() {
+        //    private boolean attackStarted = false;
 
-        this.engine.enableAll();
+        //    @Override
+        //    public void run()
+        //    {
+        //        if (!attackStarted && groupAttackStrategy.isGroupAttackComplete())
+        //        {
+        //            attackStarted = true;
+        //            ZigzagGroup zigzagGroup = new ZigzagGroup();
+        //            zigzagGroup.setScheduler(scheduler);
+        //            zigzagGroup.onInit(enemies, player);
+        //            zigzagGroup.execute(enemies, player);
+
+        //            groupAttackStrategy = zigzagGroup;
+        //        }
+        //    }
+        //}, 10000, 100, TimeUnit.MILLISECONDS);
     }
 
     public void shutdown()
@@ -240,24 +319,81 @@ public class GameManager
     }
 
 
-    public void startGame()
+    public void handlerSelectPlayer()
     {
+        if(input.isActionActive("PLAYER1") && this.player == null)
+            {
+                this.player = createPlayer( new Shape(AssetLoader.loadAnimationFrames("player.gif"), 150)); // Shape with animation frames
+                this.engine.destroyAll();
+                
+            }
+
+        if(input.isActionActive("PLAYER2")&& this.player == null)
+            {
+                this.player = createPlayer( new Shape(AssetLoader.loadAnimationFrames("nave-HanSolo.png"), 150)); // Shape with animation frames
+                this.engine.destroyAll();
+            }
+
+
         
-        this.enableObjectsToEngine();
-        this.startRelocateEnemies();
-        this.monitorPlayerLives();
-        this.engine.run();
     }
 
-    private void monitorPlayerLives()
+    public void startGame()
     {
+        if(!this.engine.getGui().isMenu())
+        {
+            this.handlerSelectPlayer();
+        }
+
+        if(this.player != null)
+            {
+
+           for (int i = 0; i < this.gameObjects.size(); i++)
+                        {
+                            this.engine.add(this.gameObjects.get(i));
+                        }
+                        this.engine.add(player);
+                        this.engine.getGui().setMenu(false);
+                        this.engine.enableAll();
+                        this.startRelocateEnemies();
+                        this.monitorPlayer();
+                        return;
+                    }
+                    
+
+
+                    this.engine.run();
+    }
+
+    private IGameObject createPlayer(Shape shape)
+    {
+        double scale = 4; // Scale of the player object
+        int layer = 1; // Layer of the player object
+        double angle = 90; // Initial angle of the player object
+        Ponto position = new Ponto(0, -330); // Initial position of the player object
+        Ponto[] points = {new Ponto(0, 0), new Ponto(0, 12), new Ponto(12, 6)}; // Points for the collider
+
+        Transform t1 = new Transform(position, layer, angle, scale); // Transform for the player
+        Poligono collider = new Poligono(points, t1); // Polygon collider for the player
+        // Circulo collider = new Circulo(5, t1); // Alternative circular collider (commented out)
+
+        PlayerBehavior behavior = new PlayerBehavior(); // Behavior of the player
+        GameObject player = new GameObject("Player", t1, collider, behavior, shape); // Create the player game object
+        player.onInit(); // Initialize the player
+
+        return player;
+    }
+
+    private void monitorPlayer()
+    {
+        this.generateInfoStat();
         ArrayList<IGameObject> lifeDisplays = new ArrayList<>(this.engine.get(0));
         this.scheduler.scheduleAtFixedRate(
             () ->
             {
                 PlayerBehavior playerBehavior = (PlayerBehavior) this.player.behavior();
                 int vidasAtuais = playerBehavior.getLife();
-                int lifes = lifeDisplays.size();
+                int lifes = lifeDisplays.size()+1;
 
                 if (lifes > vidasAtuais)
                 {
@@ -265,7 +401,7 @@ public class GameManager
                     this.engine.destroy(lifeDisplay);
                 }
 
-                if (vidasAtuais <= 0) 
+                if (vidasAtuais <= 0)
                 {
                     shutdown();
                     return;

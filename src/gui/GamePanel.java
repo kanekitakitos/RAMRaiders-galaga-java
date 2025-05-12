@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.awt.FontMetrics;
 
 /**
  * A custom JPanel for rendering game objects and background in a 2D game.
@@ -60,6 +61,7 @@ public class GamePanel extends JPanel
 
     private IShape backgroundShape;
     private boolean hitbox = false;
+    private boolean menu = true;
 
 
 
@@ -154,6 +156,21 @@ public class GamePanel extends JPanel
         this.hitbox = hitbox;
     }
 
+    /**
+     * Sets whether Menu should be displayed for game.
+     *
+     * @param menu True to show hitboxes, false to hide them
+     */
+    public void setMenu(boolean menu)
+    {
+        this.menu = menu;
+    }
+
+    public boolean isMenu()
+    {
+        return this.menu;
+    }
+
 
     private void drawBackground(Graphics2D g2d)
     {
@@ -217,26 +234,101 @@ public class GamePanel extends JPanel
     }
 
 
+    private void drawString(Graphics2D g2d, IGameObject go, int panelWidth, int panelHeight)
+    {
+        String text = go.name();
+        Ponto position = go.transform().position();
+        int scale = (int)go.transform().scale();
+    
+        g2d.setFont(new java.awt.Font("Retro Gaming", java.awt.Font.BOLD, scale));
+    
+        // Coordenadas base
+        double screenX = panelWidth / 2.0 + position.x();
+        double screenY = panelHeight / 2.0 - position.y();
+    
+        // Centralizar a string
+        FontMetrics metrics = g2d.getFontMetrics();
+        int textWidth = metrics.stringWidth(text);
+        int centeredX = (int)screenX - textWidth / 2;
+        int centeredY = (int)screenY;
+
+        // Desenha o texto principal (amarelo)
+        g2d.setColor(Color.RED);
+        g2d.drawString(text, centeredX-1, centeredY-2);
+        g2d.setColor(Color.YELLOW);
+        g2d.drawString(text, centeredX, centeredY);
+
+        if (hitbox)
+            go.collider().draw(g2d, panelWidth / 2.0, panelHeight / 2.0);
+    }
+
+
+    private void drawMenu(Graphics2D g2d)
+    {
+        if (this.backgroundShape == null)
+        {
+            g2d.setColor(Color.BLACK);
+            g2d.fillRect(0, 0, getWidth(), getHeight());
+        }
+            this.backgroundShape.updateAnimation();
+            BufferedImage currentBgFrame = this.backgroundShape.getImagem();
+            if (currentBgFrame != null)
+            {
+                g2d.drawImage(currentBgFrame, 0, 0, getWidth() , getHeight(), this);
+            }
+            else
+            {
+                System.err.println("Frame atual do background é null. Desenhando fundo branco.");
+            }
+
+            for (IGameObject go : infoToRender)
+                {
+                    if (go.transform() == null || go.shape() == null)
+                        continue;
+                        drawString(g2d, go, getWidth(), getHeight());
+
+                }
+
+                for (IGameObject go : objectsToRender)
+                {
+                    if (go.transform() == null || go.shape() == null)
+                        continue;
+                        drawGameObject(g2d, go, (int)(getWidth() + getWidth() / 2.0), getHeight());
+
+                }
+
+    }
+
+
     private void drawGame(Graphics2D g2d)
     {
 
-        for (IGameObject go : objectsToRender)
+        if(this.menu)
         {
-            if (go.transform() == null || go.shape() == null)
-                continue;
-
-            drawGameObject(g2d, go, getWidth(), getHeight());
+            drawMenu(g2d);
         }
-
-        g2d.setColor(Color.BLACK);
-        g2d.fillRect(getWidth() - getWidth() / 3, 0, getWidth() / 3, getHeight());
-
-        for (IGameObject go : infoToRender)
+        else
         {
-            if (go.transform() == null || go.shape() == null)
-                continue;
+                for (IGameObject go : objectsToRender)
+                {
+                    if (go.transform() == null || go.shape() == null)
+                        continue;
 
-            drawGameObject(g2d, go, getWidth(), getHeight());
+                    drawGameObject(g2d, go, getWidth(), getHeight());
+                }
+
+                g2d.setColor(Color.BLACK);
+                g2d.fillRect(getWidth() - getWidth() / 3, 0, getWidth() / 3, getHeight());
+
+                for (IGameObject go : infoToRender)
+                {
+                    if (go.transform() == null || go.shape() == null)
+                        continue;
+
+                    drawGameObject(g2d, go, getWidth(), getHeight());
+                }
+
+
         }
 
     }

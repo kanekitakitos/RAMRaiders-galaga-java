@@ -209,6 +209,26 @@ public class InputEvent implements IInputEvent, KeyListener, MouseListener
     }
 
     /**
+     * Removes the association of a specific key code with an action.
+     *
+     * @param keyCode The key code to remove from the mapping.
+     */
+    public void removeKeyAssociation(int keyCode)
+    {
+        keyToActionMap.remove(keyCode);
+    }
+
+    /**
+     * Removes the association of a specific mouse button with an action.
+     *
+     * @param mouseButton The mouse button code to remove from the mapping.
+     */
+    public void removeMouseAssociation(int mouseButton)
+    {
+        mouseButtonToActionMap.remove(mouseButton);
+    }
+
+    /**
      * Represents a helper class for managing action states.
      */
     private class InputMapping

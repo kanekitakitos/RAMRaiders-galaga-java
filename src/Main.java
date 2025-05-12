@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
+import core.behaviorItems.*;
 
 
 
@@ -46,6 +47,30 @@ public class Main
         return player;
     }
 
+    public static IGameObject createEnemy()
+    {
+        double scale = 4; // Scale of the player object
+        int layer = 2; // Layer of the player object
+        double angle = 90; // Initial angle of the player object
+        Ponto position = new Ponto(0, 10); // Initial position of the player object
+        Ponto[] points = {new Ponto(0, 0), new Ponto(0, 12), new Ponto(12, 6)}; // Points for the collider
+
+        Transform t1 = new Transform(position, layer, angle, scale); // Transform for the player
+        Poligono collider = new Poligono(points, t1); // Polygon collider for the player
+        // Circulo collider = new Circulo(5, t1); // Alternative circular collider (commented out)
+        Shape shape = new Shape(AssetLoader.loadAnimationFrames("inimigo2.gif"), 150); // Shape with animation frames
+        EnemyBehavior behavior = new EnemyBehavior(); // Behavior of the player
+        GameObject enemy = new GameObject("Enemy", t1, collider, behavior, shape); // Create the enemy game object
+        enemy.onInit(); // Initialize the player
+        ZigzagMovement zigzagMovement = new ZigzagMovement(); // Create the ZigzagMovement object
+        behavior.setMovement(zigzagMovement); // Set the movement strategy for the enemy
+        zigzagMovement.setActive(true);
+        zigzagMovement.setDirection(true);
+        
+        //gameManager.startGame(); // Start the game
+        return enemy;
+    }
+
     public static IInputEvent createInputHandler()
     {
         Map<Integer, String> customKeyMap = new HashMap<>(); // Map for custom key bindings
@@ -55,28 +80,16 @@ public class Main
         customKeyMap.put(KeyEvent.VK_D, "RIGHT");
         customKeyMap.put(KeyEvent.VK_C, "ATTACK");
         customKeyMap.put(KeyEvent.VK_X, "EVASIVE");
+        customKeyMap.put(KeyEvent.VK_1, "PLAYER1");
+        customKeyMap.put(KeyEvent.VK_2, "PLAYER2");
+        customKeyMap.put(KeyEvent.VK_NUMPAD1, "PLAYER1");
+        customKeyMap.put(KeyEvent.VK_NUMPAD2, "PLAYER2");
 
         Map<Integer, String> customMouseMap = new HashMap<>(); // Map for custom mouse bindings
         customMouseMap.put(MouseEvent.BUTTON1, "ATTACK");
         customMouseMap.put(MouseEvent.BUTTON3, "EVASIVE");
 
         return new InputEvent(customKeyMap, customMouseMap); // Create and return the input handler
-    }
-
-    /**
-     * Creates and starts the game engine with the provided GUI.
-     *
-     * @param GUI The SwingGui instance to be used for the game.
-     */
-    public static void createGameEngine(SwingGui GUI)
-    {
-        GameEngine engine = new GameEngine(GUI); // Initialize the game engine with the GUI
-        IGameObject player = createPlayer(); // Create the player object
-
-        engine.add(player); // Add the player to the engine
-        GameManager gameManager = new GameManager(engine, player); // Initialize the game manager with the engine and player
-        
-        gameManager.startGame(); // Start the game
     }
 
     /**
@@ -91,6 +104,8 @@ public class Main
         gui.setHitbox(false); // Enable hitbox visualization
         gui.setInput(createInputHandler()); // Set the input handler for the GUI
 
-        createGameEngine(gui); // Create and start the game engine
+        GameEngine engine = new GameEngine(gui); // Initialize the game engine with the GUI
+        GameManager gameManager = new GameManager(engine); // Initialize the game manager with the engine and player
+        gameManager.startGame();
     }
 }

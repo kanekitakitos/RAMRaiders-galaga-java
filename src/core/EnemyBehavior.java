@@ -124,6 +124,11 @@ public class EnemyBehavior extends Behavior
             this.movement.setActive(value);
     }
 
+    public IEnemyMovement getMovement()
+    {
+        return this.movement;
+    }
+
     /**
      * Checks if the enemy is currently attacking.
      *
@@ -140,9 +145,6 @@ public class EnemyBehavior extends Behavior
      */
     public void setMovement(IEnemyMovement movement)
     {
-        if (movement == null)
-            return;
-
         this.movement = movement;
     }
 
@@ -153,9 +155,12 @@ public class EnemyBehavior extends Behavior
     @Override
     public void move()
     {
-        if (movement.isActive())
+        if ( movement != null && movement.isActive())
             {
                 movement.move(this.go);
+                if(this.movement == null)
+                 return;
+
                 if(!movement.isActive())
                 {
                     // Generate a random delay between 700 and 2000 milliseconds

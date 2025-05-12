@@ -179,7 +179,6 @@ public class PlayerBehavior extends Behavior
 
         if (this.life <= 0 && this.isEnabled())
             {
-                System.out.println("Player destroyed!");
                 this.onDestroy();
             }
     }
@@ -198,7 +197,7 @@ public class PlayerBehavior extends Behavior
      */
     public void moveTo(IInputEvent ie)
     {
-        if (ie == null)
+        if (ie == null || !this.isEnabled())
             return;
 
         // Initialize movement deltas
@@ -231,7 +230,7 @@ public class PlayerBehavior extends Behavior
      */
     public void evasiveManeuver(IInputEvent ie)
     {
-        if (ie == null || !ie.isActionActive("EVASIVE") || this.isInvincible)
+        if (ie == null || !ie.isActionActive("EVASIVE") || this.isInvincible  || !this.isEnabled())
             return;
 
         // Determine direction based on the input event

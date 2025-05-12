@@ -47,4 +47,20 @@ public interface IInputEvent {
      * @param frame The JFrame to associate input handlers with.
      */
     void registerInputHandlers(JFrame frame);
+
+
+    /**
+     * Removes the association of a specific key code with an action.
+     *
+     * @param keyCode The key code to remove from the mapping.
+     */
+    void removeKeyAssociation(int keyCode);
+
+
+    /**
+     * Removes the association of a specific mouse button with an action.
+     *
+     * @param mouseButton The mouse button code to remove from the mapping.
+     */
+    void removeMouseAssociation(int mouseButton);
 }
