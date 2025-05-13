@@ -8,6 +8,7 @@ import assets.*;
 import java.util.function.Function;
 import java.util.concurrent.*;
 import gui.IInputEvent;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The `GameManager` class is responsible for managing the game's enemies,
@@ -23,7 +24,11 @@ import gui.IInputEvent;
  * - Assign movement and attack patterns to enemies.
  * - Enable enemies in the game engine.
  * - Execute group attack strategies.
- *
+ * 
+ * @see https://docs.oracle.com/javase/tutorial/essential/concurrency/sync.html
+ * @see https://docs.oracle.com/javase/tutorial/essential/concurrency/atomic.html
+ * @see https://docs.oracle.com/javase/tutorial/essential/concurrency/atomicvars.html
+ * 
  * @see GameEngine
  * @see IGameObject
  * @see IEnemyMovement
@@ -256,7 +261,36 @@ public class GameManager
 
     }
 
-    /**
+
+    private void createPlayer(Shape shape)
+    {
+        double scale = 4; // Scale of the player object
+        int layer = 1; // Layer of the player object
+        double angle = 90; // Initial angle of the player object
+        Ponto position = new Ponto(0, -330); // Initial position of the player object
+        Ponto[] points = {new Ponto(0, 0), new Ponto(0, 12), new Ponto(12, 6)}; // Points for the collider
+
+        Transform t1 = new Transform(position, layer, angle, scale); // Transform for the player
+        Poligono collider = new Poligono(points, t1); // Polygon collider for the player
+        // Circulo collider = new Circulo(5, t1); // Alternative circular collider (commented out)
+
+        PlayerBehavior behavior = new PlayerBehavior(); // Behavior of the player
+        GameObject player = new GameObject("Player", t1, collider, behavior, shape); // Create the player game object
+        player.onInit(); // Initialize the player
+        this.player = player; // Set the player as the current player
+    }
+
+// -------------------------------------------------------------------------------------------------------------------------------
+    
+    public void shutdown()
+    {
+        if (scheduler != null && !scheduler.isShutdown())
+        {
+            scheduler.shutdown();
+        }
+    }
+
+/**
      * Retrieves the list of enemy game objects.
      *
      * @return The list of enemies.
@@ -294,96 +328,8 @@ public class GameManager
         //}, 10000, 100, TimeUnit.MILLISECONDS);
     }
 
-    public void shutdown()
-    {
-        if (scheduler != null && !scheduler.isShutdown())
-        {
-            scheduler.shutdown();
-        }
-    }
 
-
-    /**
-     * Configures and returns the input mapping for the game.
-     *
-     * @return InputEvent The input event mapping for keys and mouse buttons.
-     */
-    public IInputEvent getInput()
-    {
-
-        return this.input; // Return the input event mapping
-    }
-
-
-    public void handlerSelectPlayer()
-    {
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-            scheduler.scheduleAtFixedRate(() ->
-        {
-            
-            if(input.isActionActive("PLAYER1"))
-            {
-                System.out.println("1");
-                // Jogador 1 selecionado
-                finalizarSelecao();
-                scheduler.shutdown();
-                
-            } else if(input.isActionActive("PLAYER2"))
-            {
-                this.player.shape().setFrames(AssetLoader.loadAnimationFrames("nave-HanSolo.png"), 150);
-                finalizarSelecao();
-                scheduler.shutdown();
-                
-            }
-        }, 0, 1, TimeUnit.MILLISECONDS); // Verifica a cada 100ms
-    }
-
-    // Método auxiliar para finalizar a seleção
-    private void finalizarSelecao()
-    {
-        this.engine.getGui().setMenu(false);
-        this.engine.destroyAll();
-        return;
-    }
-
-    public void startGame()
-    {
-        
-        if(this.engine.getGui().isMenu())
-            this.handlerSelectPlayer();
-
-                System.out.println(this.gameObjects.size());
-                for (int i = 0; i < this.gameObjects.size(); i++)
-                    this.engine.add(this.gameObjects.get(i));
-
-                this.engine.add(this.player);
-                this.engine.enableAll();
-                this.startRelocateEnemies();
-                this.monitorPlayer();
-            
-            System.out.println("GAMEEEEE STARTTT");
-            this.engine.run();
-        
-    }
-
-    private void createPlayer(Shape shape)
-    {
-        double scale = 4; // Scale of the player object
-        int layer = 1; // Layer of the player object
-        double angle = 90; // Initial angle of the player object
-        Ponto position = new Ponto(0, -330); // Initial position of the player object
-        Ponto[] points = {new Ponto(0, 0), new Ponto(0, 12), new Ponto(12, 6)}; // Points for the collider
-
-        Transform t1 = new Transform(position, layer, angle, scale); // Transform for the player
-        Poligono collider = new Poligono(points, t1); // Polygon collider for the player
-        // Circulo collider = new Circulo(5, t1); // Alternative circular collider (commented out)
-
-        PlayerBehavior behavior = new PlayerBehavior(); // Behavior of the player
-        GameObject player = new GameObject("Player", t1, collider, behavior, shape); // Create the player game object
-        player.onInit(); // Initialize the player
-        this.player = player; // Set the player as the current player
-    }
-
+       
     private void monitorPlayer()
     {
         this.generateInfoStat();
@@ -409,4 +355,64 @@ public class GameManager
                 }
             }, 1, 100, TimeUnit.MILLISECONDS);
     }
+
+
+    /**
+     * Configures and returns the input mapping for the game.
+     *
+     * @return InputEvent The input event mapping for keys and mouse buttons.
+     */
+    public IInputEvent getInput()
+    {
+
+        return this.input; // Return the input event mapping
+    }
+
+//-------------------------------------------------------------------------------------------------------------
+    private void handlerSelectPlayer()
+    {
+        AtomicBoolean running = new AtomicBoolean(true);
+        scheduler.scheduleAtFixedRate(() ->
+        {
+            if (!running.get()) return;
+
+            if(input.isActionActive("PLAYER1"))
+            {
+                finalizarSelecao();
+                running.set(false);
+            }
+            else if(input.isActionActive("PLAYER2"))
+            {
+                this.player.shape().setFrames(AssetLoader.loadAnimationFrames("nave-HanSolo.png"), 150);
+                finalizarSelecao();
+                running.set(false);
+            }
+        }, 0, 1, TimeUnit.MILLISECONDS);
+    }
+    
+    private void finalizarSelecao()
+    {
+        this.engine.getGui().setMenu(false);
+        this.engine.destroyAll();
+
+        for (int i = 0; i < this.gameObjects.size(); i++)
+                    this.engine.addEnable(this.gameObjects.get(i));
+
+        this.engine.addEnable(this.player);
+        this.startRelocateEnemies();
+        this.monitorPlayer();
+        return;
+    }
+
+    public void startGame()
+    {
+        if(this.engine.getGui().isMenu())
+            this.handlerSelectPlayer();
+
+        this.engine.run();
+        
+    }
+
+ 
+
 }

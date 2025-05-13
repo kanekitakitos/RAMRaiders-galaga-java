@@ -50,6 +50,7 @@ import java.awt.FontMetrics;
  *                  - Background is drawn if provided
  *                  - Info panel is drawn on the right side
  *                  - Hitboxes are displayed if enabled
+ * @see 
  *
  * @author Brandon Mejia
  * @version 2025-03-25
