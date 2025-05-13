@@ -312,14 +312,21 @@ public class GameEngine implements IGameEngine
     @Override
     public void destroyAll()
     {
+        ArrayList<IGameObject> objectsToDestroy = new ArrayList<>();
+        
+        // Primeiro, colete todos os objetos que precisam ser destruídos
         for (CopyOnWriteArrayList<IGameObject> layerObjects : layeredGameObjects.values())
         {
-            if (layerObjects == null || layerObjects.isEmpty())
-                continue;
-            for (IGameObject go : layerObjects)
+            if (layerObjects != null && !layerObjects.isEmpty())
             {
-                destroy(go);
+                objectsToDestroy.addAll(layerObjects);
             }
+        }
+        
+        // Depois, destrua cada objeto individualmente
+        for (IGameObject go : objectsToDestroy)
+        {
+            destroy(go);
         }
     }
 

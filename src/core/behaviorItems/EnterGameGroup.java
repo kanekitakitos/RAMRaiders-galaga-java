@@ -242,7 +242,7 @@ public class EnterGameGroup implements IGroupAttackStrategy
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 1, 0, 0, 1, 0, 0, 0 },
-            { 0, 1, 0, 0, 0, 0, 0, 0, 0, 1 }
+            { 0, 1, 1, 0, 0, 0, 0, 0, 0, 1 }
         };
 
         // Mapeia as posições do pattern para os índices dos inimigos

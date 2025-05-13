@@ -164,6 +164,11 @@ public class GamePanel extends JPanel
     public void setMenu(boolean menu)
     {
         this.menu = menu;
+        if(!this.menu)
+        {
+            this.infoToRender.clear();
+            this.objectsToRender.clear();
+        }
     }
 
     public boolean isMenu()

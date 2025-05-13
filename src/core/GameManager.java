@@ -77,11 +77,8 @@ public class GameManager
     {
         invariante(engine);
         this.engine = engine;
-        this.player = createPlayer( new Shape(AssetLoader.loadAnimationFrames("player.gif"), 150));
+        createPlayer( new Shape(AssetLoader.loadAnimationFrames("player.gif"), 150));
         this.input = engine.getGui().getInput();
-
-        this.engine.disable(player);
-
 
         this.groupAttackStrategy = new EnterGameGroup();
         ((EnterGameGroup)this.groupAttackStrategy).setScheduler(this.scheduler);
@@ -264,9 +261,9 @@ public class GameManager
      *
      * @return The list of enemies.
      */
-    public ArrayList<IGameObject> getEnemys()
+    public CopyOnWriteArrayList<IGameObject> getEnemys()
     {
-        return new ArrayList<>(gameObjects);
+        return gameObjects;
     }
 
     /**
@@ -313,56 +310,63 @@ public class GameManager
      */
     public IInputEvent getInput()
     {
-        
+
         return this.input; // Return the input event mapping
     }
 
 
     public void handlerSelectPlayer()
     {
-        while(true)
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+            scheduler.scheduleAtFixedRate(() ->
         {
-            if(input.isActionActive("PLAYER1") )
+            
+            if(input.isActionActive("PLAYER1"))
             {
-                this.engine.destroyAll();
-                break;
+                System.out.println("1");
+                // Jogador 1 selecionado
+                finalizarSelecao();
+                scheduler.shutdown();
+                
+            } else if(input.isActionActive("PLAYER2"))
+            {
+                this.player.shape().setFrames(AssetLoader.loadAnimationFrames("nave-HanSolo.png"), 150);
+                finalizarSelecao();
+                scheduler.shutdown();
+                
             }
+        }, 0, 1, TimeUnit.MILLISECONDS); // Verifica a cada 100ms
+    }
 
-        if(input.isActionActive("PLAYER2"))
-            {
-                this.player.shape().setFrames(AssetLoader.loadAnimationFrames("nave-HanSolo.png"), 150); // Shape with animation frames
-                this.engine.destroyAll();
-                break;
-            }
-        }
+    // Método auxiliar para finalizar a seleção
+    private void finalizarSelecao()
+    {
+        this.engine.getGui().setMenu(false);
+        this.engine.destroyAll();
+        return;
     }
 
     public void startGame()
     {
+        
         if(this.engine.getGui().isMenu())
-        {
             this.handlerSelectPlayer();
-            this.engine.getGui().setMenu(false);
-        }
 
-
-        if(!this.engine.getGui().isMenu())
-        {
-            for (int i = 0; i < this.gameObjects.size(); i++)
+                System.out.println(this.gameObjects.size());
+                for (int i = 0; i < this.gameObjects.size(); i++)
                     this.engine.add(this.gameObjects.get(i));
 
-                this.engine.add(player);
+                this.engine.add(this.player);
                 this.engine.enableAll();
                 this.startRelocateEnemies();
                 this.monitorPlayer();
-            }
-
-
-
-                    this.engine.run();
+            
+            System.out.println("GAMEEEEE STARTTT");
+            this.engine.run();
+        
     }
 
-    private IGameObject createPlayer(Shape shape)
+    private void createPlayer(Shape shape)
     {
         double scale = 4; // Scale of the player object
         int layer = 1; // Layer of the player object
@@ -377,8 +381,7 @@ public class GameManager
         PlayerBehavior behavior = new PlayerBehavior(); // Behavior of the player
         GameObject player = new GameObject("Player", t1, collider, behavior, shape); // Create the player game object
         player.onInit(); // Initialize the player
-
-        return player;
+        this.player = player; // Set the player as the current player
     }
 
     private void monitorPlayer()
@@ -400,7 +403,8 @@ public class GameManager
 
                 if (vidasAtuais <= 0)
                 {
-                    shutdown();
+                    this.engine.destroyAll();
+                    this.shutdown();
                     return;
                 }
             }, 1, 100, TimeUnit.MILLISECONDS);
