@@ -46,7 +46,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class GameManager
 {
     private CopyOnWriteArrayList<IGameObject> gameObjects = new CopyOnWriteArrayList<>(); // List of enemy game objects
-    private IGameObject player; // The player game object
+    private IGameObject player = null; // The player game object
+    private GameObject score=null;
     private IGroupAttackStrategy groupAttackStrategy; // Strategy for group attacks
 
     private GameEngine engine; // The game engine managing game objects
@@ -166,26 +167,39 @@ public class GameManager
 
     public void generateInfoStat()
     {
-        // Spawn constants
-        int layer = 0; // this layer is only for the info stat
-
-        Ponto[] pointsQuadrado = { new Ponto(-5, 5), new Ponto(5, 5), new Ponto(5, -5), new Ponto(-5, -5)};
-        // Example of life display
-        PlayerBehavior playerBehavior = (PlayerBehavior) this.player.behavior();
-        int lives = playerBehavior.getLife()-1; // This should be updated with the actual number of lives
-        Ponto position = this.player.transform().position();
-        for (int i = 0; i < lives; i++)
+        synchronized(this.engine)
         {
-            Shape shape = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0);
-            Transform transform = new Transform(new Ponto(position.x()+450 + i * 100, position.y()-20 ), layer, 90, scale);
-            Poligono collider = new Poligono(pointsQuadrado, transform);
-            
-            GameObject lifeDisplay = new GameObject("Life "+(i+1), transform, collider, new EnemyBehavior(), shape);
-            lifeDisplay.onInit();
-            this.engine.add(lifeDisplay);
+                // Spawn constants
+            int layer = 0; // this layer is only for the info stat
+            double raio = 6;
+            // Example of life display
+            PlayerBehavior playerBehavior = (PlayerBehavior) this.player.behavior();
+            int lives = playerBehavior.getLife()-1; // This should be updated with the actual number of lives
+            Ponto position = this.player.transform().position();
+            GameObject lifeDisplay = null;
+            for (int i = 0; i < lives; i++)
+            {
+                Shape shape = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0);
+                Transform transform = new Transform(new Ponto(position.x()+450 + i * 100, position.y()-20 ), layer, 90, scale);
+                Circulo collider = new Circulo(raio, transform);
+                
+                lifeDisplay = new GameObject("Life "+(i+1), transform, collider, new EnemyBehavior(), shape);
+                lifeDisplay.onInit();
+                lifeDisplay.behavior().onInit();
+                this.engine.add(lifeDisplay);
+            }
+
+            double scale = 60;
+            Shape s1 = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0);
+            Transform t1 = new Transform(new Ponto(380, 320.0), layer, 0.0, scale);
+            Circulo p1 = new Circulo(0.01, t1);
+            GameObject score = new GameObject("Score", t1, p1, new Behavior(), s1);
+            this.score = score;
+            this.score.onInit();
+            engine.addEnable(this.score);
+
         }
     }
-
 
     public void generateMenuObjects()
     {
@@ -261,6 +275,23 @@ public class GameManager
 
     }
 
+    public void generateGameOver()
+    {
+        this.engine.getGui().setMenu(true);
+        double scale = 64;
+        double raio = 0.0001;
+        int layer = 0;
+        // Start Game
+        Shape s1 = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0);
+        Transform t1 = new Transform(new Ponto(0.0, 0.0), layer, 0.0, scale);
+        Circulo p1 = new Circulo(raio, t1);
+        GameObject startGame = new GameObject("GAME OVER", t1, p1, new Behavior(), s1);
+        startGame.onInit();
+        startGame.behavior().onInit();
+        engine.add(startGame);
+
+        this.shutdown();
+    }
 
     private void createPlayer(Shape shape)
     {
@@ -333,27 +364,35 @@ public class GameManager
     private void monitorPlayer()
     {
         this.generateInfoStat();
-        ArrayList<IGameObject> lifeDisplays = new ArrayList<>(this.engine.get(0));
+        ArrayList<IGameObject> lifeDisplays = new ArrayList<>();
+        for (IGameObject obj : this.engine.get(0))
+            if (obj.name().toLowerCase().contains("life"))
+                lifeDisplays.add(obj);
+
         this.scheduler.scheduleAtFixedRate(
             () ->
             {
+
                 PlayerBehavior playerBehavior = (PlayerBehavior) this.player.behavior();
                 int vidasAtuais = playerBehavior.getLife();
+                Behavior behavior = (Behavior) this.score.behavior();
+                behavior.setScore(playerBehavior.getScore());
+
                 int lifes = lifeDisplays.size()+1;
 
-                if (lifes > vidasAtuais)
+                if (lifes > vidasAtuais && vidasAtuais >0)
                 {
                     IGameObject lifeDisplay = lifeDisplays.remove(lifeDisplays.size() - 1);
                     this.engine.destroy(lifeDisplay);
                 }
 
-                if (vidasAtuais <= 0)
+                if (lifes <= 0)
                 {
                     this.engine.destroyAll();
-                    this.shutdown();
-                    return;
+                    this.generateGameOver();
                 }
-            }, 1, 100, TimeUnit.MILLISECONDS);
+
+            }, 10, 1, TimeUnit.MILLISECONDS);
     }
 
 
@@ -388,8 +427,9 @@ public class GameManager
                 running.set(false);
             }
         }, 0, 1, TimeUnit.MILLISECONDS);
+
     }
-    
+
     private void finalizarSelecao()
     {
         this.engine.getGui().setMenu(false);
@@ -401,7 +441,7 @@ public class GameManager
         this.engine.addEnable(this.player);
         this.startRelocateEnemies();
         this.monitorPlayer();
-        return;
+        
     }
 
     public void startGame()
@@ -410,9 +450,5 @@ public class GameManager
             this.handlerSelectPlayer();
 
         this.engine.run();
-        
     }
-
- 
-
 }

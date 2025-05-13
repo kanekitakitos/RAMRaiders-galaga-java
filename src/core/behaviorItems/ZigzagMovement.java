@@ -230,35 +230,4 @@ public class ZigzagMovement implements IEnemyMovement
     {
         this.goLeftToRight = goLeftToRight;
     }
-
-    // Optional setters for configurability
-    /**
-     * Sets the number of steps to take in one direction before returning.
-     * @param maxSteps Number of steps (must be > 0).
-     */
-    public void setMaxSteps(int maxSteps) {
-        if (maxSteps > 0) {
-            this.maxSteps = maxSteps;
-        }
-    }
-
-    /**
-     * Sets the distance for each individual step of the movement.
-     * @param targetDistance Distance (must be > 0).
-     */
-    public void setTargetDistance(double targetDistance) {
-        if (targetDistance > 0) {
-            this.targetDistance = targetDistance;
-        }
-    }
-
-    /**
-     * Sets the duration of the pause between movement steps.
-     * @param waitDuration Pause duration in frames/updates (must be >= 0).
-     */
-    public void setWaitDuration(double waitDuration) {
-        if (waitDuration >= 0) {
-            this.waitDuration = waitDuration;
-        }
-    }
 }

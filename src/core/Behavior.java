@@ -6,6 +6,7 @@ import core.objectsInterface.IBehavior;
 import core.objectsInterface.IGameObject;
 import gui.IInputEvent;
 import gui.InputEvent;
+import core.behaviorItems.IAttackStrategy;
 
 /**
  * Represents the behavior logic for a GameObject in the game.
@@ -51,9 +52,12 @@ public class Behavior implements IBehavior
 {
     protected GameObject go; // The GameObject associated with this behavior
     protected boolean isEnabled; // Indicates whether the behavior is enabled
+    protected IAttackStrategy attackStrategy = null;
+    protected boolean isAttacking = false; // Indicates whether the enemy is currently attacking
 
     // The GameObject this behavior is observing
     protected IGameObject observedObject;
+    protected int score = 0;
 
     /**
      * Default constructor for the Behavior class.
@@ -65,6 +69,20 @@ public class Behavior implements IBehavior
         this.go = null;
         this.isEnabled = false;
         this.observedObject = null;
+    }
+
+
+    /**
+     * Sets the attack strategy for the Object.
+     *
+     * @param attackStrategy The attack strategy to use.
+     */
+    public void setAttackStrategy(IAttackStrategy attackStrategy)
+    {
+        if(attackStrategy == null)
+            throw new IllegalArgumentException("Attack strategy cannot be null");
+
+        this.attackStrategy = attackStrategy;
     }
 
     /**
@@ -131,9 +149,13 @@ public class Behavior implements IBehavior
                     if(go.name().contains("Player") && go.behavior().isEnabled())
                         continue;
                     else
-                        go.behavior().onDisabled(); // Destroy the enemy if it collides with the player or other object
+                        {
+                            go.behavior().notifyObserver();
+                            go.behavior().onDisabled(); // Destroy the enemy if it collides with the player or other object
+                        }
                 }
 
+        this.notifyObserver();
         this.onDestroy();
     }
 
@@ -162,6 +184,21 @@ public class Behavior implements IBehavior
     public boolean isEnabled()
     {
         return this.isEnabled;
+    }
+
+    /**
+     * Stops the current attack by setting the attacking flag to false.
+     */
+    public void stopAttack()
+    {
+        this.isAttacking = false;
+    }
+
+    /**
+     * Starts an attack by setting the attacking flag to true.
+     */
+    public void startAttack() {
+        this.isAttacking = true;
     }
 
     // -------------------------------------------------------------------------------------
@@ -194,6 +231,25 @@ public class Behavior implements IBehavior
         return this.observedObject;
     }
 
+
+    public void notifyObserver()
+    {
+        if(this.observedObject == null)
+            return;
+
+        Behavior behavior = (Behavior) this.observedObject.behavior();
+        behavior.score += 10;
+    }
+
+    public void setScore(int score)
+    {
+        this.score = score;
+    }
+
+    public int getScore()
+    {
+        return this.score ;
+    }
     // -------------------------------------------------------------------------------------
 
     /**

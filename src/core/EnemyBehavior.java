@@ -44,10 +44,9 @@ import gui.IInputEvent;
 public class EnemyBehavior extends Behavior
 {
 
-    private IAttackStrategy attackStrategy = null; // The attack strategy used by the enemy
     private IEnemyMovement movement; // The movement strategy used by the enemy
     private static final ScheduledExecutorService localScheduler = Executors.newScheduledThreadPool(1);
-    private boolean isAttacking = false; // Indicates whether the enemy is currently attacking
+    
 
     /**
      * Default constructor for `EnemyBehavior`.
@@ -65,7 +64,8 @@ public class EnemyBehavior extends Behavior
      *
      * @param strategy The attack strategy to use.
      */
-    public void setAttack(IAttackStrategy strategy) {
+    public void setAttackStrategy(IAttackStrategy strategy)
+    {
         this.attackStrategy = strategy;
     }
 
@@ -99,19 +99,6 @@ public class EnemyBehavior extends Behavior
         }
     }
 
-    /**
-     * Stops the current attack by setting the attacking flag to false.
-     */
-    public void stopAttack() {
-        this.isAttacking = false;
-    }
-
-    /**
-     * Starts an attack by setting the attacking flag to true.
-     */
-    public void startAttack() {
-        this.isAttacking = true;
-    }
 
     /**
      * Activates or deactivates the movement strategy.

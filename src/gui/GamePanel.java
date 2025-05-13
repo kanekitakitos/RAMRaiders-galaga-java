@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.awt.FontMetrics;
+import core.Behavior;
 
 /**
  * A custom JPanel for rendering game objects and background in a 2D game.
@@ -160,7 +161,7 @@ public class GamePanel extends JPanel
     /**
      * Sets whether Menu should be displayed for game.
      *
-     * @param menu True to show hitboxes, false to hide them
+     * @param menu True to show Menu, false to hide them
      */
     public void setMenu(boolean menu)
     {
@@ -264,8 +265,34 @@ public class GamePanel extends JPanel
         g2d.setColor(Color.YELLOW);
         g2d.drawString(text, centeredX, centeredY);
 
-        if (hitbox)
-            go.collider().draw(g2d, panelWidth / 2.0, panelHeight / 2.0);
+    }
+
+    public void drawScore(Graphics2D g2d, IGameObject go, int panelWidth, int panelHeight)
+    {
+        drawString(g2d, go, panelWidth, panelHeight);
+
+        Behavior behavior = (Behavior)go.behavior();
+        String text = String.valueOf(behavior.getScore());
+        Ponto position = go.transform().position();
+        int scale = (int)(go.transform().scale()/1.5);
+
+        double screenX = panelWidth / 2.0 + position.x();
+        double screenY = panelHeight / 2.0 - position.y();
+
+        g2d.setFont(new java.awt.Font("Retro Gaming", java.awt.Font.BOLD, scale));
+    
+    
+        // Centralizar a string
+        FontMetrics metrics = g2d.getFontMetrics();
+        int textWidth = metrics.stringWidth(text);
+        int centeredX = (int)screenX - textWidth / 2;
+        int centeredY = (int)screenY+60;
+
+        // Desenha o texto principal (amarelo)
+        g2d.setColor(Color.RED);
+        g2d.drawString(text, centeredX-1, centeredY-2);
+        g2d.setColor(Color.YELLOW);
+        g2d.drawString(text, centeredX, centeredY);
     }
 
 
@@ -330,6 +357,13 @@ public class GamePanel extends JPanel
                 {
                     if (go.transform() == null || go.shape() == null)
                         continue;
+
+                    if(go.name().contains("Score"))
+                        {
+                            drawScore(g2d, go, getWidth(), getHeight());
+                            continue;
+                        }
+                        
 
                     drawGameObject(g2d, go, getWidth(), getHeight());
                 }

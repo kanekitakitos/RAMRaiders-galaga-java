@@ -195,6 +195,20 @@ public class GameEngine implements IGameEngine
             this.disabledGameObjects.clear();
     }
 
+
+    public IGameObject getByName(String name)
+    {
+        for (CopyOnWriteArrayList<IGameObject> layerObjects : layeredGameObjects.values()) {
+            if (layerObjects != null)
+            {
+                for (IGameObject go : layerObjects)
+                    if (go.name().contains(name))
+                        return go; 
+            }
+        }
+        return null;
+    }
+
     /**
      * Checks for collisions for all enabled objects.
      * Calls `Behavior.onCollision(go)` for all enabled `GameObject`s,
@@ -205,13 +219,16 @@ public class GameEngine implements IGameEngine
     {
         ArrayList<IGameObject> output = new ArrayList<>();
         IGameObject currentObject = null;
+        IGameObject player = getByName("Player");
 
-        for (CopyOnWriteArrayList<IGameObject> layerObjects : layeredGameObjects.values()) {
+        for (CopyOnWriteArrayList<IGameObject> layerObjects : layeredGameObjects.values())
+        {
             if (layerObjects == null || layerObjects.isEmpty())
                 continue;
 
             int size = layerObjects.size();
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < size; i++)
+            {
                 currentObject = layerObjects.get(i);
                 for (int j = 0; j < size; j++)
                 {
@@ -219,12 +236,24 @@ public class GameEngine implements IGameEngine
                         continue;
 
                     IGameObject other = layerObjects.get(j);
-
                     if (currentObject.name().contains("Enemy") && other.name().contains("Enemy"))
                         continue;
 
                     if (currentObject.name().contains("Bullet") && other.name().contains("Bullet"))
                         continue;
+
+                        if( player != null  && player.transform().position().distancia(currentObject.transform().position()) < 200)
+                        {
+                           
+                            if (currentObject.name().contains("Enemy") && player.collider().colision(currentObject.collider()))
+                            {
+            
+                                ArrayList<IGameObject> temp = new ArrayList<>();
+                                temp.add(other);
+                                player.behavior().onCollision(temp);
+                            }
+                            
+                        }
 
                     if (currentObject.collider().colision(other.collider()))
                         output.add(other);

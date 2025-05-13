@@ -16,7 +16,8 @@ import core.EnemyBehavior;
  * @author Brandon Mejia
  * @version 2025-05-07
  */
-public class GroupAttackStrategy implements IGroupAttackStrategy {
+public class GroupAttackStrategy implements IGroupAttackStrategy
+{
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private int currentGroup = 0;
     private int[] groupSizes = { 8, 8, 8, 8, 8 };
@@ -80,7 +81,7 @@ public class GroupAttackStrategy implements IGroupAttackStrategy {
                         attackStrategy = new KamikazeAttack();
                     }
 
-                    behavior.setAttack(attackStrategy);
+                    behavior.setAttackStrategy(attackStrategy);
                     behavior.startAttack();
                 }
             }, i * 300, TimeUnit.MILLISECONDS);

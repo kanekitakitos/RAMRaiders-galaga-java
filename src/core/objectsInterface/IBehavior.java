@@ -99,4 +99,6 @@ public interface IBehavior {
 
 
      boolean isEnabled();
+
+     void notifyObserver();
 }

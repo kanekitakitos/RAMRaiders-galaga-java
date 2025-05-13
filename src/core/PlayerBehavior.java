@@ -1,6 +1,5 @@
 package core;
 
-import core.behaviorItems.IAttackStrategy;
 import core.behaviorItems.LinearShootAttack;
 import core.objectsInterface.IGameObject;
 import geometry.Ponto;
@@ -48,9 +47,6 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public class PlayerBehavior extends Behavior
 {
-    private IAttackStrategy attackStrategy; // The attack strategy used by the player
-    private boolean isAttacking = false; // Indicates whether the player is currently attacking
-
     private int life = 3; // The player's remaining lives
     private boolean isInvincible = false; // Indicates whether the player is invincible
     private final long invincibilityDuration = 2000; // Duration of invincibility in milliseconds
@@ -69,18 +65,6 @@ public class PlayerBehavior extends Behavior
         this.localScheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
-    /**
-     * Sets the attack strategy for the player.
-     *
-     * @param attackStrategy The attack strategy to use.
-     */
-    public void setAttackStrategy(IAttackStrategy attackStrategy)
-    {
-        if(attackStrategy == null)
-            throw new IllegalArgumentException("Attack strategy cannot be null");
-
-        this.attackStrategy = attackStrategy;
-    }
 
     /**
      * Checks if the player is currently invincible.

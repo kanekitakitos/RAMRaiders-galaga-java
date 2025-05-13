@@ -121,7 +121,7 @@ public class EnterGameGroup implements IGroupAttackStrategy
             {
                 relocateEnemies(enemies);
             }
-        }, 1000, groupDelayFrames * 100, TimeUnit.MILLISECONDS);
+        }, 1500, groupDelayFrames * 100, TimeUnit.MILLISECONDS);
     }
 
     
@@ -326,7 +326,7 @@ public class EnterGameGroup implements IGroupAttackStrategy
                     GameObject enemy = (GameObject) enemies.get(currentIndex);
                     EnemyBehavior enemyBehavior = (EnemyBehavior) enemy.behavior();
                     IAttackStrategy attack = new HomingShootAttack();
-                    enemyBehavior.setAttack(attack);
+                    enemyBehavior.setAttackStrategy(attack);
                     enemyBehavior.startAttack();
                 
                 }
