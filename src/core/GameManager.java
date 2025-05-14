@@ -9,6 +9,10 @@ import java.util.function.Function;
 import java.util.concurrent.*;
 import gui.IInputEvent;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+import javax.sound.sampled.Clip;
 
 /**
  * The `GameManager` class is responsible for managing the game's enemies,
@@ -38,7 +42,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @see Poligono
  * @see EnemyBehavior
  * @see Shape
- * @see AssetLoader
+ * @see ImagesLoader
  *
  * @author Brandon Mejia
  * @version 2025-04-20
@@ -83,7 +87,7 @@ public class GameManager
     {
         invariante(engine);
         this.engine = engine;
-        createPlayer( new Shape(AssetLoader.loadAnimationFrames("player.gif"), 150));
+        createPlayer( new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 150));
         this.input = engine.getGui().getInput();
 
         this.groupAttackStrategy = new EnterGameGroup();
@@ -150,20 +154,29 @@ public class GameManager
             Shape shape;
 
             if( i > 7 && i <12 ) // the first 4 enemys
-                shape = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 150);
+                shape = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 150);
             else if ( (i >= 0 && i <4) || (i >= 12 && i <= 23))
-                shape = new Shape(AssetLoader.loadAnimationFrames("inimigo2.gif"), 150);
+                shape = new Shape(ImagesLoader.loadAnimationFrames("inimigo2.gif"), 150);
             else // final two lines
-                shape = new Shape(AssetLoader.loadAnimationFrames("inimigo1.gif"), 150);
+                shape = new Shape(ImagesLoader.loadAnimationFrames("inimigo1.gif"), 150);
 
             GameObject enemy = new GameObject("Enemy " + i, t, collider, behavior, shape);
             enemy.onInit();
             enemy.behavior().subscribe(this.player);
+            enemy.setSoundEffects(createSoundEffects());
             gameObjects.add(enemy);
         }
 
     }
 
+
+    private ISoundEffects createSoundEffects()
+    {
+        Map<String, Clip> soundClips = new HashMap<>(); // Map to store sound clips
+        soundClips.put("ATTACK", AudioLoader.loadAudio("blaster.wav"));
+        SoundEffects soundEffects = new SoundEffects(soundClips);
+        return soundEffects;
+    }
 
     public void generateInfoStat()
     {
@@ -179,7 +192,7 @@ public class GameManager
             GameObject lifeDisplay = null;
             for (int i = 0; i < lives; i++)
             {
-                Shape shape = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0);
+                Shape shape = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
                 Transform transform = new Transform(new Ponto(position.x()+450 + i * 100, position.y()-20 ), layer, 90, scale);
                 Circulo collider = new Circulo(raio, transform);
                 
@@ -190,7 +203,7 @@ public class GameManager
             }
 
             double scale = 60;
-            Shape s1 = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0);
+            Shape s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
             Transform t1 = new Transform(new Ponto(380, 320.0), layer, 0.0, scale);
             Circulo p1 = new Circulo(0.01, t1);
             GameObject score = new GameObject("Score", t1, p1, new Behavior(), s1);
@@ -210,7 +223,7 @@ public class GameManager
         double raio = 0.0001;
         int layer = 0;
         // Start Game
-        Shape s1 = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0);
+        Shape s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
         Transform t1 = new Transform(new Ponto(0.0, 0.0), layer, 0.0, scale);
         Circulo p1 = new Circulo(raio, t1);
         GameObject startGame = new GameObject("Start Game", t1, p1, new Behavior(), s1);
@@ -219,7 +232,7 @@ public class GameManager
 
         // RAMRaiders
         scale = 64;
-        s1 = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0);
+        s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
         t1 = new Transform(new Ponto(0.0, startGame.transform().position().y()+140), layer, 0.0, scale); // posição Y diferente
         p1 = new Circulo(raio, t1);
         GameObject nomeGrupo = new GameObject("RAM-Raiders", t1, p1, new Behavior(), s1);
@@ -228,7 +241,7 @@ public class GameManager
 
         // Nome do grupo
         scale = 15;
-        s1 = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0);
+        s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
         t1 = new Transform(new Ponto(0.0, startGame.transform().position().y()-370), layer, 0.0, scale); // posição Y diferente
         p1 = new Circulo(raio, t1);
         GameObject grupo = new GameObject("Gabriel Pedroso                      Brandon Mejia                      Miguel Correia", t1, p1, new Behavior(), s1);
@@ -238,14 +251,14 @@ public class GameManager
 
         // Skin 1 e 2
         scale = 20;
-        s1 = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0);
+        s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
         t1 = new Transform(new Ponto(-150, startGame.transform().position().y()-80), layer, 180, scale); // posição Y diferente
         p1 = new Circulo(raio, t1);
         GameObject skin1 = new GameObject("Press 1", t1, p1, new Behavior(), s1);
         skin1.onInit();
         objects.add(skin1);
 
-        s1 = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0);
+        s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
         t1 = new Transform(new Ponto(150.0, startGame.transform().position().y()-80), layer, 180, scale); // posição Y diferente
         p1 = new Circulo(raio, t1);
         GameObject skin2 = new GameObject("Press 2", t1, p1, new Behavior(), s1);
@@ -254,14 +267,14 @@ public class GameManager
 
         double offset = 90;
         raio = 10;
-        s1 = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 150);
+        s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 150);
         t1 = new Transform(new Ponto(skin1.transform().position().x(), skin1.transform().position().y()-offset), layer+1, 90, this.scale); // posição Y diferente
         p1 = new Circulo(raio, t1);
         GameObject nave1 = new GameObject("nave", t1, p1, new Behavior(), s1);
         nave1.onInit();
         objects.add(nave1);
 
-        s1 = new Shape(AssetLoader.loadAnimationFrames("nave-HanSolo.png"), 0);
+        s1 = new Shape(ImagesLoader.loadAnimationFrames("nave-HanSolo.png"), 0);
         t1 = new Transform(new Ponto(skin2.transform().position().x(), skin2.transform().position().y()-offset), layer+1, 90, this.scale); // posição Y diferente
         p1 = new Circulo(raio-1, t1);
         GameObject nave2 = new GameObject("nave", t1, p1, new Behavior(), s1);
@@ -282,7 +295,7 @@ public class GameManager
         double raio = 0.0001;
         int layer = 0;
         // Start Game
-        Shape s1 = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 0);
+        Shape s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
         Transform t1 = new Transform(new Ponto(0.0, 0.0), layer, 0.0, scale);
         Circulo p1 = new Circulo(raio, t1);
         GameObject startGame = new GameObject("GAME OVER", t1, p1, new Behavior(), s1);
@@ -309,6 +322,8 @@ public class GameManager
         GameObject player = new GameObject("Player", t1, collider, behavior, shape); // Create the player game object
         player.onInit(); // Initialize the player
         this.player = player; // Set the player as the current player
+        this.player.setSoundEffects(createSoundEffects());
+        this.player.soundEffects().addSound("HIT", AudioLoader.loadAudio("playerHit.wav"));
     }
 
 // -------------------------------------------------------------------------------------------------------------------------------
@@ -390,6 +405,9 @@ public class GameManager
                 {
                     this.engine.destroyAll();
                     this.generateGameOver();
+                    ISoundEffects soundEffects = new SoundEffects();
+                    soundEffects.addSound("GAMEOVER", AudioLoader.loadAudio("gameOver.wav"));
+                    soundEffects.loopSound("GAMEOVER");
                 }
 
             }, 10, 1, TimeUnit.MILLISECONDS);
@@ -422,7 +440,7 @@ public class GameManager
             }
             else if(input.isActionActive("PLAYER2"))
             {
-                this.player.shape().setFrames(AssetLoader.loadAnimationFrames("nave-HanSolo.png"), 150);
+                this.player.shape().setFrames(ImagesLoader.loadAnimationFrames("nave-HanSolo.png"), 150);
                 finalizarSelecao();
                 running.set(false);
             }

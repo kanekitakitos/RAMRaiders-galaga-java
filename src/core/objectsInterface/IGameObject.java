@@ -41,4 +41,8 @@ public interface IGameObject {
 
     void onUpdate();
 
+    void setSoundEffects(ISoundEffects soundEffects);
+
+    ISoundEffects soundEffects();
+
 }

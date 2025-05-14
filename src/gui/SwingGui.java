@@ -171,6 +171,4 @@ public class SwingGui implements IGuiBridge
         return this.panel.isMenu();
     }
 
-    
-    
 }

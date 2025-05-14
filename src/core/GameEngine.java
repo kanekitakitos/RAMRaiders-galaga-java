@@ -2,13 +2,16 @@ package core;
 
 import core.objectsInterface.IGameEngine;
 import core.objectsInterface.IGameObject;
+import core.objectsInterface.ISoundEffects;
 import gui.*;
+import geometry.Ponto;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.List;
+
 
 /**
  * The `GameEngine` class manages game objects, their layers, and updates.
@@ -43,8 +46,9 @@ public class GameEngine implements IGameEngine
     // Tracks the total number of game objects
     private int totalObjects;
 
-    // Input event handler
+    // Input and Sound event handler
     private IInputEvent inputStatus;
+
     private IGuiBridge gui;
     private IGameObject player;
 
@@ -149,9 +153,8 @@ public class GameEngine implements IGameEngine
      * layer,
      * it is moved to the appropriate layer.
      *
-     * @param dt The time delta for the update.
      */
-    public void onUpdate(double dt)
+    public void onUpdate()
     {
         ArrayList<IGameObject> objectsToMove = new ArrayList<>();
         ArrayList<IGameObject> attacksToAdd = new ArrayList<>();
@@ -174,7 +177,7 @@ public class GameEngine implements IGameEngine
                 if (go.transform() != null)
                     originalLayer = go.transform().layer();
 
-                go.behavior().onUpdate(dt, this.inputStatus);
+                go.behavior().onUpdate(this.inputStatus);
 
                 IGameObject attack = go.behavior().attack(this.inputStatus);
                 if (attack != null)
@@ -225,18 +228,82 @@ public class GameEngine implements IGameEngine
             for (int i = 0; i < size; i++)
             {
                 IGameObject currentObject = layerObjects.get(i);
+                // Para maior clareza e robustez, considere usar o GameObjectType aqui, se implementado:
+                // GameObjectType currentType = currentObject.getType();
+
                 for (int j = i + 1; j < size; j++) // Otimização: j começa de i + 1
                 {
                     IGameObject other = layerObjects.get(j);
+                    // GameObjectType otherType = other.getType();
 
-                    // Mantém as regras de não colisão existentes
-                    if (currentObject.name().contains("Enemy") && other.name().contains("Enemy"))
+                    // Mantém as regras de não colisão existentes (baseadas em nome).
+                    // O ideal seria migrar para GameObjectType aqui também.
+                    if ((currentObject.name().contains("Enemy") && other.name().contains("Enemy")) ||
+                        (currentObject.name().contains("Bullet") && other.name().contains("Bullet"))) {
                         continue;
+                    }
+                    // Adicione outras regras de não colisão explícitas se necessário, por exemplo:
+                    // if ((currentObject.getType() == GameObjectType.PLAYER_BULLET && other.getType() == GameObjectType.PLAYER) ||
+                    //     (currentObject.getType() == GameObjectType.PLAYER && other.getType() == GameObjectType.PLAYER_BULLET)) {
+                    //    continue;
+                    // }
 
-                    if (currentObject.name().contains("Bullet") && other.name().contains("Bullet"))
-                        continue;
 
-                    if (currentObject.collider().colision(other.collider()))
+                    boolean collisionDetected = false;
+
+                    // Verifica se o jogador está envolvido neste par
+                    if (this.player != null && (currentObject == this.player || other == this.player)) {
+                        IGameObject nonPlayerObject = (currentObject == this.player) ? other : currentObject;
+
+                        // CASO ESPECIAL: Jogador vs Inimigo (com verificação de proximidade)
+                        // A verificação .name().contains("Enemy") deve ser substituída por .getType() == GameObjectType.ENEMY se você implementou enums.
+                        boolean isNonPlayerEnemy = nonPlayerObject.name().contains("Enemy"); // Adapte para getType() se disponível
+
+                        if (isNonPlayerEnemy) {
+                            Ponto playerPos = this.player.transform().position();
+                            Ponto enemyPos = nonPlayerObject.transform().position(); // nonPlayerObject é o inimigo aqui
+                            double distance = playerPos.distancia(enemyPos);
+
+                            // Defina um limiar de proximidade. Ajuste este valor conforme necessário para a sua jogabilidade.
+                            final double PROXIMITY_THRESHOLD = 60.0; // Exemplo: 250 unidades de distância
+
+                            if (distance < PROXIMITY_THRESHOLD)
+                            {
+                                // Se estiverem próximos, faça a verificação de colisão mais precisa (baseada em raio)
+                                double playerRadius = (this.player.collider().getLogicalWidth() + this.player.collider().getLogicalHeight()) / 4.0;
+                                double enemyRadius = (nonPlayerObject.collider().getLogicalWidth() + nonPlayerObject.collider().getLogicalHeight()) / 4.0;
+                                double collisionThreshold = playerRadius + enemyRadius;
+
+                                if (distance < collisionThreshold) { // Use a distância real aqui
+                                    collisionDetected = true;
+                                }
+                            }
+                            // Se não estiverem próximos (distance >= PROXIMITY_THRESHOLD), collisionDetected permanece false,
+                            // e a colisão não é registrada para este par específico.
+                        
+                        } else 
+                        { // Jogador vs Outro tipo (que não é Inimigo)
+                            Ponto playerPos = this.player.transform().position();
+                            Ponto otherPos = nonPlayerObject.transform().position();
+                            double distance = playerPos.distancia(otherPos);
+
+                            // Define um limiar de colisão baseado nos raios médios aproximados dos objetos
+                            double playerRadius = (this.player.collider().getLogicalWidth() + this.player.collider().getLogicalHeight()) / 4.0;
+                            double otherRadius = (nonPlayerObject.collider().getLogicalWidth() + nonPlayerObject.collider().getLogicalHeight()) / 4.0;
+                            double threshold = playerRadius + otherRadius;
+
+                            if (distance < threshold) {
+                                collisionDetected = true;
+                            }
+                        }
+                    } else {
+                        // Verificação de colisão padrão para pares que não envolvem o jogador
+                        if (currentObject.collider().colision(other.collider())) {
+                            collisionDetected = true;
+                        }
+                    }
+
+                    if (collisionDetected)
                     {
                         // Registra a colisão para ambos os objetos
                         layerCollisionMap.get(currentObject).add(other);
@@ -374,19 +441,24 @@ public class GameEngine implements IGameEngine
         final int FPS = 60;
         final long frameTime = 1000 / FPS;
 
-        while (true) {
+        while (true)
+        {
             long startTime = System.currentTimeMillis();
 
-            this.onUpdate(FPS);
+            this.onUpdate();
             this.checkCollision();
             this.gui.draw(getEnabledObjectsSnapshot());
 
             long elapsed = System.currentTimeMillis() - startTime;
             long sleepTime = frameTime - elapsed;
-            if (sleepTime > 0) {
-                try {
+            if (sleepTime > 0) 
+            {
+                try
+                {
                     Thread.sleep(sleepTime);
-                } catch (InterruptedException e) {
+                }
+                catch (InterruptedException e) 
+                {
                     Thread.currentThread().interrupt();
                     break;
                 }

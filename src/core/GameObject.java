@@ -55,6 +55,7 @@ public class GameObject implements IGameObject
     final private Collider collider; // The collider of the game object
     final private Behavior behaviour; // The behavior of the game object
     final private Shape shape; // The shape of the game object
+    private ISoundEffects soundEffects; // The sound effects of the game object
 
     protected Ponto velocity; // The velocity of the game object
     protected int velocityLayer; // The velocity layer of the game object
@@ -129,6 +130,17 @@ public class GameObject implements IGameObject
         this.shape.setlogicalWidthAndHeight(this.collider.getLogicalWidth(), this.collider.getLogicalHeight());
     }
 
+
+    public void setSoundEffects(ISoundEffects soundEffects)
+    {
+        this.soundEffects = soundEffects;
+    }
+
+    public ISoundEffects soundEffects()
+    {
+        return this.soundEffects;
+    }
+
     /**
      * Gets the name of the game object.
      *
@@ -187,7 +199,7 @@ public class GameObject implements IGameObject
         if (this.behaviour == null)
             return;
 
-        this.behaviour.onUpdate(0, null);
+        this.behaviour.onUpdate( null);
     }
 
     /**

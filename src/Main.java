@@ -39,7 +39,7 @@ public class Main
         Transform t1 = new Transform(position, layer, angle, scale); // Transform for the player
         Poligono collider = new Poligono(points, t1); // Polygon collider for the player
         // Circulo collider = new Circulo(5, t1); // Alternative circular collider (commented out)
-        Shape shape = new Shape(AssetLoader.loadAnimationFrames("player.gif"), 150); // Shape with animation frames
+        Shape shape = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 150); // Shape with animation frames
         PlayerBehavior behavior = new PlayerBehavior(); // Behavior of the player
         GameObject player = new GameObject("Player", t1, collider, behavior, shape); // Create the player game object
         player.onInit(); // Initialize the player
@@ -58,7 +58,7 @@ public class Main
         Transform t1 = new Transform(position, layer, angle, scale); // Transform for the player
         Poligono collider = new Poligono(points, t1); // Polygon collider for the player
         // Circulo collider = new Circulo(5, t1); // Alternative circular collider (commented out)
-        Shape shape = new Shape(AssetLoader.loadAnimationFrames("inimigo2.gif"), 150); // Shape with animation frames
+        Shape shape = new Shape(ImagesLoader.loadAnimationFrames("inimigo2.gif"), 150); // Shape with animation frames
         EnemyBehavior behavior = new EnemyBehavior(); // Behavior of the player
         GameObject enemy = new GameObject("Enemy", t1, collider, behavior, shape); // Create the enemy game object
         enemy.onInit(); // Initialize the player
@@ -91,7 +91,6 @@ public class Main
 
         return new InputEvent(customKeyMap, customMouseMap); // Create and return the input handler
     }
-
     /**
      * Main method to initialize the game and start the game engine.
      *
@@ -99,7 +98,7 @@ public class Main
      */
     public static void main(String[] args)
     {
-        Shape backGroundShape = new Shape(AssetLoader.loadAnimationFrames("background.png"), 1000); // Background shape
+        Shape backGroundShape = new Shape(ImagesLoader.loadAnimationFrames("background.png"), 1000); // Background shape
         SwingGui gui = new SwingGui(1100, 800, backGroundShape); // Initialize the GUI with dimensions and background
         gui.setHitbox(false); // Enable hitbox visualization
         gui.setInput(createInputHandler()); // Set the input handler for the GUI

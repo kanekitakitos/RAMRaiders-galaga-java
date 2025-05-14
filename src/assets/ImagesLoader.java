@@ -36,7 +36,7 @@ package assets;
   * @author Brandon Mejia
   * @version 2025-05-06
   */
- public class AssetLoader {
+ public class ImagesLoader {
 
      /**
       * Loads a single image from the assets directory.
@@ -46,11 +46,11 @@ package assets;
       */
      public static BufferedImage loadImage(String fileName) {
          try {
-             InputStream is = AssetLoader.class.getResourceAsStream("/assets/" + fileName);
+             InputStream is = ImagesLoader.class.getResourceAsStream("/assets/images/" + fileName);
              if (is != null) {
                  return ImageIO.read(is);
              } else {
-                 System.err.println("Image not found at path: /assets/" + fileName);
+                 System.err.println("Image not found at path: /assets/images" + fileName);
                  System.err.println("ClassLoader paths: " + System.getProperty("java.class.path"));
              }
          } catch (IOException e) {
@@ -66,9 +66,11 @@ package assets;
       * @param fileName The name of the animation file to load.
       * @return A list of animation frames as BufferedImages.
       */
-     public static List<BufferedImage> loadAnimationFrames(String fileName) {
+     public static List<BufferedImage> loadAnimationFrames(String fileName) 
+     {
          List<BufferedImage> frames = new ArrayList<>();
-         try (InputStream is = AssetLoader.class.getResourceAsStream("/assets/" + fileName)) {
+         try (InputStream is = ImagesLoader.class.getResourceAsStream("/assets/images/" + fileName)) 
+         {
              if (is == null) {
                  System.err.println("Error: Could not find animation file: " + fileName);
                  return frames;

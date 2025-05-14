@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import core.objectsInterface.IBehavior;
 import core.objectsInterface.IGameObject;
+import core.objectsInterface.ISoundEffects;
 import gui.IInputEvent;
 import gui.InputEvent;
 import core.behaviorItems.IAttackStrategy;
@@ -117,11 +118,11 @@ public class Behavior implements IBehavior
     /**
      * Updates the behavior logic.
      *
-     * @param dT The time delta since the last update.
      * @param ie The input event to process.
      */
     @Override
-    public void onUpdate(double dT, IInputEvent ie) {
+    public void onUpdate(IInputEvent ie)
+    {
         this.update();
         this.go.shape().updateAnimation();
     }

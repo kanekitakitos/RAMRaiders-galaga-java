@@ -2,6 +2,7 @@ package core;
 
 import core.behaviorItems.LinearShootAttack;
 import core.objectsInterface.IGameObject;
+import core.objectsInterface.ISoundEffects;
 import geometry.Ponto;
 import gui.IInputEvent;
 
@@ -71,7 +72,8 @@ public class PlayerBehavior extends Behavior
      *
      * @return True if the player is invincible, false otherwise.
      */
-    public boolean isInvincible() {
+    public boolean isInvincible()
+    {
         return this.isInvincible;
     }
 
@@ -89,21 +91,18 @@ public class PlayerBehavior extends Behavior
      * Updates the behavior logic.
      * Processes input events to handle movement and evasive maneuvers.
      *
-     * @param dT The time delta since the last update.
      * @param ie The input event to process.
      */
     @Override
-    public void onUpdate(double dT, IInputEvent ie)
+    public void onUpdate(IInputEvent ie)
     {
         if(ie == null)
             return;
-
-        super.onUpdate(dT, ie);
+        super.onUpdate(ie);
 
         this.moveTo(ie);
         this.evasiveManeuver(ie);
     }
-
     /**
      * Executes an attack using the current attack strategy.
      *
@@ -125,6 +124,10 @@ public class PlayerBehavior extends Behavior
             localScheduler.schedule(() -> {
                 isAttacking = false;
             }, invincibilityDuration, TimeUnit.MILLISECONDS);
+
+            ISoundEffects soundEffects = this.go.soundEffects();
+            if(soundEffects != null)
+                soundEffects.playSound("ATTACK");
 
             return this.attackStrategy.execute(this.go, this.observedObject);
         } else {
@@ -151,6 +154,7 @@ public class PlayerBehavior extends Behavior
         {
             this.life--;
             this.isInvincible = true;
+            this.go.soundEffects().playSound("HIT");
 
             // Schedule to reset the invincibility flag after the invincibility duration
             localScheduler.schedule(() ->
@@ -194,6 +198,7 @@ public class PlayerBehavior extends Behavior
         // Adjust movement deltas based on input actions
         if (ie.isActionActive("RIGHT"))
             deltaX += moveStep;
+
         if (ie.isActionActive("LEFT"))
             deltaX -= moveStep;
 

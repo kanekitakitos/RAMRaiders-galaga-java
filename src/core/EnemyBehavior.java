@@ -3,12 +3,12 @@ package core;
 import core.behaviorItems.IEnemyMovement;
 import core.behaviorItems.ZigzagMovement;
 import core.objectsInterface.IGameObject;
+import core.objectsInterface.ISoundEffects;
 import core.behaviorItems.IAttackStrategy;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import gui.IInputEvent;
-
 
 /**
  * The `EnemyBehavior` class defines the behavior of an enemy in the game.
@@ -91,12 +91,32 @@ public class EnemyBehavior extends Behavior
                 this.startAttack();
             }, randomDelay, TimeUnit.MILLISECONDS);
 
+            ISoundEffects soundEffects = this.go.soundEffects();
+            if(soundEffects != null)
+                soundEffects.playSound("ATTACK");
+            
             return this.attackStrategy.execute(this.go, this.observedObject);
         }
         else
         {
             return null;
         }
+    }
+
+
+    /**
+     * Updates the behavior logic.
+     * Processes input events to handle movement and evasive maneuvers.
+     *
+     * @param ie The input event to process.
+     */
+    @Override
+    public void onUpdate( IInputEvent ie)
+    {
+        if(ie == null)
+            return;
+        super.onUpdate( ie);
+
     }
 
 

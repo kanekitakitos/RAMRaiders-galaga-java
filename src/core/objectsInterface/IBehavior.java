@@ -37,10 +37,9 @@ public interface IBehavior {
     /**
      * Called on each update cycle to process behavior logic.
      *
-     * @param dT The time delta since the last update.
      * @param ie The input event to process during this update.
      */
-    void onUpdate(double dT, IInputEvent ie);
+    void onUpdate( IInputEvent ie);
 
     /**
      * Called when the behavior is destroyed.

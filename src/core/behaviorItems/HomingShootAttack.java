@@ -1,6 +1,6 @@
 package core.behaviorItems;
 
-import assets.AssetLoader;
+import assets.ImagesLoader;
 import core.Behavior;
 import core.GameObject;
 import core.Shape;
@@ -51,7 +51,7 @@ public class HomingShootAttack implements IAttackStrategy
 {
     // Static index to ensure unique naming for bullets
     private static int index = 0;
-    private final Shape shape = new Shape(AssetLoader.loadImage("laser2.gif"), 100); // Default shape of the bullet
+    private final Shape shape = new Shape(ImagesLoader.loadImage("laser2.gif"), 100); // Default shape of the bullet
 
 
     /**
