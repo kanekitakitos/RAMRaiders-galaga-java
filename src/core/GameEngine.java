@@ -46,6 +46,7 @@ public class GameEngine implements IGameEngine
     // Input event handler
     private IInputEvent inputStatus;
     private IGuiBridge gui;
+    private IGameObject player;
 
     /**
      * Validates the invariant for the `GameEngine` class.
@@ -80,6 +81,11 @@ public class GameEngine implements IGameEngine
         this.totalObjects = 0;
         this.gui = gui;
         this.inputStatus = this.gui.getInput();
+    }
+
+    public void setPlayer(IGameObject player)
+    {
+        this.player = player;
     }
 
     /**
@@ -195,20 +201,6 @@ public class GameEngine implements IGameEngine
             this.disabledGameObjects.clear();
     }
 
-
-    public IGameObject getByName(String name)
-    {
-        for (CopyOnWriteArrayList<IGameObject> layerObjects : layeredGameObjects.values()) {
-            if (layerObjects != null)
-            {
-                for (IGameObject go : layerObjects)
-                    if (go.name().contains(name))
-                        return go; 
-            }
-        }
-        return null;
-    }
-
     /**
      * Checks for collisions for all enabled objects.
      * Calls `Behavior.onCollision(go)` for all enabled `GameObject`s,
@@ -217,54 +209,48 @@ public class GameEngine implements IGameEngine
     @Override
     public void checkCollision()
     {
-        ArrayList<IGameObject> output = new ArrayList<>();
-        IGameObject currentObject = null;
-        IGameObject player = getByName("Player");
-
         for (CopyOnWriteArrayList<IGameObject> layerObjects : layeredGameObjects.values())
         {
             if (layerObjects == null || layerObjects.isEmpty())
                 continue;
 
+            Map<IGameObject, ArrayList<IGameObject>> layerCollisionMap = new HashMap<>();
             int size = layerObjects.size();
+
+            // Inicializa o mapa de colisão para todos os objetos na camada atual
+            for (int i = 0; i < size; i++) {
+                layerCollisionMap.put(layerObjects.get(i), new ArrayList<>());
+            }
+
             for (int i = 0; i < size; i++)
             {
-                currentObject = layerObjects.get(i);
-                for (int j = 0; j < size; j++)
+                IGameObject currentObject = layerObjects.get(i);
+                for (int j = i + 1; j < size; j++) // Otimização: j começa de i + 1
                 {
-                    if (i == j)
-                        continue;
-
                     IGameObject other = layerObjects.get(j);
+
+                    // Mantém as regras de não colisão existentes
                     if (currentObject.name().contains("Enemy") && other.name().contains("Enemy"))
                         continue;
 
                     if (currentObject.name().contains("Bullet") && other.name().contains("Bullet"))
                         continue;
 
-                        if( player != null  && player.transform().position().distancia(currentObject.transform().position()) < 200)
-                        {
-                           
-                            if (currentObject.name().contains("Enemy") && player.collider().colision(currentObject.collider()))
-                            {
-            
-                                ArrayList<IGameObject> temp = new ArrayList<>();
-                                temp.add(other);
-                                player.behavior().onCollision(temp);
-                            }
-                            
-                        }
-
                     if (currentObject.collider().colision(other.collider()))
-                        output.add(other);
+                    {
+                        // Registra a colisão para ambos os objetos
+                        layerCollisionMap.get(currentObject).add(other);
+                        layerCollisionMap.get(other).add(currentObject);
+                    }
                 }
+            }
 
-                if (!output.isEmpty())
-                {
-                    currentObject.behavior().onCollision(output);
+            // Dispara os eventos onCollision para os objetos que colidiram nesta camada
+            for (IGameObject gameObject : layerObjects) {
+                ArrayList<IGameObject> collidedWith = layerCollisionMap.get(gameObject);
+                if (collidedWith != null && !collidedWith.isEmpty()) {
+                    gameObject.behavior().onCollision(collidedWith);
                 }
-
-                output.clear();
             }
         }
     }
@@ -277,7 +263,7 @@ public class GameEngine implements IGameEngine
     @Override
     public void addEnable(IGameObject go) {
         this.enable(go);
-        add(go);
+        add(go);    
     }
 
     /**

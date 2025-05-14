@@ -386,7 +386,7 @@ public class GameManager
                     this.engine.destroy(lifeDisplay);
                 }
 
-                if (lifes <= 0)
+                if (vidasAtuais <= 0)
                 {
                     this.engine.destroyAll();
                     this.generateGameOver();
@@ -439,6 +439,7 @@ public class GameManager
                     this.engine.addEnable(this.gameObjects.get(i));
 
         this.engine.addEnable(this.player);
+        this.engine.setPlayer(player);
         this.startRelocateEnemies();
         this.monitorPlayer();
         
