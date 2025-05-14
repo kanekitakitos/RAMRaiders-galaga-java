@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ScheduledExecutorService;
+import assets.ImagesLoader;
 
 /**
  * Represents the behavior of a player in the game.
@@ -148,7 +149,7 @@ public class PlayerBehavior extends Behavior
             return;
 
         for (IGameObject go : collisions)
-            go.behavior().onDestroy();
+            go.behavior().onDisabled();
 
         if (this.life > 0 && !this.isInvincible && this.isEnabled())
         {
@@ -162,12 +163,11 @@ public class PlayerBehavior extends Behavior
                 this.isInvincible = false;
             }, invincibilityDuration, TimeUnit.MILLISECONDS);
 
-            System.out.println("Player hit! Remaining life: " + this.life);
         }
 
         if (this.life <= 0 && this.isEnabled())
             {
-                this.onDestroy();
+                this.onDisabled();
             }
     }
 

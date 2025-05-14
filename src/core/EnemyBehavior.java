@@ -1,7 +1,6 @@
 package core;
 
 import core.behaviorItems.IEnemyMovement;
-import core.behaviorItems.ZigzagMovement;
 import core.objectsInterface.IGameObject;
 import core.objectsInterface.ISoundEffects;
 import core.behaviorItems.IAttackStrategy;
@@ -9,6 +8,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import gui.IInputEvent;
+import assets.ImagesLoader;
+import geometry.Ponto;
 
 /**
  * The `EnemyBehavior` class defines the behavior of an enemy in the game.
@@ -68,8 +69,24 @@ public class EnemyBehavior extends Behavior
         ISoundEffects soundEffects = this.go.soundEffects();
         if(soundEffects!= null)
             soundEffects.playSound("DEATH");
-        
-        this.isEnabled = false;
+
+        // Troca o shape para explosão
+        try{
+            this.go.shape().setFrames(ImagesLoader.loadAnimationFrames("explosion.gif"),100);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
+        this.go.velocity(new Ponto(0,0));
+        this.go.rotateSpeed(0);
+        this.movement = null;
+        this.attackStrategy = null;
+        // Agenda para desabilitar o objeto após 2 segundos
+        localScheduler.schedule(() ->
+        {
+            super.onDisabled();
+        }, 1, TimeUnit.SECONDS);
     }
 
     /**
@@ -141,19 +158,8 @@ public class EnemyBehavior extends Behavior
     public void activateMovement(boolean value)
     {
         if (this.movement != null)
-        {
-            if(value)
-            {
-                this.movement.setActive(true);
-                this.go.soundEffects().playSound("MOVE");
-            }
-            else
-            {
-                this.movement.setActive(false);
-            }
-
-
-        }
+                this.movement.setActive(value);
+        
             
     }
 
@@ -191,7 +197,6 @@ public class EnemyBehavior extends Behavior
         if ( movement != null && movement.isActive())
             {
                 movement.move(this.go);
-                
                 if(this.movement == null)
                  return;
 
