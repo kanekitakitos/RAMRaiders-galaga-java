@@ -130,17 +130,25 @@ public class GameObject implements IGameObject
         this.shape.setlogicalWidthAndHeight(this.collider.getLogicalWidth(), this.collider.getLogicalHeight());
     }
 
+/**
+ * Sets the sound effects for the game object.
+ *
+ * @param soundEffects The sound effects to associate with the game object.
+ */
+public void setSoundEffects(ISoundEffects soundEffects)
+{
+    this.soundEffects = soundEffects;
+}
 
-    public void setSoundEffects(ISoundEffects soundEffects)
-    {
-        this.soundEffects = soundEffects;
-    }
-
-    public ISoundEffects soundEffects()
-    {
-        return this.soundEffects;
-    }
-
+/**
+ * Retrieves the sound effects associated with the game object.
+ *
+ * @return The sound effects of the game object.
+ */
+public ISoundEffects soundEffects()
+{
+    return this.soundEffects;
+}
     /**
      * Gets the name of the game object.
      *

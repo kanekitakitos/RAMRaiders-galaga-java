@@ -96,8 +96,16 @@ public interface IBehavior {
      */
     IGameObject attack(IInputEvent ie);
 
+/**
+     * Checks if the behavior is currently enabled.
+     *
+     * @return true if the behavior is enabled, false otherwise.
+     */
+    boolean isEnabled();
 
-     boolean isEnabled();
-
-     void notifyObserver();
+    /**
+     * Notifies the observer of this behavior about changes or events.
+     * Used to implement the observer pattern.
+     */
+    void notifyObserver();
 }

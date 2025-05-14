@@ -59,9 +59,9 @@ public interface IGuiBridge {
     boolean isMenu();
 
     /**
-     * Toggles the display of hitboxes for game objects.
+     * Toggles the display of Menu for game.
      *
-     * @param hitbox True to show hitboxes, false to hide them.
+     * @param Menu True to show Menu, false to hide them.
      */
     void setMenu(boolean Menu);
 }

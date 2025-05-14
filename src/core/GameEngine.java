@@ -241,11 +241,7 @@ public class GameEngine implements IGameEngine
                         (currentObject.name().contains("Bullet") && other.name().contains("Bullet"))) {
                         continue;
                     }
-                    // Adicione outras regras de não colisão explícitas se necessário, por exemplo:
-                    // if ((currentObject.getType() == GameObjectType.PLAYER_BULLET && other.getType() == GameObjectType.PLAYER) ||
-                    //     (currentObject.getType() == GameObjectType.PLAYER && other.getType() == GameObjectType.PLAYER_BULLET)) {
-                    //    continue;
-                    // }
+
 
 
                     boolean collisionDetected = false;
@@ -484,9 +480,13 @@ public class GameEngine implements IGameEngine
         }
     }
 
-
-    public IGuiBridge getGui()
-    {
-        return this.gui;
-    }
+/**
+         * Retrieves the GUI bridge used for input and rendering.
+         *
+         * @return The `IGuiBridge` instance associated with the game engine.
+         */
+        public IGuiBridge getGui()
+        {
+            return this.gui;
+        }
 }

@@ -1,54 +1,76 @@
 package core.objectsInterface;
-import javax.sound.sampled.Clip;
-
-public interface ISoundEffects {
-    /**
-     * Toca um som carregado uma vez.
-     * @param soundName O nome lógico do som a ser tocado.
-     */
-    void playSound(String soundName);
-
-    void addSound(String soundName, Clip clip);
-    /**
-     * Toca um som carregado em loop contínuo.
-     * @param soundName O nome lógico do som a ser tocado em loop.
-     */
-    void loopSound(String soundName);
+    import javax.sound.sampled.Clip;
 
     /**
-     * Para a reprodução de um som específico.
-     * @param soundName O nome lógico do som a ser parado.
+     * Interface for managing sound effects in the game.
+     * Provides methods to play, loop, stop, and manage audio clips.
+     *
+     *
+     * @author Brandon Mejia
+     *
+     * @version 2025-05-14
      */
-    void stopSound(String soundName);
+    public interface ISoundEffects {
+        /**
+         * Plays a loaded sound once.
+         *
+         * @param soundName The logical name of the sound to be played.
+         */
+        void playSound(String soundName);
 
-    /**
-     * Para a reprodução de todos os sons que estão tocando.
-     */
-    void stopAllSounds();
+        /**
+         * Adds a sound clip to the sound effects manager.
+         *
+         * @param soundName The logical name of the sound.
+         * @param clip The audio clip to be associated with the sound name.
+         */
+        void addSound(String soundName, Clip clip);
 
-    /**
-     * Verifica se um som específico está tocando atualmente.
-     * @param soundName O nome lógico do som.
-     * @return true se o som estiver tocando, false caso contrário.
-     */
-    boolean isPlaying(String soundName);
+        /**
+         * Plays a loaded sound in a continuous loop.
+         *
+         * @param soundName The logical name of the sound to be looped.
+         */
+        void loopSound(String soundName);
 
-    /**
-     * Define o volume para um som específico.
-     * @param soundName O nome lógico do som.
-     * @param volume Nível de volume de 0.0 (mudo) a 1.0 (máximo).
-     */
-    void setVolume(String soundName, float volume);
+        /**
+         * Stops the playback of a specific sound.
+         *
+         * @param soundName The logical name of the sound to be stopped.
+         */
+        void stopSound(String soundName);
 
-    /**
-     * Define o volume global para todos os sons.
-     * @param volume Nível de volume de 0.0 (mudo) a 1.0 (máximo).
-     */
-    void setGlobalVolume(float volume);
+        /**
+         * Stops the playback of all currently playing sounds.
+         */
+        void stopAllSounds();
 
-    /**
-     * Libera os recursos utilizados pelos clipes de áudio.
-     * Deve ser chamado quando o sistema de som não for mais necessário.
-     */
-    void dispose();
-}
+        /**
+         * Checks if a specific sound is currently playing.
+         *
+         * @param soundName The logical name of the sound.
+         * @return true if the sound is playing, false otherwise.
+         */
+        boolean isPlaying(String soundName);
+
+        /**
+         * Sets the volume for a specific sound.
+         *
+         * @param soundName The logical name of the sound.
+         * @param volume The volume level from 0.0 (mute) to 1.0 (maximum).
+         */
+        void setVolume(String soundName, float volume);
+
+        /**
+         * Sets the global volume for all sounds.
+         *
+         * @param volume The volume level from 0.0 (mute) to 1.0 (maximum).
+         */
+        void setGlobalVolume(float volume);
+
+        /**
+         * Releases the resources used by the audio clips.
+         * Should be called when the sound system is no longer needed.
+         */
+        void dispose();
+    }

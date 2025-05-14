@@ -156,16 +156,20 @@ public class SwingGui implements IGuiBridge
     }
 
     /**
-     * Toggles the display of hitboxes for game objects.
+     * Toggles the display of Menu for game.
      *
-     * @param hitbox True to show hitboxes, false to hide them.
+     * @param Menu True to show Menu, false to hide them.
      */
     public void setMenu(boolean Menu)
     {
         this.panel.setMenu(Menu);
     }
 
-
+    /**
+     * Checks if the menu is currently displayed.
+     *
+     * @return True if the menu is displayed, false otherwise.
+     */
     public boolean isMenu()
     {
         return this.panel.isMenu();

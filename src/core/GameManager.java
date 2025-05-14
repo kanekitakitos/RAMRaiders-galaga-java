@@ -26,11 +26,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * - Assign movement and attack patterns to enemies.
  * - Enable enemies in the game engine.
  * - Execute group attack strategies.
- * 
- * @see https://docs.oracle.com/javase/tutorial/essential/concurrency/sync.html
- * @see https://docs.oracle.com/javase/tutorial/essential/concurrency/atomic.html
- * @see https://docs.oracle.com/javase/tutorial/essential/concurrency/atomicvars.html
- * 
+ *
+ * @see <a href="https://docs.oracle.com/javase/tutorial/essential/concurrency/sync.html"> Synchronization </a>
+ * @see <a href="https://docs.oracle.com/javase/tutorial/essential/concurrency/atomic.html"> Atomic Access </a>
+ * @see <a href="https://docs.oracle.com/javase/tutorial/essential/concurrency/atomicvars.html"> Atomic Variables </a>
+ *
  * @see GameEngine
  * @see IGameObject
  * @see IEnemyMovement
@@ -179,214 +179,250 @@ public class GameManager
 
     }
 
-    private ISoundEffects createSoundEffects()
-    {
-        SoundEffects soundEffects = new SoundEffects();
-        soundEffects.addSound("ATTACK", AudioLoader.loadAudio("blaster.wav"));
-        soundEffects.addSound("DEATH", AudioLoader.loadAudio("explosion.wav"));
-
-        return soundEffects;
-    }
-
-    public void generateInfoStat()
-    {
-        synchronized(this.engine)
+    /**
+         * Creates and configures sound effects for the game.
+         * Adds predefined sound effects for attack and death actions.
+         *
+         * @return An instance of `ISoundEffects` containing the configured sound effects.
+         */
+        private ISoundEffects createSoundEffects()
         {
-                // Spawn constants
-            int layer = 0; // this layer is only for the info stat
-            double raio = 6;
-            // Example of life display
-            PlayerBehavior playerBehavior = (PlayerBehavior) this.player.behavior();
-            int lives = playerBehavior.getLife()-1; // This should be updated with the actual number of lives
-            Ponto position = this.player.transform().position();
-            GameObject lifeDisplay = null;
-            for (int i = 0; i < lives; i++)
-            {
-                Shape shape = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
-                Transform transform = new Transform(new Ponto(position.x()+450 + i * 100, position.y()-20 ), layer, 90, scale);
-                Circulo collider = new Circulo(raio, transform);
-                
-                lifeDisplay = new GameObject("Life "+(i+1), transform, collider, new EnemyBehavior(), shape);
-                lifeDisplay.onInit();
-                lifeDisplay.behavior().onInit();
-                this.engine.add(lifeDisplay);
-            }
+            SoundEffects soundEffects = new SoundEffects();
+            soundEffects.addSound("ATTACK", AudioLoader.loadAudio("blaster.wav"));
+            soundEffects.addSound("DEATH", AudioLoader.loadAudio("explosion.wav"));
 
-            double scale = 60;
-            Shape s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
-            Transform t1 = new Transform(new Ponto(380, 320.0), layer, 0.0, scale);
-            Circulo p1 = new Circulo(0.01, t1);
-            GameObject score = new GameObject("Score", t1, p1, new Behavior(), s1);
-            this.score = score;
-            this.score.onInit();
-            engine.addEnable(this.score);
-
+            return soundEffects;
         }
-    }
 
-    public void generateMenuObjects()
-    {
-        ArrayList<IGameObject> objects = new ArrayList<>();
-        
-        // Spawn constants
-        double scale = 32;
-        double raio = 0.0001;
-        int layer = 0;
-        // Start Game
-        Shape s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
-        Transform t1 = new Transform(new Ponto(0.0, 0.0), layer, 0.0, scale);
-        Circulo p1 = new Circulo(raio, t1);
-        GameObject startGame = new GameObject("Start Game", t1, p1, new Behavior(), s1);
-        startGame.onInit();
-        objects.add(startGame);
+        /**
+         * Generates the information display for the game, including player lives and score.
+         * Synchronizes with the game engine to ensure thread safety during object creation.
+         */
+        public void generateInfoStat()
+        {
+            synchronized(this.engine)
+            {
+                // Spawn constants
+                int layer = 0; // This layer is only for the info stat
+                double raio = 6;
 
-        // RAMRaiders
-        scale = 64;
-        s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
-        t1 = new Transform(new Ponto(0.0, startGame.transform().position().y()+140), layer, 0.0, scale); // posição Y diferente
-        p1 = new Circulo(raio, t1);
-        GameObject nomeGrupo = new GameObject("RAM-Raiders", t1, p1, new Behavior(), s1);
-        nomeGrupo.onInit();
-        objects.add(nomeGrupo);
+                // Example of life display
+                PlayerBehavior playerBehavior = (PlayerBehavior) this.player.behavior();
+                int lives = playerBehavior.getLife() - 1; // This should be updated with the actual number of lives
+                Ponto position = this.player.transform().position();
+                GameObject lifeDisplay = null;
 
-        // Nome do grupo
-        scale = 15;
-        s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
-        t1 = new Transform(new Ponto(0.0, startGame.transform().position().y()-370), layer, 0.0, scale); // posição Y diferente
-        p1 = new Circulo(raio, t1);
-        GameObject grupo = new GameObject("Gabriel Pedroso                      Brandon Mejia                      Miguel Correia", t1, p1, new Behavior(), s1);
-        grupo.onInit();
-        objects.add(grupo);
-        
+                for (int i = 0; i < lives; i++)
+                {
+                    Shape shape = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
+                    Transform transform = new Transform(new Ponto(position.x() + 450 + i * 100, position.y() - 20), layer, 90, scale);
+                    Circulo collider = new Circulo(raio, transform);
 
-        // Skin 1 e 2
-        scale = 20;
-        s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
-        t1 = new Transform(new Ponto(-150, startGame.transform().position().y()-80), layer, 180, scale); // posição Y diferente
-        p1 = new Circulo(raio, t1);
-        GameObject skin1 = new GameObject("Press 1", t1, p1, new Behavior(), s1);
-        skin1.onInit();
-        objects.add(skin1);
+                    lifeDisplay = new GameObject("Life " + (i + 1), transform, collider, new EnemyBehavior(), shape);
+                    lifeDisplay.onInit();
+                    lifeDisplay.behavior().onInit();
+                    this.engine.add(lifeDisplay);
+                }
 
-        s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
-        t1 = new Transform(new Ponto(150.0, startGame.transform().position().y()-80), layer, 180, scale); // posição Y diferente
-        p1 = new Circulo(raio, t1);
-        GameObject skin2 = new GameObject("Press 2", t1, p1, new Behavior(), s1);
-        skin2.onInit();
-        objects.add(skin2);
+                // Create and add the score display
+                double scale = 60;
+                Shape s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
+                Transform t1 = new Transform(new Ponto(380, 320.0), layer, 0.0, scale);
+                Circulo p1 = new Circulo(0.01, t1);
+                GameObject score = new GameObject("Score", t1, p1, new Behavior(), s1);
+                this.score = score;
+                this.score.onInit();
+                engine.addEnable(this.score);
+            }
+        }
 
-        double offset = 90;
-        raio = 10;
-        s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 150);
-        t1 = new Transform(new Ponto(skin1.transform().position().x(), skin1.transform().position().y()-offset), layer+1, 90, this.scale); // posição Y diferente
-        p1 = new Circulo(raio, t1);
-        GameObject nave1 = new GameObject("nave", t1, p1, new Behavior(), s1);
-        nave1.onInit();
-        objects.add(nave1);
+        /**
+         * Generates the menu objects for the game, including start game, group name, and skin selection.
+         * Adds the created objects to the game engine for rendering and interaction.
+         */
+        public void generateMenuObjects()
+        {
+            ArrayList<IGameObject> objects = new ArrayList<>();
 
-        s1 = new Shape(ImagesLoader.loadAnimationFrames("nave-HanSolo.png"), 0);
-        t1 = new Transform(new Ponto(skin2.transform().position().x(), skin2.transform().position().y()-offset), layer+1, 90, this.scale); // posição Y diferente
-        p1 = new Circulo(raio-1, t1);
-        GameObject nave2 = new GameObject("nave", t1, p1, new Behavior(), s1);
-        nave2.onInit();
-        objects.add(nave2);
+            // Spawn constants
+            double scale = 32;
+            double raio = 0.0001;
+            int layer = 0;
 
+            // Start Game
+            Shape s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
+            Transform t1 = new Transform(new Ponto(0.0, 0.0), layer, 0.0, scale);
+            Circulo p1 = new Circulo(raio, t1);
+            GameObject startGame = new GameObject("Start Game", t1, p1, new Behavior(), s1);
+            startGame.onInit();
+            objects.add(startGame);
 
+            // RAMRaiders
+            scale = 64;
+            s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
+            t1 = new Transform(new Ponto(0.0, startGame.transform().position().y() + 140), layer, 0.0, scale);
+            p1 = new Circulo(raio, t1);
+            GameObject nomeGrupo = new GameObject("RAM-Raiders", t1, p1, new Behavior(), s1);
+            nomeGrupo.onInit();
+            objects.add(nomeGrupo);
 
-        for (int i = 0; i < objects.size(); i++)
-            this.engine.addEnable(objects.get(i));
+            // Group Name
+            scale = 15;
+            s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
+            t1 = new Transform(new Ponto(0.0, startGame.transform().position().y() - 370), layer, 0.0, scale);
+            p1 = new Circulo(raio, t1);
+            GameObject grupo = new GameObject("Gabriel Pedroso                      Brandon Mejia                      Miguel Correia", t1, p1, new Behavior(), s1);
+            grupo.onInit();
+            objects.add(grupo);
 
-    }
+            // Skin 1 and 2
+            scale = 20;
+            s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
+            t1 = new Transform(new Ponto(-150, startGame.transform().position().y() - 80), layer, 180, scale);
+            p1 = new Circulo(raio, t1);
+            GameObject skin1 = new GameObject("Press 1", t1, p1, new Behavior(), s1);
+            skin1.onInit();
+            objects.add(skin1);
 
-    public void generateGameOver()
-    {
-        soundEffects.stopAllSounds();
-        this.engine.destroyAll();
-        this.engine.getGui().setMenu(true);
-        soundEffects.loopSound("GAMEOVER");
-        double scale = 64;
-        double raio = 0.0001;
-        int layer = 0;
-        // Start Game
-        Shape s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
-        Transform t1 = new Transform(new Ponto(0.0, 0.0), layer, 0.0, scale);
-        Circulo p1 = new Circulo(raio, t1);
-        GameObject startGame = new GameObject("GAME OVER", t1, p1, new Behavior(), s1);
-        startGame.onInit();
+            s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
+            t1 = new Transform(new Ponto(150.0, startGame.transform().position().y() - 80), layer, 180, scale);
+            p1 = new Circulo(raio, t1);
+            GameObject skin2 = new GameObject("Press 2", t1, p1, new Behavior(), s1);
+            skin2.onInit();
+            objects.add(skin2);
 
-        scale = 32;
-        s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
-        t1 = new Transform(new Ponto(0.0, -70.0), layer, 0.0, scale);
-        p1 = new Circulo(raio, t1);
-        GameObject message = new GameObject("Another one falls. The Empire endures.", t1, p1, new Behavior(), s1);
-        message.onInit();
+            // Add ships for skins
+            double offset = 90;
+            raio = 10;
+            s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 150);
+            t1 = new Transform(new Ponto(skin1.transform().position().x(), skin1.transform().position().y() - offset), layer + 1, 90, this.scale);
+            p1 = new Circulo(raio, t1);
+            GameObject nave1 = new GameObject("nave", t1, p1, new Behavior(), s1);
+            nave1.onInit();
+            objects.add(nave1);
 
+            s1 = new Shape(ImagesLoader.loadAnimationFrames("nave-HanSolo.png"), 0);
+            t1 = new Transform(new Ponto(skin2.transform().position().x(), skin2.transform().position().y() - offset), layer + 1, 90, this.scale);
+            p1 = new Circulo(raio - 1, t1);
+            GameObject nave2 = new GameObject("nave", t1, p1, new Behavior(), s1);
+            nave2.onInit();
+            objects.add(nave2);
 
-        engine.addEnable(startGame);
-        engine.addEnable(message);
+            // Add all objects to the engine
+            for (int i = 0; i < objects.size(); i++)
+                this.engine.addEnable(objects.get(i));
+        }
 
-        this.shutdown();
-    }
+        /**
+         * Generates the "Game Over" screen objects and displays them.
+         * Stops all sounds, destroys all game objects, and sets the menu state to true.
+         */
+        public void generateGameOver()
+        {
+            soundEffects.stopAllSounds();
+            this.engine.destroyAll();
+            this.engine.getGui().setMenu(true);
+            soundEffects.loopSound("GAMEOVER");
 
-    public void generateWin()
-    {
-        soundEffects.stopAllSounds();
-        this.engine.destroyAll();
-        this.engine.getGui().setMenu(true);
-        this.soundEffects.playSound("WIN");
+            double scale = 64;
+            double raio = 0.0001;
+            int layer = 0;
 
-        double scale = 64;
-        double raio = 0.0001;
-        int layer = 0;
+            // "Game Over" message
+            Shape s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
+            Transform t1 = new Transform(new Ponto(0.0, 0.0), layer, 0.0, scale);
+            Circulo p1 = new Circulo(raio, t1);
+            GameObject startGame = new GameObject("GAME OVER", t1, p1, new Behavior(), s1);
+            startGame.onInit();
 
-        Shape s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
-        Transform t1 = new Transform(new Ponto(0.0, 0.0), layer, 0.0, scale);
-        Circulo p1 = new Circulo(raio, t1);
-        GameObject win = new GameObject("Victory is yours.", t1, p1, new Behavior(), s1);
-        win.onInit();
+            // Additional message
+            scale = 32;
+            s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
+            t1 = new Transform(new Ponto(0.0, -70.0), layer, 0.0, scale);
+            p1 = new Circulo(raio, t1);
+            GameObject message = new GameObject("Another one falls. The Empire endures.", t1, p1, new Behavior(), s1);
+            message.onInit();
 
-        scale = 32;
-        s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
-        t1 = new Transform(new Ponto(0.0, -70.0), layer, 0.0, scale);
-        p1 = new Circulo(raio, t1);
-        GameObject message = new GameObject("You've brought balance to the galaxy.", t1, p1, new Behavior(), s1);
-        message.onInit();
+            engine.addEnable(startGame);
+            engine.addEnable(message);
 
-        engine.addEnable(win);
-        engine.addEnable(message);
-        this.shutdown();
+            this.shutdown();
+        }
 
-    }
-    
-    private void createPlayer(Shape shape)
-    {
-        double scale = 4; // Scale of the player object
-        int layer = 1; // Layer of the player object
-        double angle = 90; // Initial angle of the player object
-        Ponto position = new Ponto(0, -330); // Initial position of the player object
-        Ponto[] points = {new Ponto(0, 0), new Ponto(0, 12), new Ponto(12, 6)}; // Points for the collider
+        /**
+         * Generates the "Victory" screen objects and displays them.
+         * Stops all sounds, destroys all game objects, and sets the menu state to true.
+         */
+        public void generateWin()
+        {
+            soundEffects.stopAllSounds();
+            this.engine.destroyAll();
+            this.engine.getGui().setMenu(true);
+            this.soundEffects.playSound("WIN");
 
-        Transform t1 = new Transform(position, layer, angle, scale); // Transform for the player
-        Poligono collider = new Poligono(points, t1); // Polygon collider for the player
-        // Circulo collider = new Circulo(5, t1); // Alternative circular collider (commented out)
+            double scale = 64;
+            double raio = 0.0001;
+            int layer = 0;
 
-        PlayerBehavior behavior = new PlayerBehavior(); // Behavior of the player
-        GameObject player = new GameObject("Player", t1, collider, behavior, shape); // Create the player game object
-        player.onInit(); // Initialize the player
-        this.player = player; // Set the player as the current player
-        this.player.setSoundEffects(createSoundEffects());
-        this.player.soundEffects().addSound("HIT", AudioLoader.loadAudio("playerHit.wav"));
-    }
+            // Victory message
+            Shape s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
+            Transform t1 = new Transform(new Ponto(0.0, 0.0), layer, 0.0, scale);
+            Circulo p1 = new Circulo(raio, t1);
+            GameObject win = new GameObject("Victory is yours.", t1, p1, new Behavior(), s1);
+            win.onInit();
+
+            // Additional message
+            scale = 32;
+            s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
+            t1 = new Transform(new Ponto(0.0, -70.0), layer, 0.0, scale);
+            p1 = new Circulo(raio, t1);
+            GameObject message = new GameObject("You've brought balance to the galaxy.", t1, p1, new Behavior(), s1);
+            message.onInit();
+
+            engine.addEnable(win);
+            engine.addEnable(message);
+            this.shutdown();
+        }
+
+        /**
+         * Creates and initializes the player game object.
+         * Configures the player's transform, collider, behavior, and sound effects.
+         *
+         * @param shape The shape of the player game object.
+         */
+        private void createPlayer(Shape shape)
+        {
+            double scale = 4; // Scale of the player object
+            int layer = 1; // Layer of the player object
+            double angle = 90; // Initial angle of the player object
+            Ponto position = new Ponto(0, -330); // Initial position of the player object
+            Ponto[] points = {new Ponto(0, 0), new Ponto(0, 12), new Ponto(12, 6)}; // Points for the collider
+
+            Transform t1 = new Transform(position, layer, angle, scale); // Transform for the player
+            Poligono collider = new Poligono(points, t1); // Polygon collider for the player
+
+            PlayerBehavior behavior = new PlayerBehavior(); // Behavior of the player
+            GameObject player = new GameObject("Player", t1, collider, behavior, shape); // Create the player game object
+            player.onInit(); // Initialize the player
+            this.player = player; // Set the player as the current player
+            this.player.setSoundEffects(createSoundEffects());
+            this.player.soundEffects().addSound("HIT", AudioLoader.loadAudio("playerHit.wav"));
+        }
 
 // -------------------------------------------------------------------------------------------------------------------------------
     
-    public void shutdown()
-    {
-        if (scheduler != null && !scheduler.isShutdown())
+   /**
+         * Shuts down the scheduler service.
+         * Ensures that the scheduler is not null and has not already been shut down
+         * before attempting to shut it down.
+         */
+        public void shutdown()
         {
-            scheduler.shutdown();
+            if (scheduler != null && !scheduler.isShutdown())
+            {
+                scheduler.shutdown();
+            }
         }
-    }
 
 /**
      * Retrieves the list of enemy game objects.
@@ -427,63 +463,73 @@ public class GameManager
     }
 
 
-    public int countActiveEnemies()
-    {
-        int count = 0;
-        ArrayList<IGameObject> remove = new ArrayList<>();
-        for (IGameObject enemy : gameObjects)
-        {
-            if ( enemy.transform().layer() == this.player.transform().layer()+1 && this.engine.isEnabled(enemy))
-                count++;
-            if(this.engine.isDisabled(enemy))
-                remove.add(enemy);
-        }
-
-        for (IGameObject enemy : remove)
-            this.gameObjects.remove(enemy);
-
-        return count;
-    }
-
-
-    private void monitorPlayer()
-    {
-        this.generateInfoStat();
-        ArrayList<IGameObject> lifeDisplays = new ArrayList<>();
-        for (IGameObject obj : this.engine.get(0))
-            if (obj.name().toLowerCase().contains("life"))
-                lifeDisplays.add(obj);
-
-        this.scheduler.scheduleAtFixedRate(
-            () ->
-            {
-
-                PlayerBehavior playerBehavior = (PlayerBehavior) this.player.behavior();
-                int vidasAtuais = playerBehavior.getLife();
-                Behavior behavior = (Behavior) this.score.behavior();
-                behavior.setScore(playerBehavior.getScore());
-
-                int lifes = lifeDisplays.size()+1;
-
-                if (lifes > vidasAtuais && vidasAtuais >0)
+    /**
+                 * Counts the number of active enemies in the game.
+                 * Removes disabled enemies from the game objects list.
+                 *
+                 * @return The count of active enemies.
+                 */
+                public int countActiveEnemies()
                 {
-                    IGameObject lifeDisplay = lifeDisplays.remove(lifeDisplays.size() - 1);
-                    this.engine.destroy(lifeDisplay);
+                    int count = 0;
+                    ArrayList<IGameObject> remove = new ArrayList<>();
+                    for (IGameObject enemy : gameObjects)
+                    {
+                        if (enemy.transform().layer() == this.player.transform().layer() + 1 && this.engine.isEnabled(enemy))
+                            count++;
+                        if (this.engine.isDisabled(enemy))
+                            remove.add(enemy);
+                    }
+
+                    for (IGameObject enemy : remove)
+                        this.gameObjects.remove(enemy);
+
+                    return count;
                 }
 
-                if (vidasAtuais <= 0)
-                    this.generateGameOver();
+                /**
+                 * Monitors the player's status, including lives and score.
+                 * Updates the game state based on the player's life count and the number of active enemies.
+                 * Schedules periodic checks to handle game over or victory conditions.
+                 */
+                private void monitorPlayer()
+                {
+                    this.generateInfoStat();
+                    ArrayList<IGameObject> lifeDisplays = new ArrayList<>();
+                    for (IGameObject obj : this.engine.get(0))
+                        if (obj.name().toLowerCase().contains("life"))
+                            lifeDisplays.add(obj);
 
-                int numberOfEnemies = this.countActiveEnemies();
+                    this.scheduler.scheduleAtFixedRate(
+                        () ->
+                        {
+                            PlayerBehavior playerBehavior = (PlayerBehavior) this.player.behavior();
+                            int vidasAtuais = playerBehavior.getLife();
+                            Behavior behavior = (Behavior) this.score.behavior();
+                            behavior.setScore(playerBehavior.getScore());
 
-                if(numberOfEnemies == 0)
-                    this.generateWin();
+                            int lifes = lifeDisplays.size() + 1;
 
-                //if(numberOfEnemies <= 20)
-                //    this.randomAttacksAndMovements();
+                            if (lifes > vidasAtuais && vidasAtuais > 0)
+                            {
+                                IGameObject lifeDisplay = lifeDisplays.remove(lifeDisplays.size() - 1);
+                                this.engine.destroy(lifeDisplay);
+                            }
 
-            }, 100, 10, TimeUnit.MILLISECONDS);
-    }
+                            if (vidasAtuais <= 0)
+                                this.generateGameOver();
+
+                            int numberOfEnemies = this.countActiveEnemies();
+
+                            if (numberOfEnemies == 0)
+                                this.generateWin();
+
+                            // Uncomment the following block to enable random attacks and movements
+                            // if (numberOfEnemies <= 20)
+                            //     this.randomAttacksAndMovements();
+
+                        }, 100, 10, TimeUnit.MILLISECONDS);
+                }
 
 
     /**
@@ -498,52 +544,68 @@ public class GameManager
     }
 
 //-------------------------------------------------------------------------------------------------------------
-    private void handlerSelectPlayer()
-    {
-        AtomicBoolean running = new AtomicBoolean(true);
-        this.soundEffects.loopSound("MENU");
-        scheduler.scheduleAtFixedRate(() ->
+    /**
+         * Handles the player selection process in the game menu.
+         * Loops the "MENU" sound and continuously checks for player input to select a player.
+         * Once a player is selected, it finalizes the selection and stops the loop.
+         */
+        private void handlerSelectPlayer()
         {
-            if (!running.get()) return;
-
-            if(input.isActionActive("PLAYER1"))
+            AtomicBoolean running = new AtomicBoolean(true);
+            this.soundEffects.loopSound("MENU");
+            scheduler.scheduleAtFixedRate(() ->
             {
-                handlerFinalSelectPlayer();
-                running.set(false);
-            }
-            else if(input.isActionActive("PLAYER2"))
-            {
-                this.player.shape().setFrames(ImagesLoader.loadAnimationFrames("nave-HanSolo.png"), 150);
-                handlerFinalSelectPlayer();
-                running.set(false);
-            }
+                if (!running.get()) return;
 
-        }, 0, 1, TimeUnit.MILLISECONDS);
+                if(input.isActionActive("PLAYER1"))
+                {
+                    handlerFinalSelectPlayer();
+                    running.set(false);
+                }
+                else if(input.isActionActive("PLAYER2"))
+                {
+                    this.player.shape().setFrames(ImagesLoader.loadAnimationFrames("nave-HanSolo.png"), 150);
+                    handlerFinalSelectPlayer();
+                    running.set(false);
+                }
 
-    }
+            }, 0, 1, TimeUnit.MILLISECONDS);
 
-    private void handlerFinalSelectPlayer()
-    {
-        this.engine.getGui().setMenu(false);
-        this.engine.destroyAll();
+        }
 
-        for (int i = 0; i < this.gameObjects.size(); i++)
-                    this.engine.addEnable(this.gameObjects.get(i));
+        /**
+         * Finalizes the player selection process.
+         * Disables the menu, destroys all existing game objects, and enables the selected player and enemies.
+         * Stops the "MENU" sound and starts the "STARTGAME" sound.
+         * Initializes enemy relocation and player monitoring.
+         */
+        private void handlerFinalSelectPlayer()
+        {
+            this.engine.getGui().setMenu(false);
+            this.engine.destroyAll();
 
-        this.engine.addEnable(this.player);
-        this.engine.setPlayer(player);
-        this.soundEffects.stopSound("MENU");
-        this.soundEffects.loopSound("STARTGAME");
-        this.startRelocateEnemies();
-        this.monitorPlayer();
-        
-    }
+            for (int i = 0; i < this.gameObjects.size(); i++)
+                        this.engine.addEnable(this.gameObjects.get(i));
 
-    public void startGame()
-    {
-        if(this.engine.getGui().isMenu())
-            this.handlerSelectPlayer();
+            this.engine.addEnable(this.player);
+            this.engine.setPlayer(player);
+            this.soundEffects.stopSound("MENU");
+            this.soundEffects.loopSound("STARTGAME");
+            this.startRelocateEnemies();
+            this.monitorPlayer();
 
-        this.engine.run();
-    }
+        }
+
+        /**
+         * Starts the game.
+         * If the game is in the menu state, it initiates the player selection process.
+         * Otherwise, it starts the game engine.
+         */
+        public void startGame()
+        {
+            if(this.engine.getGui().isMenu())
+                this.handlerSelectPlayer();
+
+            this.engine.run();
+        }
 }
