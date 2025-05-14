@@ -211,110 +211,84 @@ public class GameEngine implements IGameEngine
     @Override
     public void checkCollision()
     {
+        // Primeiro, verifica colisões dentro da mesma camada
         for (CopyOnWriteArrayList<IGameObject> layerObjects : layeredGameObjects.values())
         {
-            if (layerObjects == null || layerObjects.isEmpty())
-                continue;
+            if (layerObjects.isEmpty()) continue;
 
             Map<IGameObject, ArrayList<IGameObject>> layerCollisionMap = new HashMap<>();
-            int size = layerObjects.size();
-
-            // Inicializa o mapa de colisão para todos os objetos na camada atual
-            for (int i = 0; i < size; i++) {
-                layerCollisionMap.put(layerObjects.get(i), new ArrayList<>());
+            for (IGameObject obj : layerObjects)
+            {
+                layerCollisionMap.put(obj, new ArrayList<>());
             }
-
-            for (int i = 0; i < size; i++)
+    
+            for (int i = 0; i < layerObjects.size(); i++)
             {
                 IGameObject currentObject = layerObjects.get(i);
-                // Para maior clareza e robustez, considere usar o GameObjectType aqui, se implementado:
-                // GameObjectType currentType = currentObject.getType();
-
-                for (int j = i + 1; j < size; j++) // Otimização: j começa de i + 1
+    
+                for (int j = i + 1; j < layerObjects.size(); j++)
                 {
                     IGameObject other = layerObjects.get(j);
-                    // GameObjectType otherType = other.getType();
-
-                    // Mantém as regras de não colisão existentes (baseadas em nome).
-                    // O ideal seria migrar para GameObjectType aqui também.
-                    if ((currentObject.name().contains("Enemy") && other.name().contains("Enemy")) ||
-                        (currentObject.name().contains("Bullet") && other.name().contains("Bullet"))) {
-                        continue;
-                    }
-
-
-
-                    boolean collisionDetected = false;
-
-                    // Verifica se o jogador está envolvido neste par
-                    if (this.player != null && (currentObject == this.player || other == this.player)) {
-                        IGameObject nonPlayerObject = (currentObject == this.player) ? other : currentObject;
-
-                        // CASO ESPECIAL: Jogador vs Inimigo (com verificação de proximidade)
-                        // A verificação .name().contains("Enemy") deve ser substituída por .getType() == GameObjectType.ENEMY se você implementou enums.
-                        boolean isNonPlayerEnemy = nonPlayerObject.name().contains("Enemy"); // Adapte para getType() se disponível
-
-                        if (isNonPlayerEnemy) {
-                            Ponto playerPos = this.player.transform().position();
-                            Ponto enemyPos = nonPlayerObject.transform().position(); // nonPlayerObject é o inimigo aqui
-                            double distance = playerPos.distancia(enemyPos);
-
-                            // Defina um limiar de proximidade. Ajuste este valor conforme necessário para a sua jogabilidade.
-                            final double PROXIMITY_THRESHOLD = 60.0; // Exemplo: 250 unidades de distância
-
-                            if (distance < PROXIMITY_THRESHOLD)
-                            {
-                                // Se estiverem próximos, faça a verificação de colisão mais precisa (baseada em raio)
-                                double playerRadius = (this.player.collider().getLogicalWidth() + this.player.collider().getLogicalHeight()) / 4.0;
-                                double enemyRadius = (nonPlayerObject.collider().getLogicalWidth() + nonPlayerObject.collider().getLogicalHeight()) / 4.0;
-                                double collisionThreshold = playerRadius + enemyRadius;
-
-                                if (distance < collisionThreshold) { // Use a distância real aqui
-                                    collisionDetected = true;
-                                }
-                            }
-                            // Se não estiverem próximos (distance >= PROXIMITY_THRESHOLD), collisionDetected permanece false,
-                            // e a colisão não é registrada para este par específico.
-                        
-                        } else 
-                        { // Jogador vs Outro tipo (que não é Inimigo)
-                            Ponto playerPos = this.player.transform().position();
-                            Ponto otherPos = nonPlayerObject.transform().position();
-                            double distance = playerPos.distancia(otherPos);
-
-                            // Define um limiar de colisão baseado nos raios médios aproximados dos objetos
-                            double playerRadius = (this.player.collider().getLogicalWidth() + this.player.collider().getLogicalHeight()) / 4.0;
-                            double otherRadius = (nonPlayerObject.collider().getLogicalWidth() + nonPlayerObject.collider().getLogicalHeight()) / 4.0;
-                            double threshold = playerRadius + otherRadius;
-
-                            if (distance < threshold) {
-                                collisionDetected = true;
-                            }
-                        }
-                    } else {
-                        // Verificação de colisão padrão para pares que não envolvem o jogador
-                        if (currentObject.collider().colision(other.collider())) {
-                            collisionDetected = true;
-                        }
-                    }
-
-                    if (collisionDetected)
+    
+                    if (shouldSkipCollision(currentObject, other)) continue;
+    
+                    if (currentObject.collider().colision(other.collider()))
                     {
-                        // Registra a colisão para ambos os objetos
                         layerCollisionMap.get(currentObject).add(other);
                         layerCollisionMap.get(other).add(currentObject);
                     }
+    
                 }
             }
-
-            // Dispara os eventos onCollision para os objetos que colidiram nesta camada
-            for (IGameObject gameObject : layerObjects) {
+    
+            for (IGameObject gameObject : layerObjects)
+            {
                 ArrayList<IGameObject> collidedWith = layerCollisionMap.get(gameObject);
-                if (collidedWith != null && !collidedWith.isEmpty()) {
+                if (!collidedWith.isEmpty()) {
                     gameObject.behavior().onCollision(collidedWith);
                 }
             }
         }
+
+        // Agora, verifica colisões entre camadas diferentes, focando no jogador
+        if (player != null)
+        {
+            int playerLayer = player.transform().layer();
+            
+            for (Map.Entry<Integer, CopyOnWriteArrayList<IGameObject>> entry : layeredGameObjects.entrySet()) {
+                int currentLayer = entry.getKey();
+                
+                // Pula se for a mesma camada do jogador, pois já foi verificada
+                if (currentLayer == playerLayer) continue;
+                
+                CopyOnWriteArrayList<IGameObject> layerObjects = entry.getValue();
+                for (IGameObject obj : layerObjects)
+                {
+                    if (shouldSkipCollision(player, obj) || obj.name().contains("Bullet")) continue;
+                    
+                    if (player.collider().colision(obj.collider()))
+                    {
+                        // Cria listas temporárias para armazenar as colisões
+                        ArrayList<IGameObject> playerCollisions = new ArrayList<>();
+                        ArrayList<IGameObject> objCollisions = new ArrayList<>();
+                        
+                        playerCollisions.add(obj);
+                        objCollisions.add(player);
+                        
+                        // Notifica ambos os objetos sobre a colisão
+                        player.behavior().onCollision(playerCollisions);
+                        obj.behavior().onCollision(objCollisions);
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean shouldSkipCollision(IGameObject obj1, IGameObject obj2)
+    {
+        return (obj1.name().contains("Enemy") && obj2.name().contains("Enemy")) ||
+            (obj1.name().contains("Bullet") && obj2.name().contains("Bullet"));
+
     }
 
     /**
@@ -323,7 +297,8 @@ public class GameEngine implements IGameEngine
      * @param go The `GameObject` to enable.
      */
     @Override
-    public void addEnable(IGameObject go) {
+    public void addEnable(IGameObject go)
+    {
         this.enable(go);
         add(go);    
     }
