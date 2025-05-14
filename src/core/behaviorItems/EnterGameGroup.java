@@ -50,7 +50,7 @@ public class EnterGameGroup implements IGroupAttackStrategy
     private ArrayList<Ponto> positions; // Calculated positions for enemies
     private int currentGroup = 0; // Tracks the current group being processed
     private int[] groupSizes = { 8, 8, 8, 8, 8 }; // Number of enemies in each group
-    private int groupDelayFrames = 60; // Delay between group entries in frames
+    private int groupDelayFrames = 50; // Delay between group entries in frames
     private ScheduledExecutorService scheduler; // Scheduler for scheduling group
     private int[][] pattern = { // Pattern defining enemy priorities
             { 0, 0, 0, 2, 2, 2, 2, 0, 0, 0 },
@@ -166,7 +166,7 @@ public class EnterGameGroup implements IGroupAttackStrategy
                 EnemyBehavior behavior = (EnemyBehavior) enemy.behavior();
                 behavior.setMovement(movement);
                 movement.setActive(true);
-            }, i * 210, TimeUnit.MILLISECONDS);
+            }, i * 230, TimeUnit.MILLISECONDS);
         }
     }
 

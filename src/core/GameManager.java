@@ -179,7 +179,6 @@ public class GameManager
 
     }
 
-
     private ISoundEffects createSoundEffects()
     {
         SoundEffects soundEffects = new SoundEffects();
@@ -301,6 +300,7 @@ public class GameManager
 
     public void generateGameOver()
     {
+        soundEffects.stopAllSounds();
         this.engine.destroyAll();
         this.engine.getGui().setMenu(true);
         soundEffects.loopSound("GAMEOVER");
@@ -427,18 +427,25 @@ public class GameManager
     }
 
 
-    public boolean allEnemiesDead()
+    public int countActiveEnemies()
     {
+        int count = 0;
+        ArrayList<IGameObject> remove = new ArrayList<>();
         for (IGameObject enemy : gameObjects)
         {
-            if (this.engine.isEnabled(enemy))
-            {
-                return false;
-            }
+            if ( enemy.transform().layer() == this.player.transform().layer()+1 && this.engine.isEnabled(enemy))
+                count++;
+            if(this.engine.isDisabled(enemy))
+                remove.add(enemy);
         }
-        return true;
+
+        for (IGameObject enemy : remove)
+            this.gameObjects.remove(enemy);
+
+        return count;
     }
-       
+
+
     private void monitorPlayer()
     {
         this.generateInfoStat();
@@ -465,17 +472,17 @@ public class GameManager
                 }
 
                 if (vidasAtuais <= 0)
-                {
-                    
                     this.generateGameOver();
-                    
-                }
-                if(this.allEnemiesDead())
-                {
-                    this.generateWin();
-                }
 
-            }, 10, 1, TimeUnit.MILLISECONDS);
+                int numberOfEnemies = this.countActiveEnemies();
+
+                if(numberOfEnemies == 0)
+                    this.generateWin();
+
+                //if(numberOfEnemies <= 20)
+                //    this.randomAttacksAndMovements();
+
+            }, 100, 10, TimeUnit.MILLISECONDS);
     }
 
 
@@ -501,13 +508,13 @@ public class GameManager
 
             if(input.isActionActive("PLAYER1"))
             {
-                finalizarSelecao();
+                handlerFinalSelectPlayer();
                 running.set(false);
             }
             else if(input.isActionActive("PLAYER2"))
             {
                 this.player.shape().setFrames(ImagesLoader.loadAnimationFrames("nave-HanSolo.png"), 150);
-                finalizarSelecao();
+                handlerFinalSelectPlayer();
                 running.set(false);
             }
 
@@ -515,7 +522,7 @@ public class GameManager
 
     }
 
-    private void finalizarSelecao()
+    private void handlerFinalSelectPlayer()
     {
         this.engine.getGui().setMenu(false);
         this.engine.destroyAll();

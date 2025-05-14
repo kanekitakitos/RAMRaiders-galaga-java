@@ -51,7 +51,7 @@ import geometry.Ponto;
  *      "https://chatgpt.com/share/68095b69-8cb0-8011-8705-2d3eade4aa69"> How to
  *      create a parametric function and what attributes I need to define one -
  *      ChatGPT</a>
- *      
+ *
  * @author Brandon Mejia
  * @version 2025-04-23
  */
