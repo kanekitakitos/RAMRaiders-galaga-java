@@ -123,7 +123,7 @@ public class PlayerBehavior extends Behavior
             // Schedule to reset the attack flag after the invincibility duration
             localScheduler.schedule(() -> {
                 isAttacking = false;
-            }, invincibilityDuration, TimeUnit.MILLISECONDS);
+            }, invincibilityDuration-500, TimeUnit.MILLISECONDS);
 
             ISoundEffects soundEffects = this.go.soundEffects();
             if(soundEffects != null)

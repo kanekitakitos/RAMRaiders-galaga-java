@@ -55,8 +55,21 @@ public class EnemyBehavior extends Behavior
     public EnemyBehavior()
     {
         super();
-        this.movement = new ZigzagMovement();
+        this.movement = null;
         // TODO: Implement enemy life logic in the future
+    }
+
+    /**
+     * Disables the behavior.
+     */
+    @Override
+    public void onDisabled()
+    {
+        ISoundEffects soundEffects = this.go.soundEffects();
+        if(soundEffects!= null)
+            soundEffects.playSound("DEATH");
+        
+        this.isEnabled = false;
     }
 
     /**
@@ -128,7 +141,20 @@ public class EnemyBehavior extends Behavior
     public void activateMovement(boolean value)
     {
         if (this.movement != null)
-            this.movement.setActive(value);
+        {
+            if(value)
+            {
+                this.movement.setActive(true);
+                this.go.soundEffects().playSound("MOVE");
+            }
+            else
+            {
+                this.movement.setActive(false);
+            }
+
+
+        }
+            
     }
 
     public IEnemyMovement getMovement()
@@ -165,6 +191,7 @@ public class EnemyBehavior extends Behavior
         if ( movement != null && movement.isActive())
             {
                 movement.move(this.go);
+                
                 if(this.movement == null)
                  return;
 

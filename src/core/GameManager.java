@@ -11,6 +11,7 @@ import gui.IInputEvent;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.sound.sampled.Clip;
 
@@ -56,6 +57,7 @@ public class GameManager
 
     private GameEngine engine; // The game engine managing game objects
     private IInputEvent input; // Input event mapping for keys and mouse buttons
+    private ISoundEffects soundEffects = new SoundEffects(); // The sound effects of the game object
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final double scale =4;
 
@@ -89,6 +91,16 @@ public class GameManager
         this.engine = engine;
         createPlayer( new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 150));
         this.input = engine.getGui().getInput();
+
+        soundEffects.addSound("GAMEOVER", AudioLoader.loadAudio("gameOver.wav"));
+        soundEffects.addSound("MENU", AudioLoader.loadAudio("menu.wav"));
+        soundEffects.addSound("WIN", AudioLoader.loadAudio("win.wav"));
+
+        // Escolhe aleatoriamente entre os dois arquivos de som para STARTGAME
+        String[] startGameSounds = {"gameSound.wav", "gameSound2.wav"};
+        Random rand = new Random();
+        String selectedSound = startGameSounds[rand.nextInt(startGameSounds.length)];
+        soundEffects.addSound("STARTGAME", AudioLoader.loadAudio(selectedSound));
 
         this.groupAttackStrategy = new EnterGameGroup();
         ((EnterGameGroup)this.groupAttackStrategy).setScheduler(this.scheduler);
@@ -164,6 +176,7 @@ public class GameManager
             enemy.onInit();
             enemy.behavior().subscribe(this.player);
             enemy.setSoundEffects(createSoundEffects());
+            enemy.soundEffects().addSound("MOVE", AudioLoader.loadAudio("move1.wav"));
             gameObjects.add(enemy);
         }
 
@@ -172,9 +185,10 @@ public class GameManager
 
     private ISoundEffects createSoundEffects()
     {
-        Map<String, Clip> soundClips = new HashMap<>(); // Map to store sound clips
-        soundClips.put("ATTACK", AudioLoader.loadAudio("blaster.wav"));
-        SoundEffects soundEffects = new SoundEffects(soundClips);
+        SoundEffects soundEffects = new SoundEffects();
+        soundEffects.addSound("ATTACK", AudioLoader.loadAudio("blaster.wav"));
+        soundEffects.addSound("DEATH", AudioLoader.loadAudio("explosion.wav"));
+
         return soundEffects;
     }
 
@@ -290,7 +304,9 @@ public class GameManager
 
     public void generateGameOver()
     {
+        this.engine.destroyAll();
         this.engine.getGui().setMenu(true);
+        soundEffects.loopSound("GAMEOVER");
         double scale = 64;
         double raio = 0.0001;
         int layer = 0;
@@ -300,12 +316,51 @@ public class GameManager
         Circulo p1 = new Circulo(raio, t1);
         GameObject startGame = new GameObject("GAME OVER", t1, p1, new Behavior(), s1);
         startGame.onInit();
-        startGame.behavior().onInit();
-        engine.add(startGame);
+
+        scale = 32;
+        s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
+        t1 = new Transform(new Ponto(0.0, -70.0), layer, 0.0, scale);
+        p1 = new Circulo(raio, t1);
+        GameObject message = new GameObject("Another one falls. The Empire endures.", t1, p1, new Behavior(), s1);
+        message.onInit();
+
+
+        engine.addEnable(startGame);
+        engine.addEnable(message);
 
         this.shutdown();
     }
 
+    public void generateWin()
+    {
+        soundEffects.stopAllSounds();
+        this.engine.destroyAll();
+        this.engine.getGui().setMenu(true);
+        this.soundEffects.playSound("WIN");
+
+        double scale = 64;
+        double raio = 0.0001;
+        int layer = 0;
+
+        Shape s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
+        Transform t1 = new Transform(new Ponto(0.0, 0.0), layer, 0.0, scale);
+        Circulo p1 = new Circulo(raio, t1);
+        GameObject win = new GameObject("Victory is yours.", t1, p1, new Behavior(), s1);
+        win.onInit();
+
+        scale = 32;
+        s1 = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 0);
+        t1 = new Transform(new Ponto(0.0, -70.0), layer, 0.0, scale);
+        p1 = new Circulo(raio, t1);
+        GameObject message = new GameObject("You've brought balance to the galaxy.", t1, p1, new Behavior(), s1);
+        message.onInit();
+
+        engine.addEnable(win);
+        engine.addEnable(message);
+        this.shutdown();
+
+    }
+    
     private void createPlayer(Shape shape)
     {
         double scale = 4; // Scale of the player object
@@ -375,6 +430,17 @@ public class GameManager
     }
 
 
+    public boolean allEnemiesDead()
+    {
+        for (IGameObject enemy : gameObjects)
+        {
+            if (this.engine.isEnabled(enemy))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
        
     private void monitorPlayer()
     {
@@ -403,11 +469,13 @@ public class GameManager
 
                 if (vidasAtuais <= 0)
                 {
-                    this.engine.destroyAll();
+                    
                     this.generateGameOver();
-                    ISoundEffects soundEffects = new SoundEffects();
-                    soundEffects.addSound("GAMEOVER", AudioLoader.loadAudio("gameOver.wav"));
-                    soundEffects.loopSound("GAMEOVER");
+                    
+                }
+                if(this.allEnemiesDead())
+                {
+                    this.generateWin();
                 }
 
             }, 10, 1, TimeUnit.MILLISECONDS);
@@ -429,6 +497,7 @@ public class GameManager
     private void handlerSelectPlayer()
     {
         AtomicBoolean running = new AtomicBoolean(true);
+        this.soundEffects.loopSound("MENU");
         scheduler.scheduleAtFixedRate(() ->
         {
             if (!running.get()) return;
@@ -444,6 +513,7 @@ public class GameManager
                 finalizarSelecao();
                 running.set(false);
             }
+
         }, 0, 1, TimeUnit.MILLISECONDS);
 
     }
@@ -458,6 +528,8 @@ public class GameManager
 
         this.engine.addEnable(this.player);
         this.engine.setPlayer(player);
+        this.soundEffects.stopSound("MENU");
+        this.soundEffects.loopSound("STARTGAME");
         this.startRelocateEnemies();
         this.monitorPlayer();
         

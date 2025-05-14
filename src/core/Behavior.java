@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import core.objectsInterface.IBehavior;
 import core.objectsInterface.IGameObject;
-import core.objectsInterface.ISoundEffects;
 import gui.IInputEvent;
 import gui.InputEvent;
 import core.behaviorItems.IAttackStrategy;

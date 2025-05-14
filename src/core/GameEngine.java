@@ -2,7 +2,6 @@ package core;
 
 import core.objectsInterface.IGameEngine;
 import core.objectsInterface.IGameObject;
-import core.objectsInterface.ISoundEffects;
 import gui.*;
 import geometry.Ponto;
 

@@ -37,5 +37,13 @@ public interface IShape
      * @param frames A list of BufferedImage objects representing the animation frames.
      * @param frameDelayMillis The delay between frames in milliseconds.
      */
-    public void setFrames(List<BufferedImage> frames, int frameDelayMillis);
+    void setFrames(List<BufferedImage> frames, int frameDelayMillis);
+
+    /**
+     * Sets the logical width and height of the shape.
+     *
+     * @param width  The logical width to set.
+     * @param height The logical height to set.
+     */
+    void setlogicalWidthAndHeight(double width, double height);
 }
