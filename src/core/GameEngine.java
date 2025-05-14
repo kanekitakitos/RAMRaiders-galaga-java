@@ -259,7 +259,7 @@ public class GameEngine implements IGameEngine
                 int currentLayer = entry.getKey();
                 
                 // Pula se for a mesma camada do jogador, pois já foi verificada
-                if (currentLayer == playerLayer) continue;
+                if (currentLayer == playerLayer || currentLayer == 0) continue;
                 
                 CopyOnWriteArrayList<IGameObject> layerObjects = entry.getValue();
                 for (IGameObject obj : layerObjects)
