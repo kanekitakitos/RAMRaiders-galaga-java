@@ -3,7 +3,6 @@ package core;
 import core.objectsInterface.IGameEngine;
 import core.objectsInterface.IGameObject;
 import gui.*;
-import geometry.Ponto;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -83,7 +82,7 @@ public class GameEngine implements IGameEngine
         this.disabledGameObjects = new ArrayList<>();
         this.totalObjects = 0;
         this.gui = gui;
-        this.inputStatus = this.gui.getInput();
+        this.inputStatus = this.gui.getInputEvent();
     }
 
     public void setPlayer(IGameObject player)
@@ -407,7 +406,8 @@ public class GameEngine implements IGameEngine
      * input.
      */
     @Override
-    public void run() {
+    public void run()
+    {
         final int FPS = 60;
         final long frameTime = 1000 / FPS;
 

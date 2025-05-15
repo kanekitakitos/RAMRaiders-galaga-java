@@ -33,7 +33,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Brandon Mejia
  * @version 2025-03-25
  */
-public interface IGuiBridge {
+public interface IGuiBridge
+{
     /**
      * Draws the provided list of game objects on the GUI.
      *
@@ -46,15 +47,7 @@ public interface IGuiBridge {
      *
      * @return An object representing the current input state.
      */
-    IInputEvent getInput();
-
-
-     /**
-     * Sets a custom input event handler for the GUI.
-     *
-     * @param inputState The input event handler to set.
-     */
-    void setInput(IInputEvent inputState);
+    IInputEvent getInputEvent();
 
     boolean isMenu();
 

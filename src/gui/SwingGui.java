@@ -5,6 +5,10 @@ import core.Shape;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A Swing-based GUI implementation for rendering game objects and handling
@@ -105,22 +109,32 @@ public class SwingGui implements IGuiBridge
         this.frame.setLocationRelativeTo(null);
         this.frame.setVisible(true);
         this.frame.setResizable(false);
-    }
 
-    /**
-     * Sets a custom input event handler for the GUI.
-     *
-     * @param inputState The input event handler to set.
-     */
-    @Override
-    public void setInput(IInputEvent inputState)
-    {
-        if (inputState == null)
-            return;
+        this.inputState = generateInputEvent();
 
-        this.inputState = inputState;
         this.inputState.registerInputHandlers(this.frame);
         this.frame.setFocusable(true);
+    }
+
+    private IInputEvent generateInputEvent()
+    {
+        Map<Integer, String> customKeyMap = new HashMap<>();
+        customKeyMap.put(KeyEvent.VK_A, "LEFT");
+        customKeyMap.put(KeyEvent.VK_LEFT, "LEFT");
+        customKeyMap.put(KeyEvent.VK_RIGHT, "RIGHT");
+        customKeyMap.put(KeyEvent.VK_D, "RIGHT");
+        customKeyMap.put(KeyEvent.VK_C, "ATTACK");
+        customKeyMap.put(KeyEvent.VK_X, "EVASIVE");
+        customKeyMap.put(KeyEvent.VK_1, "PLAYER1");
+        customKeyMap.put(KeyEvent.VK_2, "PLAYER2");
+        customKeyMap.put(KeyEvent.VK_NUMPAD1, "PLAYER1");
+        customKeyMap.put(KeyEvent.VK_NUMPAD2, "PLAYER2");
+
+        Map<Integer, String> customMouseMap = new HashMap<>(); // Map for custom mouse bindings
+        customMouseMap.put(MouseEvent.BUTTON1, "ATTACK");
+        customMouseMap.put(MouseEvent.BUTTON3, "EVASIVE");
+
+        return new InputEvent(customKeyMap, customMouseMap); // Create and return the input handler
     }
 
     /**
@@ -140,7 +154,7 @@ public class SwingGui implements IGuiBridge
      * @return The input event handler representing the current input state.
      */
     @Override
-    public IInputEvent getInput()
+    public IInputEvent getInputEvent()
     {
         return this.inputState;
     }

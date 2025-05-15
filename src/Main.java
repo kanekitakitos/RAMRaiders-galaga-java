@@ -5,10 +5,6 @@ import core.objectsInterface.*;
 import geometry.*;
 import assets.*;
 import gui.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.util.HashMap;
-import java.util.Map;
 import core.behaviorItems.*;
 
 
@@ -71,26 +67,6 @@ public class Main
         return enemy;
     }
 
-    public static IInputEvent createInputHandler()
-    {
-        Map<Integer, String> customKeyMap = new HashMap<>(); // Map for custom key bindings
-        customKeyMap.put(KeyEvent.VK_A, "LEFT");
-        customKeyMap.put(KeyEvent.VK_LEFT, "LEFT");
-        customKeyMap.put(KeyEvent.VK_RIGHT, "RIGHT");
-        customKeyMap.put(KeyEvent.VK_D, "RIGHT");
-        customKeyMap.put(KeyEvent.VK_C, "ATTACK");
-        customKeyMap.put(KeyEvent.VK_X, "EVASIVE");
-        customKeyMap.put(KeyEvent.VK_1, "PLAYER1");
-        customKeyMap.put(KeyEvent.VK_2, "PLAYER2");
-        customKeyMap.put(KeyEvent.VK_NUMPAD1, "PLAYER1");
-        customKeyMap.put(KeyEvent.VK_NUMPAD2, "PLAYER2");
-
-        Map<Integer, String> customMouseMap = new HashMap<>(); // Map for custom mouse bindings
-        customMouseMap.put(MouseEvent.BUTTON1, "ATTACK");
-        customMouseMap.put(MouseEvent.BUTTON3, "EVASIVE");
-
-        return new InputEvent(customKeyMap, customMouseMap); // Create and return the input handler
-    }
     /**
      * Main method to initialize the game and start the game engine.
      *
@@ -101,7 +77,6 @@ public class Main
         Shape backGroundShape = new Shape(ImagesLoader.loadAnimationFrames("background.png"), 1000); // Background shape
         SwingGui gui = new SwingGui(1100, 800, backGroundShape); // Initialize the GUI with dimensions and background
         gui.setHitbox(false); // Enable hitbox visualization
-        gui.setInput(createInputHandler()); // Set the input handler for the GUI
 
         GameEngine engine = new GameEngine(gui); // Initialize the game engine with the GUI
         GameManager gameManager = new GameManager(engine); // Initialize the game manager with the engine and player
