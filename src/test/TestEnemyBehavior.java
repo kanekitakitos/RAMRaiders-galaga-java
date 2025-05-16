@@ -83,7 +83,7 @@ public class TestEnemyBehavior
         assertFalse(flyCircleMovement.isActive(), "Movement should not be active");
 
         flyCircleMovement.setActive(true);
-        flyCircleMovement.setIsLeft(true);
+        flyCircleMovement.setDirection(true);
         Ponto initialPosition = enemy.transform().position();
 
         for (int i = 0; i < 80; i++)
@@ -196,7 +196,7 @@ public class TestEnemyBehavior
     @Test
     void testFlySideLassoMovementBehaviorLeft()
     {
-        FlySideMovement fly = new FlySideMovement();
+        EnterSideMovement fly = new EnterSideMovement();
         enemyBehavior.setMovement(fly);
         assertFalse(fly.isActive(), "Movement should not be active");
         fly.setActive(true);
@@ -217,7 +217,7 @@ public class TestEnemyBehavior
     @Test
     void testFlyOverTopMovementBehaviorRight()
     {
-        FlyOverTopMovement fly = new FlyOverTopMovement();
+        EnterOverTopMovement fly = new EnterOverTopMovement();
         enemyBehavior.setMovement(fly);
         assertFalse(fly.isActive(), "Movement should not be active");
         fly.setDirection(false);

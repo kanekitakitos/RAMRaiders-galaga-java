@@ -1,58 +1,18 @@
 package geometry;
 
 /**
- * The Ponto class represents a point in a 2D space with polar coordinates (r, theta) or Cartesian coordinates (x,y).
+ * The Ponto class represents a point in a 2D space with polar coordinates (r,
+ * theta) or Cartesian coordinates (x, y).
+ * It provides methods to access and manipulate the point's coordinates,
+ * calculate distances, and compare points.
+ *
  * @author Brandon Mejia
  * @version 2025-02-10
- *
  */
 public class Ponto
 {
     private double x; // The x coordinate of the point
     private double y; // The y coordinate of the point
-
-/*    /**
-//     * Checks if the given coordinates are valid (in the first quadrant and less than 10).
-//     *
-//     * @param r The radial coordinate to check.
-//     * @param theta The angular coordinate to check.
-//     */
-//    private void invariantesPolares(double r, double theta)
-//    {
-//        if (r >= 0 && theta >= 0 && theta <= 90)
-//            return;
-//
-//        System.out.println("Ponto:vi");
-//        System.exit(0);
-//    }
-
-//    /**
-//     * Checks if the given Cartesian coordinates are valid (both positive).
-//     *
-//     * @param x The x coordinate to check.
-//     * @param y The y coordinate to check.
-//     */
-//    private void invariantesCartesianas(int x, int y)
-//    {
-//        if (x >= 0 && y >= 0)
-//            return;
-//
-//        System.out.println("Ponto:vi");
-//        System.exit(0);
-//    }
-
-//    /**
-//     * Constructor that initializes the point with the given r and theta coordinates.
-//     *
-//     * @param r The radial coordinate of the point.
-//     * @param theta The angular coordinate of the point.
-//     */
-//    public Ponto(int r, int theta)
-//    {
-////      invariantesPolares(r, theta);
-//        this.x = Math.round(r * Math.cos(Math.toRadians(theta)));
-//        this.y = Math.round(r * Math.sin(Math.toRadians(theta)));
-//    }
 
     /**
      * Constructor that initializes the point with the given x and y coordinates.
@@ -62,18 +22,17 @@ public class Ponto
      */
     public Ponto(double x, double y)
     {
-//        invariantesCartesianas(x, y);
         this.x = x;
-        this.y = y; // arc tangent of y/x
+        this.y = y;
     }
 
     /**
-     * Copy constructor that creates a new point with the same coordinates as the given point.
+     * Copy constructor that creates a new point with the same coordinates as the
+     * given point.
      *
      * @param p The point to copy.
      */
-    public Ponto(Ponto p)
-    {
+    public Ponto(Ponto p) {
         this.x = p.x();
         this.y = p.y();
     }
@@ -81,19 +40,18 @@ public class Ponto
     /**
      * Gets the radial coordinate of the point.
      *
-     * @return The radial coordinate.
+     * @return The radial coordinate (distance from the origin).
      */
     public double r() {
         return Math.sqrt(x * x + y * y);
     }
 
     /**
-     * Gets the angular coordinate of the point.
+     * Gets the angular coordinate of the point in degrees.
      *
-     * @return The angular coordinate. (toDegrees)
+     * @return The angular coordinate (theta) in degrees.
      */
-    public double theta()
-    {
+    public double theta() {
         return Math.toDegrees(Math.atan2(y(), x()));
     }
 
@@ -102,8 +60,7 @@ public class Ponto
      *
      * @return The x coordinate.
      */
-    public double x()
-    {
+    public double x() {
         return this.x;
     }
 
@@ -116,9 +73,9 @@ public class Ponto
         return this.y;
     }
 
-
     /**
      * Calculates the radial distance between this point and another point.
+     * The radial distance is calculated using polar coordinates.
      *
      * @param p The other point to which the distance is calculated.
      * @return The radial distance between this point and the given point.
@@ -130,13 +87,12 @@ public class Ponto
     }
 
     /**
-     * Calculates the distance between this point and another point.
+     * Calculates the Cartesian distance between this point and another point.
      *
      * @param p The other point to which the distance is calculated.
-     * @return The distance between this point and the given point.
+     * @return The Cartesian distance between this point and the given point.
      */
-    public double distancia(Ponto p)
-    {
+    public double distancia(Ponto p) {
         double dx = this.x() - p.x();
         double dy = this.y() - p.y();
 
@@ -145,24 +101,24 @@ public class Ponto
 
     /**
      * Checks if this point is equal to another point.
+     * Two points are considered equal if their x and y coordinates are the same.
      *
      * @param p The other point to compare.
      * @return True if the points are equal, false otherwise.
      */
-    public boolean equals(Ponto p)
-    {
+    public boolean equals(Ponto p) {
         return this.x() == p.x() && this.y() == p.y();
     }
 
     /**
      * Returns a string representation of the point.
+     * The string is formatted as "(x, y)" with two decimal places.
      *
      * @return A string representation of the point.
      */
-    public String toString()
-    {
+    public String toString() {
         String x = String.format("%.2f", x()).replace(",", ".");
         String y = String.format("%.2f", y()).replace(",", ".");
-        return String.format("(%s,%s)", x,y);
+        return String.format("(%s,%s)", x, y);
     }
 }

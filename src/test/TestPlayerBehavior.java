@@ -68,7 +68,7 @@ public class TestPlayerBehavior
         collisions.add(gameObject1);
 
         playerBehavior0.onCollision(collisions);
-        assertEquals(2, playerBehavior0.life());
+        assertEquals(2, playerBehavior0.getLife());
     }
 
     @Test
@@ -95,9 +95,9 @@ public class TestPlayerBehavior
         playerBehavior0.onCollision(collisions);
 
         Thread.sleep(1300);
-        assertEquals(2, playerBehavior0.life());
+        assertEquals(2, playerBehavior0.getLife());
         playerBehavior0.onCollision(collisions); // hit
-        assertEquals(1, playerBehavior0.life());
+        assertEquals(1, playerBehavior0.getLife());
         assertTrue(playerBehavior0.isEnabled());
     }
 
@@ -108,16 +108,16 @@ public class TestPlayerBehavior
         collisions.add(gameObject1);
 
 
-        assertEquals(3, playerBehavior0.life());
+        assertEquals(3, playerBehavior0.getLife());
         playerBehavior0.onCollision(collisions); // hit
         Thread.sleep(1300);
-        assertEquals(2, playerBehavior0.life());
+        assertEquals(2, playerBehavior0.getLife());
         playerBehavior0.onCollision(collisions);// hit
         Thread.sleep(1300);
-        assertEquals(1, playerBehavior0.life());
+        assertEquals(1, playerBehavior0.getLife());
         playerBehavior0.onCollision(collisions); // hit
 
-        assertEquals(0, playerBehavior0.life());
+        assertEquals(0, playerBehavior0.getLife());
         assertFalse(playerBehavior0.isEnabled());
 
 
@@ -129,7 +129,7 @@ public class TestPlayerBehavior
         inputEvent.setPlayerMove("RIGHT", true);
         Ponto initialPosition = gameObject0.transform().position();
 
-        playerBehavior0.evasiveManeuver(inputEvent);
+        playerBehavior0.moveAndEvasiveManeuver(inputEvent);
 
         Ponto newPosition = gameObject0.transform().position();
         assertTrue(newPosition.x() > initialPosition.x());
@@ -142,7 +142,7 @@ public class TestPlayerBehavior
         inputEvent.setPlayerMove("LEFT", true);
         Ponto initialPosition = gameObject0.transform().position();
 
-        playerBehavior0.evasiveManeuver(inputEvent);
+        playerBehavior0.moveAndEvasiveManeuver(inputEvent);
         assertTrue(playerBehavior0.isInvincible());
 
         Ponto newPosition = gameObject0.transform().position();

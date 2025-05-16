@@ -1,64 +1,88 @@
 package core;
 
 import core.behaviorItems.IEnemyMovement;
-import core.behaviorItems.ZigzagMovement;
 import core.objectsInterface.IGameObject;
-import gui.InputEvent;
+import core.objectsInterface.ISoundEffects;
 import core.behaviorItems.IAttackStrategy;
-import core.behaviorItems.IGroupAttackStrategy;
-
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import gui.IInputEvent;
+import assets.ImagesLoader;
+import geometry.Ponto;
+import java.util.List;
+import java.awt.image.BufferedImage;
 
 /**
- * EnemyBehavior class that defines the behavior of an enemy in the game.
+ * The `EnemyBehavior` class defines the behavior of an enemy in the game.
  *
- * This class uses the Strategy pattern to allow dynamic selection of attack strategies
- * and the Observer pattern (inherited from the Behavior class) to monitor changes in observed objects.
- * It supports both individual and group attack strategies.
+ * <p>
+ * This class extends the `Behavior` class and uses the Strategy pattern to
+ * dynamically
+ * select attack and movement strategies. It also incorporates the Observer
+ * pattern
+ * (inherited from `Behavior`) to monitor changes in observed objects.
+ * </p>
  *
  * @Pre-Conditions:
- *   - The enemy's game object, transform, and collider must be properly initialized.
- *   - The enemy should be subscribed to a valid observed GameObject when required for executing attacks.
+ *                  - The enemy's game object, transform, and collider must be
+ *                  properly initialized.
+ *                  - The enemy should be subscribed to a valid observed
+ *                  `IGameObject` when required for executing attacks.
  *
  * @Post-Conditions:
- *   - Attack execution returns a valid game object if an attack strategy is set, or null otherwise.
- *   - Group attack execution properly coordinates the selected group strategy on the target.
+ *                   - Attack execution returns a valid game object if an attack
+ *                   strategy is set, or null otherwise.
+ *                   - Movement is executed based on the active movement
+ *                   strategy.
  *
  * @see core.Behavior
  * @see core.behaviorItems.IAttackStrategy
- * @see core.behaviorItems.IGroupAttackStrategy
+ * @see core.EnemyGroupAttack.IGroupAttackStrategy
+ * @see core.behaviorItems.IEnemyMovement
  *
- * @author Brandon Mejia
- * @author Gabriel Pedroso
- * @author Miguel Correia
- *
- * @version 2025-04-18
+ * @Author Brandon Mejia
+ * @Version 2025-04-18
  */
-public class EnemyBehavior extends Behavior
-{
+public class EnemyBehavior extends Behavior {
 
-    private IAttackStrategy attackStrategy = null;
-    static private IGroupAttackStrategy groupAttack = null;
-    private IEnemyMovement movement;
+    private IEnemyMovement movement; // The movement strategy used by the enemy
     private static final ScheduledExecutorService localScheduler = Executors.newScheduledThreadPool(1);
-
-
-    private boolean isAttacking = false;
-    private long attackDuration = 500; // Attack duration in milliseconds
+    private static List<BufferedImage> explosion = ImagesLoader.loadAnimationFrames("explosion.gif");
 
     /**
-     * Default constructor for EnemyBehavior.
+     * Default constructor for `EnemyBehavior`.
+     * Initializes the movement strategy to a default `ZigzagMovement`.
      */
-    public EnemyBehavior()
-    {
+    public EnemyBehavior() {
         super();
-        this.movement = new ZigzagMovement();
-        // 30% chance of having 2 lives, 80% chance of having 1 life
-        //this.life = new Random().nextDouble() < 0.3 ? 2 : 1;
-        //TODO: Ainda falta implementar a vida do inimigo
+        this.movement = null;
+        // TODO: Implement enemy life logic in the future
+    }
+
+    /**
+     * Disables the behavior.
+     */
+    @Override
+    public void onDisabled() {
+        ISoundEffects soundEffects = this.go.soundEffects();
+        if (soundEffects != null)
+            soundEffects.playSound("DEATH");
+
+        // Troca o shape para explosão
+        try {
+            this.go.shape().setFrames(explosion, 100);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        this.go.velocity(new Ponto(0, 0));
+        this.go.rotateSpeed(0);
+        this.movement = null;
+        this.attackStrategy = null;
+        // Agenda para desabilitar o objeto após 2 segundos
+        localScheduler.schedule(() -> {
+            super.onDisabled();
+        }, 1, TimeUnit.SECONDS);
     }
 
     /**
@@ -66,8 +90,7 @@ public class EnemyBehavior extends Behavior
      *
      * @param strategy The attack strategy to use.
      */
-    public void setAttack(IAttackStrategy strategy)
-    {
+    public void setAttackStrategy(IAttackStrategy strategy) {
         this.attackStrategy = strategy;
     }
 
@@ -75,104 +98,103 @@ public class EnemyBehavior extends Behavior
      * Executes an attack using the currently set attack strategy.
      *
      * @param ie The input event triggering the attack.
-     * @return The game object resulting from the attack, or null if no strategy is set.
+     * @return The game object resulting from the attack, or null if no strategy is
+     *         set.
      */
-    public IGameObject attack(InputEvent ie)
-    {
-        if (groupAttack == null)
-            return null;
+    @Override
+    public IGameObject attack(IInputEvent ie) {
+        if (this.attackStrategy != null && this.isAttacking && this.isEnabled()) {
+            this.stopAttack();
+            long minDelay = 1500;
+            long maxDelay = 7000;
+            long randomDelay = minDelay + (long) (Math.random() * (maxDelay - minDelay));
+            // Schedule to reset the attack flag after the specified attack duration
+            localScheduler.schedule(() -> {
+                this.startAttack();
+            }, randomDelay, TimeUnit.MILLISECONDS);
 
+            ISoundEffects soundEffects = this.go.soundEffects();
+            if (soundEffects != null)
+                soundEffects.playSound("ATTACK");
 
-        if(!this.isAttacking && this.isEnabled())
-        {
-            // Schedule to reset the attack flag after 500ms delay
-            localScheduler.schedule(this::stopAttack, this.attackDuration, TimeUnit.MILLISECONDS);
             return this.attackStrategy.execute(this.go, this.observedObject);
-        }
-        else
-        {
+        } else {
             return null;
         }
     }
 
     /**
-     * Stops the current attack by setting the attacking flag to false.
+     * Updates the behavior logic.
+     * Processes input events to handle movement and evasive maneuvers.
+     *
+     * @param ie The input event to process.
      */
-    public void stopAttack()
-    {
-        this.isAttacking = false;
+    @Override
+    public void onUpdate(IInputEvent ie) {
+        if (ie == null)
+            return;
+        super.onUpdate(ie);
+
     }
 
-    public void startAttack()
-    {
-        this.isAttacking = true;
-    }
-
-    public void activateMovement(boolean value)
-    {
+    /**
+     * Activates or deactivates the movement strategy.
+     *
+     * @param value `true` to activate movement, `false` to deactivate it.
+     */
+    public void activateMovement(boolean value) {
         if (this.movement != null)
             this.movement.setActive(value);
+
+    }
+
+    public IEnemyMovement getMovement() {
+        return this.movement;
     }
 
     /**
      * Checks if the enemy is currently attacking.
      *
-     * @return true if the enemy is attacking, false otherwise.
+     * @return `true` if the enemy is attacking, `false` otherwise.
      */
-    public boolean isAttacking()
-    {
+    public boolean isAttacking() {
         return isAttacking;
     }
 
-
-
-    public void setMovement(IEnemyMovement movement)
-    {
-        if (movement == null)
-            return;
-
+    /**
+     * Sets the movement strategy for the enemy.
+     *
+     * @param movement The movement strategy to use.
+     */
+    public void setMovement(IEnemyMovement movement) {
         this.movement = movement;
     }
 
     /**
-     * Executes a group attack using the specified group attack strategy.
-     *
-     * @param strategy The group attack strategy to use.
-     * @param group The list of game objects participating in the attack.
-     * @param target The target of the group attack.
+     * Moves the enemy using the currently set movement strategy.
+     * If the movement strategy is active, it updates the enemy's position.
      */
-    static public void groupAttack(IGroupAttackStrategy strategy, List<IGameObject> group, IGameObject target)
-    {
-        strategy.onInit(group, target);
-        strategy.execute(group, target);
-    }
-
-    /**
-     * Executes a group attack using the instance's group attack strategy.
-     *
-     * @param group The list of game objects participating in the attack.
-     * @param target The target of the group attack.
-     */
-    public void groupAttack(List<IGameObject> group, IGameObject target)
-    {
-        if (groupAttack == null)
-            return;
-
-        if(this.isEnabled())
-            groupAttack(groupAttack, group, target);
-    }
-
     @Override
-    public void move()
-    {
-
-        if (movement.isActive())
+    public void move() {
+        if (movement != null && movement.isActive()) {
             movement.move(this.go);
+            if (this.movement == null)
+                return;
+
+            if (!movement.isActive()) {
+                // Generate a random delay between 700 and 2000 milliseconds
+                long minDelay = 800;
+                long maxDelay = 1500;
+                long randomDelay = minDelay + (long) (Math.random() * (maxDelay - minDelay));
+
+                // Schedule to reset the Movement flag after the specified Movement duration
+                localScheduler.schedule(() -> {
+                    this.movement.setActive(true);
+                }, randomDelay, TimeUnit.MILLISECONDS);
+            }
+        }
 
         super.move();
     }
-
-
-
 
 }

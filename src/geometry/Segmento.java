@@ -1,6 +1,9 @@
 package geometry;
+
 /**
  * Represents a line segment defined by two points.
+ * Provides methods to calculate properties such as length, check for
+ * intersections, and verify geometric relationships.
  *
  * @author Brandon Mejia
  * @version 2025-02-22
@@ -9,10 +12,9 @@ package geometry;
  *
  * @inv The points a and b must not be equal.
  */
-public class Segmento
-{
-    private Ponto a;
-    private Ponto b;
+public class Segmento {
+    private Ponto a; // The first endpoint of the segment
+    private Ponto b; // The second endpoint of the segment
 
     /**
      * Ensures the invariants of the segment are maintained.
@@ -35,16 +37,19 @@ public class Segmento
      * @param a The first point of the segment.
      * @param b The second point of the segment.
      */
-    public Segmento(Ponto a, Ponto b)
-    {
+    public Segmento(Ponto a, Ponto b) {
         invariantes(a, b);
         this.a = a;
         this.b = b;
     }
 
-
-    public Segmento(Segmento s)
-    {
+    /**
+     * Copy constructor that creates a new segment with the same endpoints as the
+     * given segment.
+     *
+     * @param s The segment to copy.
+     */
+    public Segmento(Segmento s) {
         this.a = new Ponto(s.a);
         this.b = new Ponto(s.b);
     }
@@ -79,15 +84,11 @@ public class Segmento
         if (other == null)
             throw new IllegalArgumentException("O segmento não pode ser nulo.");
 
-        // Create vectors representing this segment
         double dx1 = (this.b().x() - this.a().x());
         double dy1 = (this.b().y() - this.a().y());
-
-        // create vectors representing the other segment
         double dx2 = other.b().x() - other.a().x();
         double dy2 = other.b().y() - other.a().y();
 
-        // Calculate the dot product of the two vectors
         double dotProduct = dx1 * dx2 + dy1 * dy2;
 
         return dotProduct == 0;
@@ -108,39 +109,34 @@ public class Segmento
      * @param other The other segment to check for intersection.
      * @return True if the segments intersect, false otherwise.
      */
-    public boolean intersecta(Segmento other)
-    {
-        double denom = (this.b.x() - this.a.x()) * (other.b.y() - other.a().y()) - (this.b.y() - this.a.y()) * (other.b.x() - other.a().x());
+    public boolean intersecta(Segmento other) {
+        double denom = (this.b.x() - this.a.x()) * (other.b.y() - other.a().y())
+                - (this.b.y() - this.a.y()) * (other.b.x() - other.a().x());
         if (denom == 0)
-            return false; // The segments are parallel or collinear
+            return false;
 
-        double alpha = ((other.b.x() - other.a().x()) * (this.a.y() - other.a().y()) - (other.b.y() - other.a().y()) * (this.a.x() - other.a().x())) / denom;
-        double beta = ((this.b.x() - this.a.x()) * (this.a.y() - other.a().y()) - (this.b.y() - this.a.y()) * (this.a.x() - other.a().x())) / denom;
+        double alpha = ((other.b.x() - other.a().x()) * (this.a.y() - other.a().y())
+                - (other.b.y() - other.a().y()) * (this.a.x() - other.a().x())) / denom;
+        double beta = ((this.b.x() - this.a.x()) * (this.a.y() - other.a().y())
+                - (this.b.y() - this.a.y()) * (this.a.x() - other.a().x())) / denom;
 
-        // Check if the intersection is within the segments
-        // -0.0 are considered not valid value, only 0.0 and +0.0 are valid
         if (alpha >= 0 && alpha <= 1 && beta >= 0 && beta <= 1 && alpha != -0 && beta != -0) {
-            // Check if the intersection is not at the end of the segments
             if (isPointOnSegment(other.a()) || isPointOnSegment(other.b()))
                 return false;
             else
                 return true;
-
         }
-
 
         return false;
     }
 
-
     /**
-     * Checks if this segment intersects with Circle.
+     * Checks if this segment intersects with a circle.
      *
-     * @param other The Circle to check for intersection.
-     * @return True if the Circle intersect, false otherwise.
+     * @param other The circle to check for intersection.
+     * @return True if the circle intersects, false otherwise.
      */
-    public boolean intersecta(Circulo other)
-    {
+    public boolean intersecta(Circulo other) {
         double dx = this.b.x() - this.a.x();
         double dy = this.b.y() - this.a.y();
         double dhx = this.a.x() - other.centro().x();
@@ -152,10 +148,8 @@ public class Segmento
 
         double delta = B * B - 4 * A * C;
 
-        // No intersection
         if (delta < 0)
             return false;
-
 
         double sqrtDelta = Math.sqrt(delta);
         double t1 = (-B + sqrtDelta) / (2 * A);
@@ -163,15 +157,11 @@ public class Segmento
 
         boolean intersectionFound = false;
 
-        // verify if t1 is in the range of the segment (0 to 1)
         if (t1 >= 0 && t1 <= 1)
             intersectionFound = true;
 
-
-        // verify if t2 is in the range of the segment (0 to 1)
         if (t2 >= 0 && t2 <= 1)
             intersectionFound = true;
-
 
         return intersectionFound;
     }
@@ -182,30 +172,28 @@ public class Segmento
      * @param p The point to check.
      * @return True if the point lies on the segment, false otherwise.
      */
-    public boolean isPointOnSegment(Ponto p)
-    {
+    public boolean isPointOnSegment(Ponto p) {
         return this.a.distanciaRadial(p) + this.b.distanciaRadial(p) == this.length();
     }
 
     /**
-	 * Checks if three points are colinear.
-	 *(use the method isPointOnSegment to check if the point is on the segment)
+     * Checks if three points are collinear.
      *
-	 * @param c The third point to check.
-	 * @return True if the points are colinear, false otherwise.
-	 */
-    public boolean isCollinear(Ponto c)
-    {
-        return (this.a.x() * (this.b.y() - c.y()) + this.b.x() * (c.y() - this.a.y()) + c.x() * (this.a.y() - this.b.y())) == 0;
+     * @param c The third point to check.
+     * @return True if the points are collinear, false otherwise.
+     */
+    public boolean isCollinear(Ponto c) {
+        return (this.a.x() * (this.b.y() - c.y()) + this.b.x() * (c.y() - this.a.y())
+                + c.x() * (this.a.y() - this.b.y())) == 0;
     }
 
     /**
      * Returns a string representation of the segment.
      *
-     * @return A string in the format "[a,b]" where a and b are the endpoints of the segment.
+     * @return A string in the format "[a,b]" where a and b are the endpoints of the
+     *         segment.
      */
-    public String toString()
-    {
+    public String toString() {
         return "[" + this.a + "," + this.b + "]";
     }
 
@@ -215,8 +203,7 @@ public class Segmento
      * @param s The segment to compare with.
      * @return True if both segments have the same endpoints, false otherwise.
      */
-    public boolean equals(Segmento s)
-    {
+    public boolean equals(Segmento s) {
         return this.a.equals(s.a) && this.b.equals(s.b);
     }
 }
