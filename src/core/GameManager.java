@@ -368,7 +368,6 @@ public class GameManager {
 
                 EnemyBehavior behavior = (EnemyBehavior) enemy.behavior();
                 IEnemyMovement movement = behavior.getMovement();
-                // Se o inimigo tiver um movimento ativo, retorna false
                 if (movement != null && movement.isActive())
                 {
                     return false;

@@ -75,21 +75,6 @@ public class FlyLassoMovement implements IEnemyMovement
     }
 
     /**
-     * Activates or deactivates the movement.
-     * Resets the time and initial position when deactivated.
-     * 
-     * @param active True to activate the movement, false to deactivate it.
-     */
-    @Override
-    public void setActive(boolean active) {
-        this.active = active;
-        if (!active) {
-            t = 0.0;
-            initialPosition = null;
-        }
-    }
-
-    /**
      * Checks if the movement is currently active.
      * 
      * @return True if the movement is active, false otherwise.
@@ -105,13 +90,18 @@ public class FlyLassoMovement implements IEnemyMovement
      * 
      * @param enemy The GameObject to move.
      */
+    private double totalDistance = 0.0; // Distância total percorrida
+    private Ponto lastPosition = null; // Última posição para cálculo da distância
+
     @Override
     public void move(GameObject enemy) {
         if (!active)
             return;
 
-        if (initialPosition == null)
+        if (initialPosition == null) {
             initialPosition = enemy.transform().position();
+            lastPosition = initialPosition;
+        }
 
         double t1 = 0.6; // Duration of vertical drop
         double t2 = 1.0; // Duration of circular loop
@@ -119,13 +109,63 @@ public class FlyLassoMovement implements IEnemyMovement
         Ponto current = handlePosition(t, t1, t2);
         Ponto next = handlePosition(t + tIncrement, t1, t2);
 
+        // Calcula a distância percorrida
+        if (lastPosition != null) {
+            double dx = current.x() - lastPosition.x();
+            double dy = current.y() - lastPosition.y();
+            totalDistance += Math.sqrt(dx * dx + dy * dy);
+        }
+        lastPosition = current;
+
         Ponto velocity = new Ponto(next.x() - current.x(), next.y() - current.y());
         enemy.velocity(velocity);
 
         t += tIncrement;
 
+        // Se a distância total exceder um limite, retorna à posição original
+        if (totalDistance > 200 * scale) {
+            returnToInitialPosition(enemy);
+            return;
+        }
+
         if (t > 4.5)
             setActive(false);
+    }
+
+    /**
+     * Retorna o inimigo à sua posição original de forma suave.
+     * 
+     * @param enemy O GameObject representando o inimigo
+     */
+    private void returnToInitialPosition(GameObject enemy) {
+        Ponto currentPos = enemy.transform().position();
+        double dx = initialPosition.x() - currentPos.x();
+        double dy = initialPosition.y() - currentPos.y();
+        double distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < 0.1) {
+            enemy.velocity(new Ponto(0, 0));
+            setActive(false);
+            return;
+        }
+
+        double speed = Math.min(5.0, distance * 0.1);
+        Ponto velocity = new Ponto(
+            dx * speed / distance,
+            dy * speed / distance
+        );
+        enemy.velocity(velocity);
+    }
+
+    @Override
+    public void setActive(boolean active) {
+        this.active = active;
+        if (!active) {
+            t = 0.0;
+            initialPosition = null;
+            lastPosition = null;
+            totalDistance = 0.0;
+        }
     }
 
     /**
