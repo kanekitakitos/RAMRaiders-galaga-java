@@ -56,39 +56,46 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Brandon Mejia
  * @version 2025-05-07
  */
-public class EnterGameGroup implements IGroupAttackStrategy
-{
+public class EnterGameGroup implements IGroupAttackStrategy {
 
-    private ArrayList<Ponto> positions; // Calculated positions for enemies
-    private int currentGroup = 0; // Tracks the current group being processed
-    private int[] groupSizes = { 8, 8, 8, 8, 8 }; // Number of enemies in each group
-    private int groupDelayFrames = 50; // Delay between group entries in frames
-    private ScheduledExecutorService scheduler; // Scheduler for scheduling group
-    private int[][] pattern = { // Pattern defining enemy priorities
+    /** List of calculated positions for enemies. */
+    private ArrayList<Ponto> positions;
+    /** Tracks the current group being processed. */
+    private int currentGroup = 0;
+    /** Number of enemies in each group. */
+    private int[] groupSizes = { 8, 8, 8, 8, 8 };
+    /** Delay between group entries in frames. */
+    private int groupDelayFrames = 30;
+    /** Scheduler for managing timed tasks. */
+    private ScheduledExecutorService scheduler;
+    /** Pattern defining enemy priorities. */
+    private int[][] pattern = {
             { 0, 0, 0, 2, 2, 2, 2, 0, 0, 0 },
             { 0, 3, 3, 2, 1, 1, 2, 3, 3, 0 },
             { 0, 3, 3, 2, 1, 1, 2, 3, 3, 0 },
             { 5, 5, 4, 4, 1, 1, 4, 4, 5, 5 },
             { 5, 5, 4, 4, 1, 1, 4, 4, 5, 5 }
     };
+    /** Indicates whether the group attack is complete. */
     private boolean isGroupAttackComplete = false;
+    /** Manages the grid of enemies. */
     private EnemyGridMapper enemyGridMapper;
 
-
-
+    /** Tracks whether movement patterns have been assigned. */
+    private AtomicBoolean patternsAssigned = new AtomicBoolean(false);
 
     /**
      * Validates the invariants for the `EnterGameGroup` class.
-     * Ensures that the provided list of enemies is not null or empty,
-     * and that the target object is not null.
-     * If the validation fails, an error message is printed, and the program exits.
+     * Ensures that the provided list of enemies is not null or empty, and that the
+     * target object is not null.
+     * If validation fails, an error message is printed, and the program exits.
      *
-     * @param enemies A list of `IGameObject` instances representing the enemies. Must not be null or empty.
+     * @param enemies A list of `IGameObject` instances representing the enemies.
+     *                Must not be null or empty.
      * @param target  The target `IGameObject` instance. Must not be null.
      */
-    private void invariante(List<IGameObject> enemies, IGameObject target)
-    {
-        if(enemies != null && !enemies.isEmpty() && target != null)
+    private void invariante(List<IGameObject> enemies, IGameObject target) {
+        if (enemies != null && !enemies.isEmpty() && target != null)
             return;
 
         System.out.println("EnterGameGroup:iv");
@@ -102,8 +109,7 @@ public class EnterGameGroup implements IGroupAttackStrategy
      * @param target  The target object to base enemy positions on.
      */
     @Override
-    public void execute(List<IGameObject> enemies, IGameObject target)
-    {
+    public void execute(List<IGameObject> enemies, IGameObject target) {
         startRelocateEnemies(enemies);
     }
 
@@ -115,11 +121,10 @@ public class EnterGameGroup implements IGroupAttackStrategy
      * @param target  The target object to base enemy positions on.
      */
     @Override
-    public void onInit(List<IGameObject> enemies, IGameObject target)
-    {
+    public void onInit(List<IGameObject> enemies, IGameObject target) {
         invariante(enemies, target);
         this.enemyGridMapper = new EnemyGridMapper(this.pattern);
-        this.positions = enemyGridMapper.calculateEnemyPositions(target.transform().position(),enemies);
+        this.positions = enemyGridMapper.calculateEnemyPositions(target.transform().position(), enemies);
     }
 
     /**
@@ -127,51 +132,45 @@ public class EnterGameGroup implements IGroupAttackStrategy
      *
      * @param enemies List of enemies to be relocated.
      */
-    private AtomicBoolean patternsAssigned = new AtomicBoolean(false);
-
-    public synchronized void startRelocateEnemies(List<IGameObject> enemies)
-    {
-        scheduler.scheduleAtFixedRate(() ->
-        {
-            synchronized(enemies)
-            {
+    public synchronized void startRelocateEnemies(List<IGameObject> enemies) {
+        scheduler.scheduleAtFixedRate(() -> {
+            synchronized (enemies) {
                 relocateEnemies(enemies);
             }
         }, 1500, groupDelayFrames * 100, TimeUnit.MILLISECONDS);
     }
 
-    private void relocateEnemies(List<IGameObject> enemies)
-    {
+    /**
+     * Relocates enemies in the current group to their designated positions.
+     * Assigns movement and attack patterns after all groups are relocated.
+     *
+     * @param enemies List of enemies to be relocated.
+     */
+    private void relocateEnemies(List<IGameObject> enemies) {
         currentGroup++;
-        if (currentGroup > 5)
-        {
-            if (patternsAssigned.compareAndSet(false, true))
-            {
+        if (currentGroup > 5) {
+            if (patternsAssigned.compareAndSet(false, true)) {
                 this.assignMovementPatterns(enemies);
                 this.assignAttackPatterns(enemies);
                 this.isGroupAttackComplete = true;
             }
             return;
         }
-        for (int i = 0; i < groupSizes[currentGroup - 1]; i++)
-        {
+        for (int i = 0; i < groupSizes[currentGroup - 1]; i++) {
             final int enemyIndex = i + ((currentGroup - 1) * 8); // 8 enemies per group
-            scheduler.schedule(() ->
-            {
+            scheduler.schedule(() -> {
                 GameObject enemy = (GameObject) enemies.get(enemyIndex);
                 Ponto targetPosition = positions.get(enemyIndex);
 
                 IEnemyMovement movement;
-                if (enemy.transform().angle() == 270)
-                { // Coming from above
+                if (enemy.transform().angle() == 270) { // Coming from above
                     EnterOverTopMovement bottom = new EnterOverTopMovement();
                     bottom.setFinalTarget(targetPosition);
-                    boolean isRightToLeft = enemy.transform().position().x() > 0.0; // Check if the enemy is coming from the right
+                    boolean isRightToLeft = enemy.transform().position().x() > 0.0; // Check if the enemy is coming from
+                                                                                    // the right
                     bottom.setDirection(isRightToLeft);
                     movement = bottom;
-                }
-                else
-                {
+                } else {
                     EnterSideMovement leftOrRight = new EnterSideMovement();
                     leftOrRight.setFinalTarget(targetPosition);
                     boolean isRightToLeft = enemy.transform().angle() == 180;
@@ -186,111 +185,136 @@ public class EnterGameGroup implements IGroupAttackStrategy
         }
     }
 
-
     /**
      * Gets the total number of enemies managed by this strategy.
      *
      * @return The total number of enemies.
      */
-    public int getNumberOfEnemies()
-    {
+    public int getNumberOfEnemies() {
         return 40;
     }
 
-    public void setScheduler(ScheduledExecutorService scheduler)
-    {
+    /**
+     * Sets the scheduler for managing timed tasks.
+     *
+     * @param scheduler The `ScheduledExecutorService` to use for scheduling tasks.
+     */
+    public void setScheduler(ScheduledExecutorService scheduler) {
         this.scheduler = scheduler;
     }
 
-    public boolean isGroupAttackComplete()
-    {
+    /**
+     * Checks if the group attack is complete.
+     *
+     * @return true if the group attack is complete, false otherwise.
+     */
+    public boolean isGroupAttackComplete() {
         return this.isGroupAttackComplete;
     }
 
     /**
-     * Assigns movement patterns to enemies based on a given pattern matrix.
+     * Assigns movement patterns to a subset of enemies based on predefined
+     * patterns.
+     * The method selects one of three movement patterns randomly, retrieves the
+     * enemies
+     * matching the selected pattern, and applies a circular movement behavior to
+     * them.
      *
-     * @param pattern          A 2D array representing the movement pattern.
+     * @param enemies A list of `IGameObject` instances representing the enemies.
      */
-    private void assignMovementPatterns(List<IGameObject> enemies)
-    {
+    private void assignMovementPatterns(List<IGameObject> enemies) {
+        // Predefined movement pattern 1
         int[][] movementPattern1 = {
-            { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 1, 0, 1 },
-            { 1, 1, 0, 0, 0, 1, 0, 0, 1, 0 }
-        };
-        int[][] movementPattern2 = {
-            { 0, 0, 0, 1, 0, 0, 1, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 1, 0, 1, 0, 0, 0, 1, 0, 0 },
-            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 }
-        };
-        int[][] movementPattern3 = {
-            { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
-            { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 1, 0, 0, 0, 0, 0, 1, 0, 0 },
-            { 1, 0, 0, 0, 0, 1, 0, 0, 0, 1 }
+                { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 1, 0, 1 },
+                { 1, 1, 0, 0, 0, 1, 0, 0, 1, 0 }
         };
 
-        int[][] movementPattern = switch ((int) (Math.random() * 3))
-        {
+        // Predefined movement pattern 2
+        int[][] movementPattern2 = {
+                { 0, 0, 0, 1, 0, 0, 1, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 1, 0, 1, 0, 0, 0, 1, 0, 0 },
+                { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 }
+        };
+
+        // Predefined movement pattern 3
+        int[][] movementPattern3 = {
+                { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
+                { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 1, 0, 0, 0, 0, 0, 1, 0, 0 },
+                { 1, 0, 0, 0, 0, 1, 0, 0, 0, 1 }
+        };
+
+        // Randomly select one of the three movement patterns
+        int[][] movementPattern = switch ((int) (Math.random() * 3)) {
             case 0 -> movementPattern1;
             case 1 -> movementPattern2;
             default -> movementPattern3;
         };
 
-        ArrayList<IGameObject> enemiesToApply = this.enemyGridMapper.getEnemiesFromPattern(movementPattern); // Obtém os inimigos do pattern
-        synchronized(enemiesToApply)
-        {
-            for (int i = 0; i < enemiesToApply.size(); i++)
-            {
+        // Retrieve enemies matching the selected movement pattern
+        ArrayList<IGameObject> enemiesToApply = this.enemyGridMapper.getEnemiesFromPattern(movementPattern);
+
+        // Synchronize on the list of enemies to ensure thread safety
+        synchronized (enemiesToApply) {
+            for (int i = 0; i < enemiesToApply.size(); i++) {
+                // Cast the enemy to GameObject and retrieve its behavior
                 GameObject enemy = (GameObject) enemiesToApply.get(i);
                 EnemyBehavior enemyBehavior = (EnemyBehavior) enemy.behavior();
+
+                // Create a new circular movement behavior
                 FlyCircleMovement movement = new FlyCircleMovement();
 
-                if(enemy.transform().position().x() > 0)
-                    movement.setDirection(true);
+                // Set the movement direction based on the enemy's position
+                if (enemy.transform().position().x() > 0)
+                    movement.setDirection(true); // Move clockwise
                 else
-                    movement.setDirection(false);
+                    movement.setDirection(false); // Move counterclockwise
 
+                // Apply the movement behavior to the enemy and activate it
                 enemyBehavior.setMovement(movement);
                 movement.setActive(true);
             }
         }
     }
 
-    private void assignAttackPatterns(List<IGameObject> enemies)
-    {
+    /**
+     * Assigns attack patterns to a subset of enemies based on predefined patterns.
+     * The method selects one of two attack patterns randomly, retrieves the enemies
+     * matching the selected pattern, and applies a homing shoot attack behavior to
+     * them.
+     *
+     * @param enemies A list of `IGameObject` instances representing the enemies.
+     */
+    private void assignAttackPatterns(List<IGameObject> enemies) {
         int[][] attackPattern1 = {
-            { 0, 0, 0, 1, 0, 0, 1, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-            { 0, 1, 0, 0, 0, 0, 0, 1, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+                { 0, 0, 0, 1, 0, 0, 1, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+                { 0, 1, 0, 0, 0, 0, 0, 1, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
         };
         int[][] attackPattern2 = {
-            { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 },
-            { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+                { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 },
+                { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
         };
 
-        int[][] attackPattern = switch ((int) (Math.random() * 2))
-        {
+        int[][] attackPattern = switch ((int) (Math.random() * 2)) {
             case 0 -> attackPattern1;
             default -> attackPattern2;
         };
 
         ArrayList<IGameObject> enemiesToApply = this.enemyGridMapper.getEnemiesFromPattern(attackPattern);
-        synchronized(enemiesToApply)
-        {
-            for (int i = 0; i < enemiesToApply.size(); i++)
-            {
+        synchronized (enemiesToApply) {
+            for (int i = 0; i < enemiesToApply.size(); i++) {
                 GameObject enemy = (GameObject) enemiesToApply.get(i);
                 EnemyBehavior enemyBehavior = (EnemyBehavior) enemy.behavior();
                 IAttackStrategy attack = new HomingShootAttack();

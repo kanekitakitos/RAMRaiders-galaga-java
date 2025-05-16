@@ -54,11 +54,9 @@ public class LinearShootAttack implements IAttackStrategy {
      * @param attacker The `IGameObject` initiating the attack.
      * @throws IllegalArgumentException if the attacker is null.
      */
-    private void invariante(IGameObject attacker)
-    {
+    private void invariante(IGameObject attacker) {
         if (attacker != null)
             return;
-
 
         System.out.println("LinearShootAttack:vi");
         System.exit(0);
@@ -73,8 +71,7 @@ public class LinearShootAttack implements IAttackStrategy {
      * @return The created bullet object as an `IGameObject`.
      */
     @Override
-    public IGameObject execute(IGameObject attacker, IGameObject target)
-    {
+    public IGameObject execute(IGameObject attacker, IGameObject target) {
         invariante(attacker);
 
         String name = "Linear_Bullet";

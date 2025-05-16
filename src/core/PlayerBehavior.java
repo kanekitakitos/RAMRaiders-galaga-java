@@ -46,34 +46,29 @@ import java.util.concurrent.ScheduledExecutorService;
  * @Author Brandon Mejia
  * @Version 2025-04-18
  */
-public class PlayerBehavior extends Behavior
-{
+public class PlayerBehavior extends Behavior {
     private int life = 3; // The player's remaining lives
     private boolean isInvincible = false; // Indicates whether the player is invincible
     private final long invincibilityDuration = 2000; // Duration of invincibility in milliseconds
 
     private final ScheduledExecutorService localScheduler; // Scheduler for handling timed tasks
 
-
     /**
      * Constructs a new PlayerBehavior instance.
      * Initializes the default attack strategy and the scheduler.
      */
-    public PlayerBehavior()
-    {
+    public PlayerBehavior() {
         super();
         this.attackStrategy = new LinearShootAttack();
         this.localScheduler = Executors.newSingleThreadScheduledExecutor();
     }
-
 
     /**
      * Checks if the player is currently invincible.
      *
      * @return True if the player is invincible, false otherwise.
      */
-    public boolean isInvincible()
-    {
+    public boolean isInvincible() {
         return this.isInvincible;
     }
 
@@ -82,8 +77,7 @@ public class PlayerBehavior extends Behavior
      *
      * @return The number of lives the player has.
      */
-    public int getLife()
-    {
+    public int getLife() {
         return this.life;
     }
 
@@ -94,15 +88,15 @@ public class PlayerBehavior extends Behavior
      * @param ie The input event to process.
      */
     @Override
-    public void onUpdate(IInputEvent ie)
-    {
-        if(ie == null)
+    public void onUpdate(IInputEvent ie) {
+        if (ie == null)
             return;
         super.onUpdate(ie);
 
         this.moveTo(ie);
         this.evasiveManeuver(ie);
     }
+
     /**
      * Executes an attack using the current attack strategy.
      *
@@ -111,22 +105,20 @@ public class PlayerBehavior extends Behavior
      *         executed.
      */
     @Override
-    public IGameObject attack(IInputEvent ie)
-    {
+    public IGameObject attack(IInputEvent ie) {
         if (this.attackStrategy == null || ie == null)
             return null;
 
-        if (!this.isAttacking && this.isEnabled() && ie.isActionActive("ATTACK"))
-        {
+        if (!this.isAttacking && this.isEnabled() && ie.isActionActive("ATTACK")) {
             this.isAttacking = true;
 
             // Schedule to reset the attack flag after the invincibility duration
             localScheduler.schedule(() -> {
                 isAttacking = false;
-            }, invincibilityDuration-500, TimeUnit.MILLISECONDS);
+            }, invincibilityDuration , TimeUnit.MILLISECONDS);
 
             ISoundEffects soundEffects = this.go.soundEffects();
-            if(soundEffects != null)
+            if (soundEffects != null)
                 soundEffects.playSound("ATTACK");
 
             return this.attackStrategy.execute(this.go, this.observedObject);
@@ -142,34 +134,29 @@ public class PlayerBehavior extends Behavior
      * @param collisions A list of game objects that this behavior collided with.
      */
     @Override
-    public void onCollision(ArrayList<IGameObject> collisions)
-    {
-        if(collisions == null || collisions.isEmpty())
+    public void onCollision(ArrayList<IGameObject> collisions) {
+        if (collisions == null || collisions.isEmpty())
             return;
 
         for (IGameObject go : collisions)
             go.behavior().onDisabled();
 
-        if (this.life > 0 && !this.isInvincible && this.isEnabled())
-        {
+        if (this.life > 0 && !this.isInvincible && this.isEnabled()) {
             this.life--;
             this.isInvincible = true;
             this.go.soundEffects().playSound("HIT");
 
             // Schedule to reset the invincibility flag after the invincibility duration
-            localScheduler.schedule(() ->
-            {
+            localScheduler.schedule(() -> {
                 this.isInvincible = false;
             }, invincibilityDuration, TimeUnit.MILLISECONDS);
 
         }
 
-        if (this.life <= 0 && this.isEnabled())
-            {
-                this.onDisabled();
-            }
+        if (this.life <= 0 && this.isEnabled()) {
+            this.onDisabled();
+        }
     }
-
 
     /**
      * Moves the player based on the input event.
@@ -180,10 +167,10 @@ public class PlayerBehavior extends Behavior
      * player's collider position is updated to match the new position.
      * </p>
      *
-     * @param ie The input event containing movement actions. If null, no movement is performed.
+     * @param ie The input event containing movement actions. If null, no movement
+     *           is performed.
      */
-    public void moveTo(IInputEvent ie)
-    {
+    public void moveTo(IInputEvent ie) {
         if (ie == null || !this.isEnabled())
             return;
 
@@ -216,9 +203,8 @@ public class PlayerBehavior extends Behavior
      *
      * @param ie The input event triggering the evasive maneuver.
      */
-    public void evasiveManeuver(IInputEvent ie)
-    {
-        if (ie == null || !ie.isActionActive("EVASIVE") || this.isInvincible  || !this.isEnabled())
+    public void evasiveManeuver(IInputEvent ie) {
+        if (ie == null || !ie.isActionActive("EVASIVE") || this.isInvincible || !this.isEnabled())
             return;
 
         // Determine direction based on the input event
@@ -226,7 +212,7 @@ public class PlayerBehavior extends Behavior
         double deltaY = 0;
 
         // Define move step
-        double moveStep = 2.5*3;
+        double moveStep = 2.5 * 3;
 
         if (ie.isActionActive("RIGHT"))
             deltaX += moveStep;

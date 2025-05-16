@@ -27,8 +27,7 @@ import java.awt.Graphics2D;
  * @Author Brandon Mejia
  * @Version 2025-03-25
  */
-public abstract class Collider implements ICollider
-{
+public abstract class Collider implements ICollider {
     protected Transform transform; // The transform associated with this collider
 
     /**
@@ -59,8 +58,7 @@ public abstract class Collider implements ICollider
      * @return The centroid as a `Ponto` object.
      */
     @Override
-    public Ponto centroid()
-    {
+    public Ponto centroid() {
         return transform.position();
     }
 
@@ -72,8 +70,7 @@ public abstract class Collider implements ICollider
      * 3. `updatePosicao()` - to update position.
      */
     @Override
-    public void onUpdateCollider()
-    {
+    public void onUpdateCollider() {
         updateRotacao();
         updatePosicao();
         updateEscalar();

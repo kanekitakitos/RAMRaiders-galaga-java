@@ -44,8 +44,7 @@ import java.awt.image.BufferedImage;
  * @Author Brandon Mejia
  * @Version 2025-04-18
  */
-public class EnemyBehavior extends Behavior
-{
+public class EnemyBehavior extends Behavior {
 
     private IEnemyMovement movement; // The movement strategy used by the enemy
     private static final ScheduledExecutorService localScheduler = Executors.newScheduledThreadPool(1);
@@ -55,8 +54,7 @@ public class EnemyBehavior extends Behavior
      * Default constructor for `EnemyBehavior`.
      * Initializes the movement strategy to a default `ZigzagMovement`.
      */
-    public EnemyBehavior()
-    {
+    public EnemyBehavior() {
         super();
         this.movement = null;
         // TODO: Implement enemy life logic in the future
@@ -66,27 +64,23 @@ public class EnemyBehavior extends Behavior
      * Disables the behavior.
      */
     @Override
-    public void onDisabled()
-    {
+    public void onDisabled() {
         ISoundEffects soundEffects = this.go.soundEffects();
-        if(soundEffects!= null)
+        if (soundEffects != null)
             soundEffects.playSound("DEATH");
 
         // Troca o shape para explosão
-        try{
-            this.go.shape().setFrames(explosion,100);
-        }
-        catch(Exception e)
-        {
+        try {
+            this.go.shape().setFrames(explosion, 100);
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        this.go.velocity(new Ponto(0,0));
+        this.go.velocity(new Ponto(0, 0));
         this.go.rotateSpeed(0);
         this.movement = null;
         this.attackStrategy = null;
         // Agenda para desabilitar o objeto após 2 segundos
-        localScheduler.schedule(() ->
-        {
+        localScheduler.schedule(() -> {
             super.onDisabled();
         }, 1, TimeUnit.SECONDS);
     }
@@ -96,8 +90,7 @@ public class EnemyBehavior extends Behavior
      *
      * @param strategy The attack strategy to use.
      */
-    public void setAttackStrategy(IAttackStrategy strategy)
-    {
+    public void setAttackStrategy(IAttackStrategy strategy) {
         this.attackStrategy = strategy;
     }
 
@@ -109,32 +102,26 @@ public class EnemyBehavior extends Behavior
      *         set.
      */
     @Override
-    public IGameObject attack(IInputEvent ie)
-    {
-        if (this.attackStrategy != null && this.isAttacking && this.isEnabled())
-        {
+    public IGameObject attack(IInputEvent ie) {
+        if (this.attackStrategy != null && this.isAttacking && this.isEnabled()) {
             this.stopAttack();
-            long minDelay = 2000;
-            long maxDelay = 9000;
+            long minDelay = 1500;
+            long maxDelay = 7000;
             long randomDelay = minDelay + (long) (Math.random() * (maxDelay - minDelay));
             // Schedule to reset the attack flag after the specified attack duration
-            localScheduler.schedule(() ->
-            {
+            localScheduler.schedule(() -> {
                 this.startAttack();
             }, randomDelay, TimeUnit.MILLISECONDS);
 
             ISoundEffects soundEffects = this.go.soundEffects();
-            if(soundEffects != null)
+            if (soundEffects != null)
                 soundEffects.playSound("ATTACK");
-            
+
             return this.attackStrategy.execute(this.go, this.observedObject);
-        }
-        else
-        {
+        } else {
             return null;
         }
     }
-
 
     /**
      * Updates the behavior logic.
@@ -143,30 +130,25 @@ public class EnemyBehavior extends Behavior
      * @param ie The input event to process.
      */
     @Override
-    public void onUpdate( IInputEvent ie)
-    {
-        if(ie == null)
+    public void onUpdate(IInputEvent ie) {
+        if (ie == null)
             return;
-        super.onUpdate( ie);
+        super.onUpdate(ie);
 
     }
-
 
     /**
      * Activates or deactivates the movement strategy.
      *
      * @param value `true` to activate movement, `false` to deactivate it.
      */
-    public void activateMovement(boolean value)
-    {
+    public void activateMovement(boolean value) {
         if (this.movement != null)
-                this.movement.setActive(value);
-        
-            
+            this.movement.setActive(value);
+
     }
 
-    public IEnemyMovement getMovement()
-    {
+    public IEnemyMovement getMovement() {
         return this.movement;
     }
 
@@ -184,8 +166,7 @@ public class EnemyBehavior extends Behavior
      *
      * @param movement The movement strategy to use.
      */
-    public void setMovement(IEnemyMovement movement)
-    {
+    public void setMovement(IEnemyMovement movement) {
         this.movement = movement;
     }
 
@@ -194,28 +175,24 @@ public class EnemyBehavior extends Behavior
      * If the movement strategy is active, it updates the enemy's position.
      */
     @Override
-    public void move()
-    {
-        if ( movement != null && movement.isActive())
-            {
-                movement.move(this.go);
-                if(this.movement == null)
-                 return;
+    public void move() {
+        if (movement != null && movement.isActive()) {
+            movement.move(this.go);
+            if (this.movement == null)
+                return;
 
-                if(!movement.isActive())
-                {
-                    // Generate a random delay between 700 and 2000 milliseconds
-                    long minDelay = 800;
-                    long maxDelay = 1500;
-                    long randomDelay = minDelay + (long) (Math.random() * (maxDelay - minDelay));
+            if (!movement.isActive()) {
+                // Generate a random delay between 700 and 2000 milliseconds
+                long minDelay = 800;
+                long maxDelay = 1500;
+                long randomDelay = minDelay + (long) (Math.random() * (maxDelay - minDelay));
 
-                    // Schedule to reset the Movement flag after the specified Movement duration
-                    localScheduler.schedule(() ->
-                    {
-                        this.movement.setActive(true);
-                    }, randomDelay, TimeUnit.MILLISECONDS);
-                }
+                // Schedule to reset the Movement flag after the specified Movement duration
+                localScheduler.schedule(() -> {
+                    this.movement.setActive(true);
+                }, randomDelay, TimeUnit.MILLISECONDS);
             }
+        }
 
         super.move();
     }

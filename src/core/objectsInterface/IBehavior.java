@@ -39,7 +39,7 @@ public interface IBehavior {
      *
      * @param ie The input event to process during this update.
      */
-    void onUpdate( IInputEvent ie);
+    void onUpdate(IInputEvent ie);
 
     /**
      * Called when the behavior is destroyed.
@@ -96,7 +96,7 @@ public interface IBehavior {
      */
     IGameObject attack(IInputEvent ie);
 
-/**
+    /**
      * Checks if the behavior is currently enabled.
      *
      * @return true if the behavior is enabled, false otherwise.

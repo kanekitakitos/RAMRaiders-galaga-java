@@ -34,37 +34,43 @@ public interface IGameObject {
      * @return The collider of the game object.
      */
     ICollider collider();
-/**
+
+    /**
      * Gets the shape of the game object.
      *
-     * @return The `Shape` instance representing the visual appearance of the game object.
+     * @return The `Shape` instance representing the visual appearance of the game
+     *         object.
      */
     Shape shape();
 
     /**
      * Gets the behavior of the game object.
      *
-     * @return The `IBehavior` instance defining the logic and actions of the game object.
+     * @return The `IBehavior` instance defining the logic and actions of the game
+     *         object.
      */
     IBehavior behavior();
 
     /**
      * Updates the game object.
-     * This method is called during the game loop to update the state of the game object.
+     * This method is called during the game loop to update the state of the game
+     * object.
      */
     void onUpdate();
 
     /**
      * Sets the sound effects for the game object.
      *
-     * @param soundEffects The `ISoundEffects` instance to associate with the game object.
+     * @param soundEffects The `ISoundEffects` instance to associate with the game
+     *                     object.
      */
     void setSoundEffects(ISoundEffects soundEffects);
 
     /**
      * Gets the sound effects associated with the game object.
      *
-     * @return The `ISoundEffects` instance managing the sound effects of the game object.
+     * @return The `ISoundEffects` instance managing the sound effects of the game
+     *         object.
      */
     ISoundEffects soundEffects();
 

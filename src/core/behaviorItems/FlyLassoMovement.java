@@ -4,56 +4,8 @@ import core.GameObject;
 import geometry.Ponto;
 
 /**
- * The FlyLassoMovement class implements a movement pattern for enemies
- * that includes an initial vertical drop, a circular loop, and a final descent.
- * This movement is time-based and can be activated or deactivated.
- *
- * <p>
- * Phases of movement:
- * </p>
- * <ol>
- * <li>Initial vertical drop with velocity V1</li>
- * <li>Circular loop with radius R</li>
- * <li>Final descent with oscillating motion</li>
- * </ol>
- *
- * <p>
- * Example usage:
- * </p>
- * 
- * <pre>
- * FlyLassoMovement movement = new FlyLassoMovement();
- * movement.setDirection(true); // Set direction to right-to-left
- * movement.setActive(true); // Activate the movement
- *
- * </pre>
- *
- * @preConditions:
- *                 - The GameObject passed to move() must not be null.
- *                 - The GameObject must have a valid Transform component.
- *                 - The direction (goRightToLeft) should be set before
- *                 activation.
- *                 - The initial position is automatically captured when
- *                 movement starts.
- *                 - The scale factor must be positive and non-zero.
- *
- * @postConditions:
- *                  - The enemy will execute a three-phase movement:
- *                  1. Initial vertical drop with velocity V1.
- *                  2. Circular loop with radius R.
- *                  3. Final descent with oscillating motion.
- *                  - Movement deactivates automatically when t > 4.5.
- *                  - When deactivated, time (t) resets to 0 and initial
- *                  position is cleared.
- *                  - The movement scales according to the defined scale factor
- *                  (0.2).
- *                  - The enemy's velocity is updated each frame based on
- *                  position delta.
- *                  - The movement pattern remains consistent with the chosen
- *                  direction.
- *
  * @author Brandon Mejia
- * @version 2025-04-23
+ * @version 2025-05-16
  */
 public class FlyLassoMovement implements IEnemyMovement
 {

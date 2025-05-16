@@ -116,26 +116,40 @@ public class SwingGui implements IGuiBridge
         this.frame.setFocusable(true);
     }
 
-    private IInputEvent generateInputEvent()
-    {
-        Map<Integer, String> customKeyMap = new HashMap<>();
-        customKeyMap.put(KeyEvent.VK_A, "LEFT");
-        customKeyMap.put(KeyEvent.VK_LEFT, "LEFT");
-        customKeyMap.put(KeyEvent.VK_RIGHT, "RIGHT");
-        customKeyMap.put(KeyEvent.VK_D, "RIGHT");
-        customKeyMap.put(KeyEvent.VK_C, "ATTACK");
-        customKeyMap.put(KeyEvent.VK_X, "EVASIVE");
-        customKeyMap.put(KeyEvent.VK_1, "PLAYER1");
-        customKeyMap.put(KeyEvent.VK_2, "PLAYER2");
-        customKeyMap.put(KeyEvent.VK_NUMPAD1, "PLAYER1");
-        customKeyMap.put(KeyEvent.VK_NUMPAD2, "PLAYER2");
+    /**
+         * Generates a custom input event handler with predefined key and mouse bindings.
+         *
+         * <p>
+         * This method creates mappings for keyboard and mouse inputs to specific game actions.
+         * The key bindings include directional controls, attack, evasive maneuvers, and player selection.
+         * The mouse bindings include attack and evasive maneuvers.
+         * </p>
+         *
+         * @return An instance of `InputEvent` containing the custom key and mouse mappings.
+         */
+        private IInputEvent generateInputEvent()
+        {
+            // Map for custom keyboard bindings
+            Map<Integer, String> customKeyMap = new HashMap<>();
+            customKeyMap.put(KeyEvent.VK_A, "LEFT"); // Move left
+            customKeyMap.put(KeyEvent.VK_LEFT, "LEFT"); // Move left
+            customKeyMap.put(KeyEvent.VK_RIGHT, "RIGHT"); // Move right
+            customKeyMap.put(KeyEvent.VK_D, "RIGHT"); // Move right
+            customKeyMap.put(KeyEvent.VK_C, "ATTACK"); // Attack action
+            customKeyMap.put(KeyEvent.VK_X, "EVASIVE"); // Evasive maneuver
+            customKeyMap.put(KeyEvent.VK_1, "PLAYER1"); // Select player 1
+            customKeyMap.put(KeyEvent.VK_2, "PLAYER2"); // Select player 2
+            customKeyMap.put(KeyEvent.VK_NUMPAD1, "PLAYER1"); // Select player 1 (numpad)
+            customKeyMap.put(KeyEvent.VK_NUMPAD2, "PLAYER2"); // Select player 2 (numpad)
 
-        Map<Integer, String> customMouseMap = new HashMap<>(); // Map for custom mouse bindings
-        customMouseMap.put(MouseEvent.BUTTON1, "ATTACK");
-        customMouseMap.put(MouseEvent.BUTTON3, "EVASIVE");
+            // Map for custom mouse bindings
+            Map<Integer, String> customMouseMap = new HashMap<>();
+            customMouseMap.put(MouseEvent.BUTTON1, "ATTACK"); // Left mouse button for attack
+            customMouseMap.put(MouseEvent.BUTTON3, "EVASIVE"); // Right mouse button for evasive maneuver
 
-        return new InputEvent(customKeyMap, customMouseMap); // Create and return the input handler
-    }
+            // Create and return the input handler with the custom mappings
+            return new InputEvent(customKeyMap, customMouseMap);
+        }
 
     /**
      * Renders the provided list of game objects on the panel.

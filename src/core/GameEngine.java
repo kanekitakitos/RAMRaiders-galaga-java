@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.List;
 
-
 /**
  * The `GameEngine` class manages game objects, their layers, and updates.
  * It allows adding, removing, and retrieving game objects, as well as checking
@@ -35,8 +34,7 @@ import java.util.List;
  *
  * @version 2025-04-16
  */
-public class GameEngine implements IGameEngine
-{
+public class GameEngine implements IGameEngine {
     // Stores game objects organized by layers
     private HashMap<Integer, CopyOnWriteArrayList<IGameObject>> layeredGameObjects;
     private ArrayList<IGameObject> disabledGameObjects;
@@ -55,17 +53,16 @@ public class GameEngine implements IGameEngine
      * Ensures that the provided `IGuiBridge` instance is not null.
      * If the validation fails, an error message is printed, and the program exits.
      *
-     * @param gui The `IGuiBridge` instance used for input and rendering. Must not be null.
+     * @param gui The `IGuiBridge` instance used for input and rendering. Must not
+     *            be null.
      */
-    private void invariante(IGuiBridge gui)
-    {
-        if(gui != null)
+    private void invariante(IGuiBridge gui) {
+        if (gui != null)
             return;
 
         System.out.println("GameEngine:iv");
         System.exit(0);
     }
-
 
     /**
      * Constructs a new `GameEngine` instance.
@@ -74,8 +71,7 @@ public class GameEngine implements IGameEngine
      *
      * @param gui The GUI bridge used for input and rendering.
      */
-    public GameEngine(IGuiBridge gui)
-    {
+    public GameEngine(IGuiBridge gui) {
         invariante(gui);
 
         this.layeredGameObjects = new HashMap<>();
@@ -85,8 +81,7 @@ public class GameEngine implements IGameEngine
         this.inputStatus = this.gui.getInputEvent();
     }
 
-    public void setPlayer(IGameObject player)
-    {
+    public void setPlayer(IGameObject player) {
         this.player = player;
     }
 
@@ -96,8 +91,7 @@ public class GameEngine implements IGameEngine
      *
      * @param go The `GameObject` to add.
      */
-    public void add(IGameObject go)
-    {
+    public void add(IGameObject go) {
         int layer = go.transform().layer();
         if (!layeredGameObjects.containsKey(layer))
             layeredGameObjects.put(layer, new CopyOnWriteArrayList<>());
@@ -113,11 +107,9 @@ public class GameEngine implements IGameEngine
      * @param go The `GameObject` to remove.
      */
     @Override
-    public void destroy(IGameObject go)
-    {
+    public void destroy(IGameObject go) {
         int layer = go.transform().layer();
-        if (layeredGameObjects.containsKey(layer))
-        {
+        if (layeredGameObjects.containsKey(layer)) {
             layeredGameObjects.get(layer).remove(go);
             this.totalObjects--;
             if (layeredGameObjects.get(layer).isEmpty()) // Remove the list if it is empty
@@ -125,12 +117,10 @@ public class GameEngine implements IGameEngine
         }
     }
 
-    public CopyOnWriteArrayList<IGameObject> get(int layer)
-    {
-        if (!layeredGameObjects.containsKey(layer) )
+    public CopyOnWriteArrayList<IGameObject> get(int layer) {
+        if (!layeredGameObjects.containsKey(layer))
             return null;
 
-            
         return layeredGameObjects.get(layer);
     }
 
@@ -139,8 +129,7 @@ public class GameEngine implements IGameEngine
      *
      * @return The total number of `GameObject`s.
      */
-    public int size()
-    {
+    public int size() {
         return this.totalObjects;
     }
 
@@ -153,8 +142,7 @@ public class GameEngine implements IGameEngine
      * it is moved to the appropriate layer.
      *
      */
-    public void onUpdate()
-    {
+    public void onUpdate() {
         ArrayList<IGameObject> objectsToMove = new ArrayList<>();
         ArrayList<IGameObject> attacksToAdd = new ArrayList<>();
 
@@ -163,11 +151,9 @@ public class GameEngine implements IGameEngine
             if (layerObjects == null)
                 continue;
 
-            for (IGameObject go : layerObjects)
-            {
+            for (IGameObject go : layerObjects) {
 
-                if(this.isDisabled(go))
-                {
+                if (this.isDisabled(go)) {
                     this.disabledGameObjects.add(go);
                     continue; // Skip this object if it is disabled
                 }
@@ -188,19 +174,17 @@ public class GameEngine implements IGameEngine
             }
         }
 
-        for (IGameObject go : objectsToMove)
-        {
+        for (IGameObject go : objectsToMove) {
             destroy(go);
             add(go);
         }
         for (IGameObject go : attacksToAdd)
             addEnable(go);
 
-        for (IGameObject go : this.disabledGameObjects)
-            {
-                this.destroy(go);
-            }
-            this.disabledGameObjects.clear();
+        for (IGameObject go : this.disabledGameObjects) {
+            this.destroy(go);
+        }
+        this.disabledGameObjects.clear();
     }
 
     /**
@@ -209,40 +193,35 @@ public class GameEngine implements IGameEngine
      * passing in the list of all the objects that collided with each `IGameObject`.
      */
     @Override
-    public void checkCollision()
-    {
+    public void checkCollision() {
         // Primeiro, verifica colisões dentro da mesma camada
-        for (CopyOnWriteArrayList<IGameObject> layerObjects : layeredGameObjects.values())
-        {
-            if (layerObjects.isEmpty()) continue;
+        for (CopyOnWriteArrayList<IGameObject> layerObjects : layeredGameObjects.values()) {
+            if (layerObjects.isEmpty())
+                continue;
 
             Map<IGameObject, ArrayList<IGameObject>> layerCollisionMap = new HashMap<>();
-            for (IGameObject obj : layerObjects)
-            {
+            for (IGameObject obj : layerObjects) {
                 layerCollisionMap.put(obj, new ArrayList<>());
             }
-    
-            for (int i = 0; i < layerObjects.size(); i++)
-            {
+
+            for (int i = 0; i < layerObjects.size(); i++) {
                 IGameObject currentObject = layerObjects.get(i);
-    
-                for (int j = i + 1; j < layerObjects.size(); j++)
-                {
+
+                for (int j = i + 1; j < layerObjects.size(); j++) {
                     IGameObject other = layerObjects.get(j);
-    
-                    if (shouldSkipCollision(currentObject, other)) continue;
-    
-                    if (currentObject.collider().colision(other.collider()))
-                    {
+
+                    if (shouldSkipCollision(currentObject, other))
+                        continue;
+
+                    if (currentObject.collider().colision(other.collider())) {
                         layerCollisionMap.get(currentObject).add(other);
                         layerCollisionMap.get(other).add(currentObject);
                     }
-    
+
                 }
             }
-    
-            for (IGameObject gameObject : layerObjects)
-            {
+
+            for (IGameObject gameObject : layerObjects) {
                 ArrayList<IGameObject> collidedWith = layerCollisionMap.get(gameObject);
                 if (!collidedWith.isEmpty()) {
                     gameObject.behavior().onCollision(collidedWith);
@@ -251,30 +230,29 @@ public class GameEngine implements IGameEngine
         }
 
         // Agora, verifica colisões entre camadas diferentes, focando no jogador
-        if (player != null)
-        {
+        if (player != null) {
             int playerLayer = player.transform().layer();
-            
+
             for (Map.Entry<Integer, CopyOnWriteArrayList<IGameObject>> entry : layeredGameObjects.entrySet()) {
                 int currentLayer = entry.getKey();
-                
+
                 // Pula se for a mesma camada do jogador, pois já foi verificada
-                if (currentLayer == playerLayer || currentLayer == 0) continue;
-                
+                if (currentLayer == playerLayer || currentLayer == 0)
+                    continue;
+
                 CopyOnWriteArrayList<IGameObject> layerObjects = entry.getValue();
-                for (IGameObject obj : layerObjects)
-                {
-                    if (shouldSkipCollision(player, obj) || obj.name().contains("Bullet")) continue;
-                    
-                    if (player.collider().colision(obj.collider()))
-                    {
+                for (IGameObject obj : layerObjects) {
+                    if (shouldSkipCollision(player, obj) || obj.name().contains("Bullet"))
+                        continue;
+
+                    if (player.collider().colision(obj.collider())) {
                         // Cria listas temporárias para armazenar as colisões
                         ArrayList<IGameObject> playerCollisions = new ArrayList<>();
                         ArrayList<IGameObject> objCollisions = new ArrayList<>();
-                        
+
                         playerCollisions.add(obj);
                         objCollisions.add(player);
-                        
+
                         // Notifica ambos os objetos sobre a colisão
                         player.behavior().onCollision(playerCollisions);
                         obj.behavior().onCollision(objCollisions);
@@ -284,10 +262,9 @@ public class GameEngine implements IGameEngine
         }
     }
 
-    private boolean shouldSkipCollision(IGameObject obj1, IGameObject obj2)
-    {
+    private boolean shouldSkipCollision(IGameObject obj1, IGameObject obj2) {
         return (obj1.name().contains("Enemy") && obj2.name().contains("Enemy")) ||
-            (obj1.name().contains("Bullet") && obj2.name().contains("Bullet"));
+                (obj1.name().contains("Bullet") && obj2.name().contains("Bullet"));
 
     }
 
@@ -297,10 +274,9 @@ public class GameEngine implements IGameEngine
      * @param go The `GameObject` to enable.
      */
     @Override
-    public void addEnable(IGameObject go)
-    {
+    public void addEnable(IGameObject go) {
         this.enable(go);
-        add(go);    
+        add(go);
     }
 
     /**
@@ -330,8 +306,7 @@ public class GameEngine implements IGameEngine
      * @param go The `GameObject` to disable.
      */
     @Override
-    public void disable(IGameObject go)
-    {
+    public void disable(IGameObject go) {
         go.behavior().onDisabled();
     }
 
@@ -354,7 +329,7 @@ public class GameEngine implements IGameEngine
      */
     @Override
     public boolean isDisabled(IGameObject go) {
-        return !( go.behavior()).isEnabled();
+        return !(go.behavior()).isEnabled();
     }
 
     /**
@@ -362,40 +337,32 @@ public class GameEngine implements IGameEngine
      * Iterates through all layers and removes all `GameObject`s.
      */
     @Override
-    public void destroyAll()
-    {
+    public void destroyAll() {
         ArrayList<IGameObject> objectsToDestroy = new ArrayList<>();
-        
+
         // Primeiro, colete todos os objetos que precisam ser destruídos
-        for (CopyOnWriteArrayList<IGameObject> layerObjects : layeredGameObjects.values())
-        {
-            if (layerObjects != null && !layerObjects.isEmpty())
-            {
+        for (CopyOnWriteArrayList<IGameObject> layerObjects : layeredGameObjects.values()) {
+            if (layerObjects != null && !layerObjects.isEmpty()) {
                 objectsToDestroy.addAll(layerObjects);
             }
         }
-        
+
         // Depois, destrua cada objeto individualmente
-        for (IGameObject go : objectsToDestroy)
-        {
+        for (IGameObject go : objectsToDestroy) {
             destroy(go);
         }
     }
-
 
     /**
      * enable all `GameObject`s in the engine.
      * Iterates through all layers and enable all `GameObject`s.
      */
     @Override
-    public void enableAll()
-    {
-        for (CopyOnWriteArrayList<IGameObject> layerObjects : layeredGameObjects.values())
-        {
+    public void enableAll() {
+        for (CopyOnWriteArrayList<IGameObject> layerObjects : layeredGameObjects.values()) {
             if (layerObjects == null || layerObjects.isEmpty())
                 continue;
-            for (IGameObject go : layerObjects)
-            {
+            for (IGameObject go : layerObjects) {
                 this.enable(go);
             }
         }
@@ -407,13 +374,11 @@ public class GameEngine implements IGameEngine
      * input.
      */
     @Override
-    public void run()
-    {
+    public void run() {
         final int FPS = 60;
         final long frameTime = 1000 / FPS;
 
-        while (true)
-        {
+        while (true) {
             long startTime = System.currentTimeMillis();
 
             this.onUpdate();
@@ -422,14 +387,10 @@ public class GameEngine implements IGameEngine
 
             long elapsed = System.currentTimeMillis() - startTime;
             long sleepTime = frameTime - elapsed;
-            if (sleepTime > 0) 
-            {
-                try
-                {
+            if (sleepTime > 0) {
+                try {
                     Thread.sleep(sleepTime);
-                }
-                catch (InterruptedException e) 
-                {
+                } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
                 }
@@ -442,8 +403,7 @@ public class GameEngine implements IGameEngine
      *
      * @return A `CopyOnWriteArrayList` of enabled `GameObject`s.
      */
-    public CopyOnWriteArrayList<IGameObject> getEnabledObjectsSnapshot()
-    {
+    public CopyOnWriteArrayList<IGameObject> getEnabledObjectsSnapshot() {
         CopyOnWriteArrayList<IGameObject> snapshot = new CopyOnWriteArrayList<>();
         synchronized (layeredGameObjects) {
             for (CopyOnWriteArrayList<IGameObject> layer : layeredGameObjects.values()) {
@@ -456,13 +416,12 @@ public class GameEngine implements IGameEngine
         }
     }
 
-/**
-         * Retrieves the GUI bridge used for input and rendering.
-         *
-         * @return The `IGuiBridge` instance associated with the game engine.
-         */
-        public IGuiBridge getGui()
-        {
-            return this.gui;
-        }
+    /**
+     * Retrieves the GUI bridge used for input and rendering.
+     *
+     * @return The `IGuiBridge` instance associated with the game engine.
+     */
+    public IGuiBridge getGui() {
+        return this.gui;
+    }
 }

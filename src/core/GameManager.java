@@ -82,45 +82,59 @@ public class GameManager {
     }
     // -------------------------------------------------------------------------------------------------------------------------------
 
+
     /**
-     * Constructs a `GameManager` instance.
+     * Constructs a new `GameManager` instance and initializes the game engine, player,
+     * sound effects, group attack strategy, enemies, and menu objects.
      *
-     * @param engine The game engine to manage game objects.
+     * @param gui The GUI bridge interface used to interact with the game's graphical user interface.
+     * @throws IllegalArgumentException if the provided `gui` is null.
      */
     public GameManager(IGuiBridge gui)
     {
+        // Ensures the GUI bridge is not null; exits the program if it is.
         invariante(gui);
-        this.engine = new GameEngine(gui);
-        
 
+        // Initializes the game engine with the provided GUI bridge.
+        this.engine = new GameEngine(gui);
+
+        // Creates the player game object with a specific shape and animation.
         createPlayer(new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 150));
+
+        // Retrieves the input event mapping from the GUI.
         this.input = engine.getGui().getInputEvent();
 
+        // Adds sound effects for various game states.
         soundEffects.addSound("GAMEOVER", AudioLoader.loadAudio("gameOver.wav"));
         soundEffects.addSound("MENU", AudioLoader.loadAudio("menu.wav"));
         soundEffects.addSound("WIN", AudioLoader.loadAudio("win.wav"));
 
-        // Escolhe aleatoriamente entre os dois arquivos de som para STARTGAME
+        // Randomly selects one of two sound files for the "STARTGAME" sound effect.
         String[] startGameSounds = { "gameSound.wav", "gameSound2.wav" };
         Random rand = new Random();
         String selectedSound = startGameSounds[rand.nextInt(startGameSounds.length)];
         soundEffects.addSound("STARTGAME", AudioLoader.loadAudio(selectedSound));
 
+        // Initializes the group attack strategy and sets its scheduler.
         this.groupAttackStrategy = new EnterGameGroup();
         ((EnterGameGroup) this.groupAttackStrategy).setScheduler(this.scheduler);
 
+        // Defines a function to determine the spawn index for each enemy based on its position in the group.
         Function<Integer, Integer> spawnIndexFunction = (Integer i) -> {
-
-            int groupSize = 8;
-            int groupNumber = i / groupSize;
-            int patternIndex = groupNumber % 4;
+            int groupSize = 8; // Number of enemies in a group.
+            int groupNumber = i / groupSize; // Determines the group number.
+            int patternIndex = groupNumber % 4; // Cycles through 4 spawn patterns.
 
             return patternIndex;
         };
 
+        // Generates enemies using the group attack strategy's enemy count and the spawn index function.
         this.generateEnemies(groupAttackStrategy.getNumberOfEnemies(), spawnIndexFunction);
+
+        // Initializes the group attack strategy with the list of enemies and the player.
         this.groupAttackStrategy.onInit(this.enemys, player);
 
+        // Generates the menu objects for the game.
         this.generateMenuObjects();
     }
 
@@ -349,11 +363,6 @@ public class GameManager {
         }
     }
 
-    /**
-     * Verifica se todos os inimigos ativos estão parados (sem movimento).
-     *
-     * @return true se todos os inimigos ativos estiverem parados, false caso contrário
-     */
     public boolean areAllEnemiesStopped()
     {
         for (IGameObject enemy : enemys)
@@ -374,10 +383,21 @@ public class GameManager {
     }
 
 
+    /**
+     * Sets the visibility of hitboxes in the game.
+     *
+     * <p>
+     * This method enables or disables the display of hitboxes in the game's GUI,
+     * depending on the provided parameter.
+     * </p>
+     *
+     * @param hitbox A boolean value indicating whether to show hitboxes (true) or hide them (false).
+     */
     public void setHitbox(boolean hitbox)
     {
         this.engine.getGui().setHitbox(hitbox);
     }
+
     /**
      * Starts the game.
      * If the game is in the menu state, it initiates the player selection process.

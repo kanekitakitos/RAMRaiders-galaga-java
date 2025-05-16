@@ -14,29 +14,37 @@ import java.io.InputStream;
  * Fornece métodos estáticos para carregar arquivos de áudio utilizando
  * os formatos suportados nativamente pela API Java Sound.
  *
- * <p>Exemplo de uso:</p>
+ * <p>
+ * Exemplo de uso:
+ * </p>
+ * 
  * <pre>
- *     Clip somExplosao = AudioLoader.loadAudio("explosao.wav");
- *     if (somExplosao != null) {
- *         somExplosao.start();
- *     }
- *     Clip musicaFundo = AudioLoader.loadAudio("musica_tema.wav");
- *     if (musicaFundo != null) {
- *         musicaFundo.loop(Clip.LOOP_CONTINUOUSLY);
- *     }
+ * Clip somExplosao = AudioLoader.loadAudio("explosao.wav");
+ * if (somExplosao != null) {
+ *     somExplosao.start();
+ * }
+ * Clip musicaFundo = AudioLoader.loadAudio("musica_tema.wav");
+ * if (musicaFundo != null) {
+ *     musicaFundo.loop(Clip.LOOP_CONTINUOUSLY);
+ * }
  * </pre>
  *
  * @preConditions:
- * - Os arquivos de áudio devem estar em formatos nativamente suportados pelo Java Sound API
- *   (ex: .wav, .au, .aiff com codificação PCM).
- * - Os arquivos de áudio devem existir no diretório `/assets/audio/`.
- * - Os nomes dos arquivos devem ser válidos e incluir as extensões de arquivo (por exemplo, .wav).
+ *                 - Os arquivos de áudio devem estar em formatos nativamente
+ *                 suportados pelo Java Sound API
+ *                 (ex: .wav, .au, .aiff com codificação PCM).
+ *                 - Os arquivos de áudio devem existir no diretório
+ *                 `/assets/audio/`.
+ *                 - Os nomes dos arquivos devem ser válidos e incluir as
+ *                 extensões de arquivo (por exemplo, .wav).
  *
  * @postConditions:
- * - Arquivos de áudio carregados com sucesso serão retornados como objetos Clip.
- * - Falhas no carregamento (ex: arquivo não encontrado, formato não suportado)
- *   retornarão null.
- * - Todos os recursos serão devidamente tratados.
+ *                  - Arquivos de áudio carregados com sucesso serão retornados
+ *                  como objetos Clip.
+ *                  - Falhas no carregamento (ex: arquivo não encontrado,
+ *                  formato não suportado)
+ *                  retornarão null.
+ *                  - Todos os recursos serão devidamente tratados.
  *
  * @author Brandon Mejia
  * @version 2024-05-23
@@ -49,12 +57,13 @@ public class AudioLoader {
      * com codificações PCM.
      *
      * @param fileName O nome do arquivo de áudio a ser carregado (ex: "som.wav").
-     * @return O áudio carregado como um objeto Clip, ou null se o carregamento falhar.
+     * @return O áudio carregado como um objeto Clip, ou null se o carregamento
+     *         falhar.
      */
-    public static Clip loadAudio(String fileName)
-    {
+    public static Clip loadAudio(String fileName) {
         try {
-            // É importante usar um BufferedInputStream para que o AudioSystem possa marcar/resetar o stream
+            // É importante usar um BufferedInputStream para que o AudioSystem possa
+            // marcar/resetar o stream
             InputStream audioSrc = AudioLoader.class.getResourceAsStream("/assets/audio/" + fileName);
             if (audioSrc == null) {
                 System.err.println("Arquivo de áudio não encontrado no caminho: /assets/audio/" + fileName);
@@ -69,20 +78,13 @@ public class AudioLoader {
             audioClip.open(audioStream);
             return audioClip;
 
-        }
-        catch
-        (UnsupportedAudioFileException e)
-        {
+        } catch (UnsupportedAudioFileException e) {
             System.err.println("Formato de arquivo de áudio não suportado ou arquivo corrompido: " + fileName);
             e.printStackTrace();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             System.err.println("Erro de I/O ao carregar áudio: " + fileName);
             e.printStackTrace();
-        }
-        catch (LineUnavailableException e)
-        {
+        } catch (LineUnavailableException e) {
             System.err.println("Linha de áudio não disponível: " + fileName);
             e.printStackTrace();
         }

@@ -33,8 +33,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Brandon Mejia
  * @version 2025-03-25
  */
-public interface IGuiBridge
-{
+public interface IGuiBridge {
     /**
      * Draws the provided list of game objects on the GUI.
      *

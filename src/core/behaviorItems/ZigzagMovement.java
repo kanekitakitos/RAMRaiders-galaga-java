@@ -32,7 +32,7 @@ import java.util.Random;
  * @see Ponto
  *
  * @author Brandon Mejia
- * @version 2025-04-03 (Modified by Trae AI)
+ * @version 2025-04-03
  */
 public class ZigzagMovement implements IEnemyMovement
 {

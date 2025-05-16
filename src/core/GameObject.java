@@ -48,8 +48,7 @@ import geometry.Ponto;
  * @author Brandon Mejia
  * @version 2025-03-25
  */
-public class GameObject implements IGameObject
-{
+public class GameObject implements IGameObject {
     final private String name; // The name of the game object
     final private Transform transform; // The transform of the game object
     final private Collider collider; // The collider of the game object
@@ -62,9 +61,6 @@ public class GameObject implements IGameObject
     protected double rotateSpeed; // The rotation speed of the game object
     protected double scaleDiff; // The scale difference of the game object
 
-
-
-
     /**
      * Validates the invariants for the `GameObject` class.
      * Ensures that the provided parameters are not null.
@@ -76,15 +72,12 @@ public class GameObject implements IGameObject
      * @param behaviour The behavior of the game object. Must not be null.
      * @param shape     The shape of the game object. Must not be null.
      */
-    private void invariante(String name, ITransform transform, ICollider collider, IBehavior behaviour, IShape shape)
-    {
-        if (name == null || transform == null || collider == null || shape == null || behaviour == null)
-        {
+    private void invariante(String name, ITransform transform, ICollider collider, IBehavior behaviour, IShape shape) {
+        if (name == null || transform == null || collider == null || shape == null || behaviour == null) {
             System.out.println("GameObject:iv");
             System.exit(0);
         }
     }
-
 
     /**
      * Constructs a GameObject instance with the specified name, transform, and
@@ -99,8 +92,7 @@ public class GameObject implements IGameObject
      * @throws IllegalArgumentException if any of the parameters 'name',
      *                                  'transform', or 'collider' is null.
      */
-    public GameObject(String name, Transform transform, Collider collider, Behavior behaviour, Shape shape)
-    {
+    public GameObject(String name, Transform transform, Collider collider, Behavior behaviour, Shape shape) {
 
         invariante(name, transform, collider, behaviour, shape);
 
@@ -123,32 +115,30 @@ public class GameObject implements IGameObject
      * It sets the game object to be enabled and calls the onInit method of its
      * behavior.
      */
-    public void onInit()
-    {
+    public void onInit() {
         this.collider.onUpdateCollider();
         this.behaviour.gameObject(this);
         this.shape.setlogicalWidthAndHeight(this.collider.getLogicalWidth(), this.collider.getLogicalHeight());
     }
 
-/**
- * Sets the sound effects for the game object.
- *
- * @param soundEffects The sound effects to associate with the game object.
- */
-public void setSoundEffects(ISoundEffects soundEffects)
-{
-    this.soundEffects = soundEffects;
-}
+    /**
+     * Sets the sound effects for the game object.
+     *
+     * @param soundEffects The sound effects to associate with the game object.
+     */
+    public void setSoundEffects(ISoundEffects soundEffects) {
+        this.soundEffects = soundEffects;
+    }
 
-/**
- * Retrieves the sound effects associated with the game object.
- *
- * @return The sound effects of the game object.
- */
-public ISoundEffects soundEffects()
-{
-    return this.soundEffects;
-}
+    /**
+     * Retrieves the sound effects associated with the game object.
+     *
+     * @return The sound effects of the game object.
+     */
+    public ISoundEffects soundEffects() {
+        return this.soundEffects;
+    }
+
     /**
      * Gets the name of the game object.
      *
@@ -207,7 +197,7 @@ public ISoundEffects soundEffects()
         if (this.behaviour == null)
             return;
 
-        this.behaviour.onUpdate( null);
+        this.behaviour.onUpdate(null);
     }
 
     /**

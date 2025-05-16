@@ -48,8 +48,7 @@ import core.behaviorItems.IAttackStrategy;
  * @Author Brandon Mejia
  * @Version 2025-04-16
  */
-public class Behavior implements IBehavior
-{
+public class Behavior implements IBehavior {
     protected GameObject go; // The GameObject associated with this behavior
     protected boolean isEnabled; // Indicates whether the behavior is enabled
     protected IAttackStrategy attackStrategy = null;
@@ -64,22 +63,19 @@ public class Behavior implements IBehavior
      * Initializes the behavior with no associated GameObject and sets it as
      * disabled.
      */
-    public Behavior()
-    {
+    public Behavior() {
         this.go = null;
         this.isEnabled = false;
         this.observedObject = null;
     }
-
 
     /**
      * Sets the attack strategy for the Object.
      *
      * @param attackStrategy The attack strategy to use.
      */
-    public void setAttackStrategy(IAttackStrategy attackStrategy)
-    {
-        if(attackStrategy == null)
+    public void setAttackStrategy(IAttackStrategy attackStrategy) {
+        if (attackStrategy == null)
             throw new IllegalArgumentException("Attack strategy cannot be null");
 
         this.attackStrategy = attackStrategy;
@@ -120,8 +116,7 @@ public class Behavior implements IBehavior
      * @param ie The input event to process.
      */
     @Override
-    public void onUpdate(IInputEvent ie)
-    {
+    public void onUpdate(IInputEvent ie) {
         this.update();
         this.go.shape().updateAnimation();
     }
@@ -142,18 +137,15 @@ public class Behavior implements IBehavior
      * @param collisions A list of GameObjects that this behavior collided with.
      */
     @Override
-    public void onCollision(ArrayList<IGameObject> collisions)
-    {
-        for (IGameObject go : collisions)
-                {
-                    if(go.name().contains("Player") && go.behavior().isEnabled())
-                        continue;
-                    else
-                        {
-                            go.behavior().notifyObserver();
-                            go.behavior().onDisabled(); // Destroy the enemy if it collides with the player or other object
-                        }
-                }
+    public void onCollision(ArrayList<IGameObject> collisions) {
+        for (IGameObject go : collisions) {
+            if (go.name().contains("Player") && go.behavior().isEnabled())
+                continue;
+            else {
+                go.behavior().notifyObserver();
+                go.behavior().onDisabled(); // Destroy the enemy if it collides with the player or other object
+            }
+        }
 
         this.notifyObserver();
         this.onDestroy();
@@ -181,16 +173,14 @@ public class Behavior implements IBehavior
      * @return True if the behavior is enabled, false otherwise.
      */
     @Override
-    public boolean isEnabled()
-    {
+    public boolean isEnabled() {
         return this.isEnabled;
     }
 
     /**
      * Stops the current attack by setting the attacking flag to false.
      */
-    public void stopAttack()
-    {
+    public void stopAttack() {
         this.isAttacking = false;
     }
 
@@ -231,24 +221,20 @@ public class Behavior implements IBehavior
         return this.observedObject;
     }
 
-
-    public void notifyObserver()
-    {
-        if(this.observedObject == null)
+    public void notifyObserver() {
+        if (this.observedObject == null)
             return;
 
         Behavior behavior = (Behavior) this.observedObject.behavior();
         behavior.score += 10;
     }
 
-    public void setScore(int score)
-    {
+    public void setScore(int score) {
         this.score = score;
     }
 
-    public int getScore()
-    {
-        return this.score ;
+    public int getScore() {
+        return this.score;
     }
     // -------------------------------------------------------------------------------------
 

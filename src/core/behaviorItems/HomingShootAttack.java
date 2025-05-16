@@ -47,12 +47,10 @@ import java.util.Random;
  *
  * @version 2025-04-21
  */
-public class HomingShootAttack implements IAttackStrategy
-{
+public class HomingShootAttack implements IAttackStrategy {
     // Static index to ensure unique naming for bullets
     private static int index = 0;
     private final Shape shape = new Shape(ImagesLoader.loadImage("laser2.gif"), 100); // Default shape of the bullet
-
 
     /**
      * Validates the invariants for the attack.
@@ -64,10 +62,8 @@ public class HomingShootAttack implements IAttackStrategy
      * @throws IllegalArgumentException if the attacker or target is null, or if
      *                                  they are the same object.
      */
-    private void invariante(IGameObject attacker, IGameObject target)
-    {
-        if (attacker == null || target == null || attacker.equals(target))
-        {
+    private void invariante(IGameObject attacker, IGameObject target) {
+        if (attacker == null || target == null || attacker.equals(target)) {
             System.out.println("HomingShootAttack:vi");
             System.exit(0);
         }
@@ -88,10 +84,10 @@ public class HomingShootAttack implements IAttackStrategy
         String name = "Homing_Bullet";
         // Define the shape of the bullet as a rectangle
         Ponto[] rPoints = {
-            new Ponto(0, 2),
-            new Ponto(8, 2),
-            new Ponto(8, 0),
-            new Ponto(0, 0)
+                new Ponto(0, 2),
+                new Ponto(8, 2),
+                new Ponto(8, 0),
+                new Ponto(0, 0)
         };
         GameObject bullet = getGameObject(rPoints, attacker, name, target);
 
@@ -110,8 +106,7 @@ public class HomingShootAttack implements IAttackStrategy
      * @param target   The target game object.
      * @return The created bullet as a GameObject.
      */
-    private GameObject getGameObject(Ponto[] rPoints, IGameObject attacker, String name, IGameObject target)
-    {
+    private GameObject getGameObject(Ponto[] rPoints, IGameObject attacker, String name, IGameObject target) {
         long minSpeed = 7;
         long maxSpeed = 12;
         long randomSpeed = minSpeed + (long) (Math.random() * (maxSpeed - minSpeed));
@@ -120,8 +115,8 @@ public class HomingShootAttack implements IAttackStrategy
         Random random = new Random();
         double randomOffsetX = (random.nextDouble() - 0.5) * 25;
         Ponto bulletStart = attacker.transform().position();
-        bulletStart = calculateBulletStartPosition(new Ponto(bulletStart.x() + randomOffsetX,bulletStart.y()), theta);
-        return createBullet(rPoints, attacker, name, theta, bulletStart, randomSpeed,target.transform().layer());
+        bulletStart = calculateBulletStartPosition(new Ponto(bulletStart.x() + randomOffsetX, bulletStart.y()), theta);
+        return createBullet(rPoints, attacker, name, theta, bulletStart, randomSpeed, target.transform().layer());
     }
 
     /**
@@ -131,8 +126,7 @@ public class HomingShootAttack implements IAttackStrategy
      * @param target   The target game object.
      * @return The angle in radians.
      */
-    private double calculateAngleToTarget(IGameObject attacker, IGameObject target)
-    {
+    private double calculateAngleToTarget(IGameObject attacker, IGameObject target) {
         Ponto attackerPosition = attacker.transform().position();
         Ponto targetPosition = target.transform().position();
         double dx = targetPosition.x() - attackerPosition.x();
@@ -148,8 +142,7 @@ public class HomingShootAttack implements IAttackStrategy
      * @param theta            The angle of the bullet's trajectory.
      * @return The starting position of the bullet as a Ponto.
      */
-    private Ponto calculateBulletStartPosition(Ponto attackerPosition, double theta)
-    {
+    private Ponto calculateBulletStartPosition(Ponto attackerPosition, double theta) {
         double offsetDistance = 2;
         return new Ponto(
                 attackerPosition.x() + offsetDistance * Math.cos(theta),

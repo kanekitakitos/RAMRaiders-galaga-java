@@ -51,8 +51,7 @@ import java.util.Map;
  * @author Brandon Mejia
  * @version 2025-04-18
  */
-public class InputEvent implements IInputEvent, KeyListener, MouseListener
-{
+public class InputEvent implements IInputEvent, KeyListener, MouseListener {
 
     private InputMapping inputMapping = new InputMapping();
     private Map<Integer, String> keyToActionMap = new HashMap<>();
@@ -62,12 +61,13 @@ public class InputEvent implements IInputEvent, KeyListener, MouseListener
      * Validates the invariants for the provided key and mouse maps.
      * Ensures that the maps are not null or empty.
      *
-     * @param customKeyMap   A map of key codes to action strings. Must not be null or empty.
-     * @param customMouseMap A map of mouse button codes to action strings. Must not be null or empty.
+     * @param customKeyMap   A map of key codes to action strings. Must not be null
+     *                       or empty.
+     * @param customMouseMap A map of mouse button codes to action strings. Must not
+     *                       be null or empty.
      *
      */
-    private void invariante(Map<Integer, String> customKeyMap, Map<Integer, String> customMouseMap)
-    {
+    private void invariante(Map<Integer, String> customKeyMap, Map<Integer, String> customMouseMap) {
         if (customKeyMap == null || customMouseMap == null || customKeyMap.isEmpty() || customMouseMap.isEmpty())
             throw new IllegalArgumentException("Key and mouse maps cannot be null or empty");
     }
@@ -78,8 +78,7 @@ public class InputEvent implements IInputEvent, KeyListener, MouseListener
      * @param customKeyMap   A map of key codes to action strings.
      * @param customMouseMap A map of mouse button codes to action strings.
      */
-    public InputEvent(Map<Integer, String> customKeyMap, Map<Integer, String> customMouseMap)
-    {
+    public InputEvent(Map<Integer, String> customKeyMap, Map<Integer, String> customMouseMap) {
         invariante(customKeyMap, customMouseMap);
 
         this.keyToActionMap = customKeyMap;
@@ -97,15 +96,13 @@ public class InputEvent implements IInputEvent, KeyListener, MouseListener
         return inputMapping.isActionActive(action);
     }
 
-
     /**
      * Handles key press events and updates the action state.
      *
      * @param e The KeyEvent triggered by the key press.
      */
     @Override
-    public void keyPressed(KeyEvent e)
-    {
+    public void keyPressed(KeyEvent e) {
         String action = keyToActionMap.get(e.getKeyCode());
         if (action != null) {
             inputMapping.setActionState(action, true);
@@ -118,8 +115,7 @@ public class InputEvent implements IInputEvent, KeyListener, MouseListener
      * @param e The KeyEvent triggered by the key release.
      */
     @Override
-    public void keyReleased(KeyEvent e)
-    {
+    public void keyReleased(KeyEvent e) {
         String action = keyToActionMap.get(e.getKeyCode());
         if (action != null) {
             inputMapping.setActionState(action, false);
@@ -132,8 +128,7 @@ public class InputEvent implements IInputEvent, KeyListener, MouseListener
      * @param e The MouseEvent triggered by the mouse button press.
      */
     @Override
-    public void mousePressed(MouseEvent e)
-    {
+    public void mousePressed(MouseEvent e) {
         int button = e.getButton();
         String action = mouseButtonToActionMap.get(button);
         if (action != null) {
@@ -147,8 +142,7 @@ public class InputEvent implements IInputEvent, KeyListener, MouseListener
      * @param e The MouseEvent triggered by the mouse button release.
      */
     @Override
-    public void mouseReleased(MouseEvent e)
-    {
+    public void mouseReleased(MouseEvent e) {
         int button = e.getButton();
         String action = mouseButtonToActionMap.get(button);
         if (action != null) {
@@ -162,9 +156,8 @@ public class InputEvent implements IInputEvent, KeyListener, MouseListener
      * @param frame The JFrame to associate input handlers with.
      */
     @Override
-    public void registerInputHandlers(JFrame frame)
-    {
-        if(frame == null)
+    public void registerInputHandlers(JFrame frame) {
+        if (frame == null)
             throw new IllegalArgumentException("Frame cannot be null");
 
         frame.addKeyListener(this);
@@ -213,8 +206,7 @@ public class InputEvent implements IInputEvent, KeyListener, MouseListener
      *
      * @param keyCode The key code to remove from the mapping.
      */
-    public void removeKeyAssociation(int keyCode)
-    {
+    public void removeKeyAssociation(int keyCode) {
         keyToActionMap.remove(keyCode);
     }
 
@@ -223,16 +215,14 @@ public class InputEvent implements IInputEvent, KeyListener, MouseListener
      *
      * @param mouseButton The mouse button code to remove from the mapping.
      */
-    public void removeMouseAssociation(int mouseButton)
-    {
+    public void removeMouseAssociation(int mouseButton) {
         mouseButtonToActionMap.remove(mouseButton);
     }
 
     /**
      * Represents a helper class for managing action states.
      */
-    private class InputMapping
-    {
+    private class InputMapping {
 
         private Map<String, Boolean> actionStates = new HashMap<>();
 

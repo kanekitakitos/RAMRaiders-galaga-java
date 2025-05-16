@@ -3,7 +3,10 @@ package core.behaviorItems;
 import core.GameObject;
 import core.objectsInterface.IGameObject;
 import geometry.Ponto;
-
+/**
+ * @author Brandon Mejia
+ * @version 2025-05-16
+ */
 public class FlyTopDownMovement implements IEnemyMovement {
     private boolean active = false;
     private double t = 0.0;
