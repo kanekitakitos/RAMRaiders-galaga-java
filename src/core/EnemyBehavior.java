@@ -112,7 +112,7 @@ public class EnemyBehavior extends Behavior
         if (this.attackStrategy != null && this.isAttacking && this.isEnabled())
         {
             this.stopAttack();
-            long minDelay = 2500;
+            long minDelay = 2000;
             long maxDelay = 9000;
             long randomDelay = minDelay + (long) (Math.random() * (maxDelay - minDelay));
             // Schedule to reset the attack flag after the specified attack duration
@@ -203,8 +203,8 @@ public class EnemyBehavior extends Behavior
                 if(!movement.isActive())
                 {
                     // Generate a random delay between 700 and 2000 milliseconds
-                    long minDelay = 700;
-                    long maxDelay = 2000;
+                    long minDelay = 800;
+                    long maxDelay = 1500;
                     long randomDelay = minDelay + (long) (Math.random() * (maxDelay - minDelay));
 
                     // Schedule to reset the Movement flag after the specified Movement duration

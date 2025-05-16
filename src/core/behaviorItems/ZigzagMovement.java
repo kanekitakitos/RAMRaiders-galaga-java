@@ -46,9 +46,9 @@ public class ZigzagMovement implements IEnemyMovement
     private int stepsTaken = 0;             // Number of steps/segments completed in the current phase
 
     // Configurable parameters for the zigzag pattern
-    private double targetDistance = 15;     // Distance for each "X" step of the movement
-    static private double waitDuration = 70;       // Time (in update calls/frames) to wait between steps
-    private int maxSteps = 4;               // Number of steps to take in one direction before returning
+    private double targetDistance = 5;     // Distance for each "X" step of the movement
+    static private double waitDuration = 50;       // Time (in update calls/frames) to wait between steps
+    private int maxSteps = 8;               // Number of steps to take in one direction before returning
 
     // Internal state for tracking total displacement
     private double accumulatedDisplacement = 0; // Tracks total distance moved away from start before returning

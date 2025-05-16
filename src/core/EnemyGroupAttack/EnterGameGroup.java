@@ -137,10 +137,6 @@ public class EnterGameGroup implements IGroupAttackStrategy
             {
                 relocateEnemies(enemies);
             }
-            if(this.isGroupAttackComplete())
-            {
-                return;
-            }
         }, 1500, groupDelayFrames * 100, TimeUnit.MILLISECONDS);
     }
 
@@ -153,6 +149,7 @@ public class EnterGameGroup implements IGroupAttackStrategy
             {
                 this.assignMovementPatterns(enemies);
                 this.assignAttackPatterns(enemies);
+                this.isGroupAttackComplete = true;
             }
             return;
         }
@@ -218,23 +215,23 @@ public class EnterGameGroup implements IGroupAttackStrategy
     private void assignMovementPatterns(List<IGameObject> enemies)
     {
         int[][] movementPattern1 = {
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 1, 0, 1 },
             { 1, 1, 0, 0, 0, 1, 0, 0, 1, 0 }
         };
         int[][] movementPattern2 = {
+            { 0, 0, 0, 1, 0, 0, 1, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 1, 0, 0, 0, 1, 0, 0 },
+            { 0, 1, 0, 1, 0, 0, 0, 1, 0, 0 },
             { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 1, 0, 1, 0, 0, 0, 0, 0 }
+            { 0, 0, 1, 0, 1, 0, 0, 1, 0, 0 }
         };
         int[][] movementPattern3 = {
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
+            { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 1, 0, 0, 0, 0, 0, 1, 0, 0 },
             { 1, 0, 0, 0, 0, 1, 0, 0, 0, 1 }
         };
@@ -271,7 +268,7 @@ public class EnterGameGroup implements IGroupAttackStrategy
         int[][] attackPattern1 = {
             { 0, 0, 0, 1, 0, 0, 1, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-            { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 1, 0, 0, 0, 0, 0, 1, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
         };

@@ -59,7 +59,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class GameManager {
     private CopyOnWriteArrayList<IGameObject> enemys = new CopyOnWriteArrayList<>(); // List of enemy game objects
-    private CopyOnWriteArrayList<IGameObject> infObjects = new CopyOnWriteArrayList<>(); // List of enemy game objects
     private IGameObject player = null; // The player game object
     private GameObject score = null;
     private IGroupAttackStrategy groupAttackStrategy; // Strategy for group attacks
@@ -78,6 +77,7 @@ public class GameManager {
         System.out.println("GameManager:iv");
         System.exit(0);
     }
+    // -------------------------------------------------------------------------------------------------------------------------------
 
     /**
      * Constructs a `GameManager` instance.
@@ -119,6 +119,285 @@ public class GameManager {
 
         this.generateMenuObjects();
     }
+
+
+
+    /**
+     * Shuts down the scheduler service.
+     * Ensures that the scheduler is not null and has not already been shut down
+     * before attempting to shut it down.
+     */
+    public void shutdown() {
+        if (scheduler != null && !scheduler.isShutdown()) {
+            scheduler.shutdown();
+        }
+    }
+
+    /**
+     * Retrieves the list of enemy game objects.
+     *
+     * @return The list of enemies.
+     */
+    public CopyOnWriteArrayList<IGameObject> getEnemys() {
+        return enemys;
+    }
+
+    /**
+     * Executes the group attack strategy to relocate enemies.
+     */
+    private void startRelocateEnemies()
+    {
+        this.groupAttackStrategy.execute(this.enemys, this.player);
+
+        // Verifica periodicamente se o movimento foi completado e executa o zigzag a cada 20 segundos
+        this.scheduler.scheduleAtFixedRate(new Runnable()
+        {
+            private boolean firstAttackStarted = false;
+
+            @Override
+            public void run()
+            {
+                if (!firstAttackStarted && groupAttackStrategy.isGroupAttackComplete())
+                {
+                    firstAttackStarted = true;
+                    executeZigzagAttack();
+                    
+                    // Agenda a repetição do zigzag a cada 20 segundos
+                    scheduler.scheduleAtFixedRate(() -> {
+                        executeZigzagAttack();
+                    }, 13, 60, TimeUnit.SECONDS);
+                }
+            }
+
+            private void executeZigzagAttack() {
+                ZigzagGroup zigzagGroup = new ZigzagGroup();
+                zigzagGroup.onInit(enemys, player);
+                zigzagGroup.setScheduler(scheduler);
+                zigzagGroup.execute(enemys, player);
+                groupAttackStrategy = zigzagGroup;
+            }
+        }, 1000, 100, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Counts the number of active enemies in the game.
+     * Removes disabled enemies from the game objects list.
+     *
+     * @return The count of active enemies.
+     */
+    public int countActiveEnemies()
+    {
+        int count = 0;
+        for (IGameObject enemy : enemys)
+        {
+            if (enemy.transform().layer() == this.player.transform().layer() + 1 && this.engine.isEnabled(enemy))
+                count++;
+
+        }
+
+
+        return count;
+    }
+
+    /**
+     * Monitors the player's status, including lives and score.
+     * Updates the game state based on the player's life count and the number of
+     * active enemies.
+     * Schedules periodic checks to handle game over or victory conditions.
+     */
+    private void monitorPlayer()
+    {
+        this.generateInfoStat();
+        ArrayList<IGameObject> lifeDisplays = new ArrayList<>();
+        for (IGameObject obj : this.engine.get(0))
+            if (obj.name().toLowerCase().contains("life"))
+                lifeDisplays.add(obj);
+
+        this.scheduler.scheduleAtFixedRate(() -> {
+
+                    PlayerBehavior playerBehavior = (PlayerBehavior) this.player.behavior();
+                    int vidasAtuais = playerBehavior.getLife();
+                    Behavior behavior = (Behavior) this.score.behavior();
+                    behavior.setScore(playerBehavior.getScore());
+
+                    int lifes = lifeDisplays.size() + 1;
+
+                    if (lifes > vidasAtuais && vidasAtuais > 0) {
+                        IGameObject lifeDisplay = lifeDisplays.remove(lifeDisplays.size() - 1);
+                        this.engine.destroy(lifeDisplay);
+                    }
+
+                    if (vidasAtuais <= 0)
+                        this.generateGameOver();
+
+                    int numberOfEnemies = this.countActiveEnemies();
+
+                    if (numberOfEnemies == 0)
+                        this.generateWin();
+
+                    // Uncomment the following block to enable random attacks and movements
+                     if (numberOfEnemies <= 10)
+                     {
+                        if(areAllEnemiesStopped())
+                        {
+                            applyToAllEnemies(null, null);
+                        }
+
+                     }
+                    // this.randomAttacksAndMovements();
+
+                }, 100, 10, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Configures and returns the input mapping for the game.
+     *
+     * @return InputEvent The input event mapping for keys and mouse buttons.
+     */
+    public IInputEvent getInput()
+    {
+        return this.input; // Return the input event mapping
+    }
+
+    /**
+     * Handles the player selection process in the game menu.
+     * Loops the "MENU" sound and continuously checks for player input to select a
+     * player.
+     * Once a player is selected, it finalizes the selection and stops the loop.
+     */
+    private void handlerSelectPlayer()
+    {
+        AtomicBoolean running = new AtomicBoolean(true);
+        this.soundEffects.loopSound("MENU");
+        scheduler.scheduleAtFixedRate(() ->
+        {
+            if (!running.get())
+                return;
+
+            if (input.isActionActive("PLAYER1"))
+            {
+                handlerFinalSelectPlayer();
+                running.set(false);
+            } else if (input.isActionActive("PLAYER2"))
+            {
+                this.player.shape().setFrames(ImagesLoader.loadAnimationFrames("nave-HanSolo.png"), 150);
+                handlerFinalSelectPlayer();
+                running.set(false);
+            }
+
+        }, 0, 1, TimeUnit.MILLISECONDS);
+
+    }
+
+    /**
+     * Finalizes the player selection process.
+     * Disables the menu, destroys all existing game objects, and enables the
+     * selected player and enemies.
+     * Stops the "MENU" sound and starts the "STARTGAME" sound.
+     * Initializes enemy relocation and player monitoring.
+     */
+    private void handlerFinalSelectPlayer()
+    {
+        this.engine.getGui().setMenu(false);
+        this.engine.destroyAll();
+
+        for (int i = 0; i < this.enemys.size(); i++)
+            this.engine.addEnable(this.enemys.get(i));
+
+        this.engine.addEnable(this.player);
+        this.engine.setPlayer(player);
+
+        this.soundEffects.stopSound("MENU");
+        this.soundEffects.loopSound("STARTGAME");
+        this.startRelocateEnemies();
+
+        this.monitorPlayer();
+
+    }
+
+    /**
+     * Aplica um movimento ou ataque específico a todos os inimigos ativos.
+     * Se o movimento ou ataque for null, o atual será desativado.
+     * 
+     * @param movement O movimento a ser aplicado (null para apenas desativar o atual)
+     * @param attack A estratégia de ataque a ser aplicada (null para apenas desativar o atual)
+     */
+    public void applyToAllEnemies(IEnemyMovement movement, IAttackStrategy attack)
+    {
+        for (IGameObject enemy : enemys)
+        {
+            if (enemy != null && engine.isEnabled(enemy))
+            {
+                EnemyBehavior behavior = (EnemyBehavior) enemy.behavior();
+                
+                // Sempre desativa o movimento atual se existir
+                if (behavior.getMovement() != null)
+                {
+                    behavior.getMovement().setActive(false);
+                }
+                
+                // Aplica o novo movimento (mesmo que seja null)
+                behavior.setMovement(movement);
+                if (movement != null) {
+                    movement.setActive(true);
+                }
+                
+                // Aplica a nova estratégia de ataque (mesmo que seja null)
+                behavior.setAttackStrategy(attack);
+                if (attack != null)
+                {
+                    behavior.startAttack();
+                }
+            }
+        }
+    }
+
+    /**
+     * Verifica se todos os inimigos ativos estão parados (sem movimento).
+     * 
+     * @return true se todos os inimigos ativos estiverem parados, false caso contrário
+     */
+    public boolean areAllEnemiesStopped()
+    {
+        for (IGameObject enemy : enemys)
+        {
+            if (enemy != null)
+            {
+                if(this.engine.isDisabled(enemy))
+                    continue;
+
+                EnemyBehavior behavior = (EnemyBehavior) enemy.behavior();
+                IEnemyMovement movement = behavior.getMovement();
+                // Se o inimigo tiver um movimento ativo, retorna false
+                if (movement != null && movement.isActive())
+                {
+                    return false;
+                }
+            }
+        }
+        // Se chegou aqui, significa que todos os inimigos estão parados
+        return true;
+    }
+
+
+    public void setHitbox(boolean hitbox)
+    {
+        this.engine.getGui().setHitbox(hitbox);
+    }
+    /**
+     * Starts the game.
+     * If the game is in the menu state, it initiates the player selection process.
+     * Otherwise, it starts the game engine.
+     */
+    public void startGame() {
+        if (this.engine.getGui().isMenu())
+            this.handlerSelectPlayer();
+
+        this.engine.run();
+    }
+
+    // -------------------------------------------------------------------------------------------------------------------------------
+    // -------------------------------------------------------------------------------------------------------------------------------
 
     /**
      * Generates enemy game objects and assigns them to the enemies list.
@@ -408,193 +687,7 @@ public class GameManager {
         this.player.soundEffects().addSound("HIT", AudioLoader.loadAudio("playerHit.wav"));
     }
 
-    // -------------------------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Shuts down the scheduler service.
-     * Ensures that the scheduler is not null and has not already been shut down
-     * before attempting to shut it down.
-     */
-    public void shutdown() {
-        if (scheduler != null && !scheduler.isShutdown()) {
-            scheduler.shutdown();
-        }
-    }
-
-    /**
-     * Retrieves the list of enemy game objects.
-     *
-     * @return The list of enemies.
-     */
-    public CopyOnWriteArrayList<IGameObject> getEnemys() {
-        return enemys;
-    }
-
-    /**
-     * Executes the group attack strategy to relocate enemies.
-     */
-    private void startRelocateEnemies() {
-        this.groupAttackStrategy.execute(this.enemys, this.player);
-
-        // Verifica periodicamente se o movimento foi completado, mas só executa o
-        // ataque uma vez
-        this.scheduler.scheduleAtFixedRate(new Runnable()
-        {
-            private boolean attackStarted = false;
-
-            @Override
-            public void run()
-            {
-                if (!attackStarted && groupAttackStrategy.isGroupAttackComplete())
-                {
-                    attackStarted = true;
-                    ZigzagGroup zigzagGroup = new ZigzagGroup();
-                    zigzagGroup.onInit(enemys, player);
-
-                    zigzagGroup.execute(enemys, player);
-                    groupAttackStrategy = zigzagGroup;
-                }
-            }
-        }, 15000, 100, TimeUnit.MILLISECONDS);
-    }
-
-    /**
-     * Counts the number of active enemies in the game.
-     * Removes disabled enemies from the game objects list.
-     *
-     * @return The count of active enemies.
-     */
-    public int countActiveEnemies()
-    {
-        int count = 0;
-        for (IGameObject enemy : enemys)
-        {
-            if (enemy.transform().layer() == this.player.transform().layer() + 1 && this.engine.isEnabled(enemy))
-                count++;
-
-        }
-
-
-        return count;
-    }
-
-    /**
-     * Monitors the player's status, including lives and score.
-     * Updates the game state based on the player's life count and the number of
-     * active enemies.
-     * Schedules periodic checks to handle game over or victory conditions.
-     */
-    private void monitorPlayer()
-    {
-        this.generateInfoStat();
-        ArrayList<IGameObject> lifeDisplays = new ArrayList<>();
-        for (IGameObject obj : this.engine.get(0))
-            if (obj.name().toLowerCase().contains("life"))
-                lifeDisplays.add(obj);
-
-        this.scheduler.scheduleAtFixedRate(
-                () -> {
-                    PlayerBehavior playerBehavior = (PlayerBehavior) this.player.behavior();
-                    int vidasAtuais = playerBehavior.getLife();
-                    Behavior behavior = (Behavior) this.score.behavior();
-                    behavior.setScore(playerBehavior.getScore());
-
-                    int lifes = lifeDisplays.size() + 1;
-
-                    if (lifes > vidasAtuais && vidasAtuais > 0) {
-                        IGameObject lifeDisplay = lifeDisplays.remove(lifeDisplays.size() - 1);
-                        this.engine.destroy(lifeDisplay);
-                    }
-
-                    if (vidasAtuais <= 0)
-                        this.generateGameOver();
-
-                    int numberOfEnemies = this.countActiveEnemies();
-
-                    if (numberOfEnemies == 0)
-                        this.generateWin();
-
-                    // Uncomment the following block to enable random attacks and movements
-                    // if (numberOfEnemies <= 20)
-                    // this.randomAttacksAndMovements();
-
-                }, 100, 10, TimeUnit.MILLISECONDS);
-    }
-
-    /**
-     * Configures and returns the input mapping for the game.
-     *
-     * @return InputEvent The input event mapping for keys and mouse buttons.
-     */
-    public IInputEvent getInput() {
-
-        return this.input; // Return the input event mapping
-    }
-
-    // -------------------------------------------------------------------------------------------------------------
-    /**
-     * Handles the player selection process in the game menu.
-     * Loops the "MENU" sound and continuously checks for player input to select a
-     * player.
-     * Once a player is selected, it finalizes the selection and stops the loop.
-     */
-    private void handlerSelectPlayer() {
-        AtomicBoolean running = new AtomicBoolean(true);
-        this.soundEffects.loopSound("MENU");
-        scheduler.scheduleAtFixedRate(() -> {
-            if (!running.get())
-                return;
-
-            if (input.isActionActive("PLAYER1")) {
-                handlerFinalSelectPlayer();
-                running.set(false);
-            } else if (input.isActionActive("PLAYER2")) {
-                this.player.shape().setFrames(ImagesLoader.loadAnimationFrames("nave-HanSolo.png"), 150);
-                handlerFinalSelectPlayer();
-                running.set(false);
-            }
-
-        }, 0, 1, TimeUnit.MILLISECONDS);
-
-    }
-
-    /**
-     * Finalizes the player selection process.
-     * Disables the menu, destroys all existing game objects, and enables the
-     * selected player and enemies.
-     * Stops the "MENU" sound and starts the "STARTGAME" sound.
-     * Initializes enemy relocation and player monitoring.
-     */
-    private void handlerFinalSelectPlayer() {
-        this.engine.getGui().setMenu(false);
-        this.engine.destroyAll();
-
-        for (int i = 0; i < this.enemys.size(); i++)
-            this.engine.addEnable(this.enemys.get(i));
-
-        this.engine.addEnable(this.player);
-        this.engine.setPlayer(player);
-        this.soundEffects.stopSound("MENU");
-        this.soundEffects.loopSound("STARTGAME");
-        this.startRelocateEnemies();
-        this.monitorPlayer();
-
-    }
-
-
-    public void setHitbox(boolean hitbox)
-    {
-        this.engine.getGui().setHitbox(hitbox);
-    }
-    /**
-     * Starts the game.
-     * If the game is in the menu state, it initiates the player selection process.
-     * Otherwise, it starts the game engine.
-     */
-    public void startGame() {
-        if (this.engine.getGui().isMenu())
-            this.handlerSelectPlayer();
-
-        this.engine.run();
-    }
 }
+
+
+    

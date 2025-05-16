@@ -3,9 +3,13 @@ package core.EnemyGroupAttack;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import core.objectsInterface.IGameObject;
 import core.EnemyBehavior;
 import core.behaviorItems.ZigzagMovement;
+import core.behaviorItems.IEnemyMovement;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class ZigzagGroup implements IGroupAttackStrategy
@@ -17,38 +21,71 @@ public class ZigzagGroup implements IGroupAttackStrategy
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
         { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
     };
+
     private EnemyGridMapper enemyGridMapper = new EnemyGridMapper(pattern);
     private boolean isGroupAttackComplete = false;
     private ArrayList<IGameObject> enemies;
+    private ArrayList<IEnemyMovement> previousMovements = new ArrayList<>();
+    private ScheduledExecutorService scheduler;
+    private AtomicBoolean processComplete = new AtomicBoolean(false);
+
+    private void applyZigzagMovement()
+    {
+        if (processComplete.get())
+        {
+            return;
+        }
+
+        int index = 0;
+        for (int row = 0; row < pattern.length; row++)
+        {
+            for (int col = 0; col < pattern[row].length; col++)
+            {
+                int direction = pattern[row][col];
+                if (direction > 0 && index < enemies.size())
+                {
+                    IGameObject enemy = enemies.get(index);
+                    if (enemy != null)
+                    {
+                        EnemyBehavior enemyBehavior = (EnemyBehavior) enemy.behavior();
+                        IEnemyMovement currentMovement = enemyBehavior.getMovement();
+                        if (currentMovement != null) {
+                            currentMovement.setActive(false);
+                        }
+
+                        ZigzagMovement zigzagMovement = new ZigzagMovement();
+                        // 2 = direita, 1 = esquerda
+                        boolean moveRight = (direction == 2);
+                        zigzagMovement.setDirection(moveRight);
+                        enemyBehavior.setMovement(zigzagMovement);
+                        zigzagMovement.setActive(true);
+                        
+                        scheduler.schedule(() -> {
+                            if (!processComplete.get() && currentMovement != null) {
+                                enemyBehavior.setMovement(currentMovement);
+                                currentMovement.setActive(true);
+                            }
+                        }, 5000, TimeUnit.MILLISECONDS);
+                    }
+                    index++;
+                }
+            }
+        }
+        processComplete.set(true);
+        isGroupAttackComplete = true;
+    }
 
     @Override
     public void onInit(List<IGameObject> enemies, IGameObject target)
     {
         this.enemyGridMapper = new EnemyGridMapper(pattern);
         this.enemies = this.enemyGridMapper.getEnemiesFromPattern(pattern);
-    }
-
-    private void applyZigzagMovement()
-    {
-        int index = 0; // Inicia o índice para percorrer a lista de inimigos
-        for (int row = 0; row < pattern.length; row++)
-        {
-            for (int col = 0; col < pattern[row].length; col++)
-            {
-                int priority = pattern[row][col];
-                if (priority > 0 && index < enemies.size())
-                {
-                    IGameObject enemy = enemies.get(index);
-                    if (enemy != null) // Verifica se o inimigo não é nulo
-                    {
-                        EnemyBehavior enemyBehavior = (EnemyBehavior) enemy.behavior();
-                        ZigzagMovement zigzagMovement = new ZigzagMovement();
-                        zigzagMovement.setDirection(priority == 2); // Se o número for 2, começa para a direita
-                        enemyBehavior.setMovement(zigzagMovement);
-                        zigzagMovement.setActive(true);
-                    }
-                    index++; // Incrementa o índice para o próximo inimigo
-                }
+        
+        // Salva os movimentos anteriores durante a inicialização
+        for (IGameObject enemy : this.enemies) {
+            if (enemy != null) {
+                EnemyBehavior behavior = (EnemyBehavior) enemy.behavior();
+                previousMovements.add(behavior.getMovement());
             }
         }
     }
@@ -73,6 +110,8 @@ public class ZigzagGroup implements IGroupAttackStrategy
     }
 
     @Override
-    public void setScheduler(ScheduledExecutorService scheduler) {
+    public void setScheduler(ScheduledExecutorService scheduler)
+    {
+        this.scheduler = scheduler;
     }
 }
