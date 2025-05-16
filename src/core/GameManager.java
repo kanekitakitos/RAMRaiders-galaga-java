@@ -91,6 +91,7 @@ public class GameManager {
     {
         invariante(gui);
         this.engine = new GameEngine(gui);
+        
 
         createPlayer(new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 150));
         this.input = engine.getGui().getInputEvent();
@@ -202,7 +203,7 @@ public class GameManager {
         return count;
     }
 
-    private boolean alreadyAppliedToAllEnemies = false;
+    //private boolean alreadyAppliedToAllEnemies = false;
     /**
      * Monitors the player's status, including lives and score.
      * Updates the game state based on the player's life count and the number of
@@ -240,16 +241,16 @@ public class GameManager {
                         this.generateWin();
 
                     // Executa apenas uma vez
-                    if (numberOfEnemies <= 20 && !alreadyAppliedToAllEnemies)
-                    {
-                        boolean passa = areAllEnemiesStopped();
-                        if(passa)
-                        {
-                            System.out.println("ENTROOOO");
-                            applyToAllEnemies();
-                            alreadyAppliedToAllEnemies = true;
-                        }
-                    }
+                    //if (numberOfEnemies <= 20 && !alreadyAppliedToAllEnemies)
+                    //{
+                    //    boolean passa = areAllEnemiesStopped();
+                    //    if(passa)
+                    //    {
+                    //        System.out.println("ENTROOOO");
+                    //        applyToAllEnemies();
+                    //        alreadyAppliedToAllEnemies = true;
+                    //    }
+                    //}
                     // this.randomAttacksAndMovements();
 
                 }, 100, 100, TimeUnit.MILLISECONDS);
@@ -338,7 +339,8 @@ public class GameManager {
                 movement = new FlyTopDownMovement();
                 movement.setDirection(enemy.transform().position().x()*-1 > 0);
                 behavior.setMovement(movement);
-                movement.setTarget(enemy.transform().position());
+                Ponto p =enemy.transform().position();
+                movement.setTarget(new Ponto(p.x(),p.y()-100));
 
                 movement.setActive(true);
 
@@ -349,7 +351,7 @@ public class GameManager {
 
     /**
      * Verifica se todos os inimigos ativos estão parados (sem movimento).
-     * 
+     *
      * @return true se todos os inimigos ativos estiverem parados, false caso contrário
      */
     public boolean areAllEnemiesStopped()
