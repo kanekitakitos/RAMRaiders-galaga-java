@@ -57,4 +57,11 @@ public interface IGuiBridge
      * @param Menu True to show Menu, false to hide them.
      */
     void setMenu(boolean Menu);
+
+    /**
+     * Toggles the display of hitboxes for game objects.
+     *
+     * @param hitbox True to show hitboxes, false to hide them.
+     */
+    void setHitbox(boolean hitbox);
 }

@@ -1,4 +1,4 @@
-package core.behaviorItems;
+package core.EnemyGroupAttack;
 
 import java.util.List;
 import core.objectsInterface.IGameObject;

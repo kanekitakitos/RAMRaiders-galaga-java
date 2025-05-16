@@ -139,7 +139,8 @@ public class GameEngine implements IGameEngine
      *
      * @return The total number of `GameObject`s.
      */
-    public int size() {
+    public int size()
+    {
         return this.totalObjects;
     }
 

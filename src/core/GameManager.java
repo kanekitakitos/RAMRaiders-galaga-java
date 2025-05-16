@@ -1,12 +1,18 @@
 package core;
 
 import java.util.ArrayList;
+
+import core.EnemyGroupAttack.EnterGameGroup;
+import core.EnemyGroupAttack.IGroupAttackStrategy;
+import core.EnemyGroupAttack.ZigzagGroup;
 import core.behaviorItems.*;
 import core.objectsInterface.*;
 import geometry.*;
 import assets.*;
 import java.util.function.Function;
 import java.util.concurrent.*;
+
+import gui.IGuiBridge;
 import gui.IInputEvent;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.Random;
@@ -52,7 +58,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @version 2025-04-20
  */
 public class GameManager {
-    private CopyOnWriteArrayList<IGameObject> gameObjects = new CopyOnWriteArrayList<>(); // List of enemy game objects
+    private CopyOnWriteArrayList<IGameObject> enemys = new CopyOnWriteArrayList<>(); // List of enemy game objects
+    private CopyOnWriteArrayList<IGameObject> infObjects = new CopyOnWriteArrayList<>(); // List of enemy game objects
     private IGameObject player = null; // The player game object
     private GameObject score = null;
     private IGroupAttackStrategy groupAttackStrategy; // Strategy for group attacks
@@ -63,17 +70,9 @@ public class GameManager {
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final double scale = 4;
 
-    /**
-     * Validates the invariants for the `GameManager` class.
-     * Ensures that the provided `GameEngine` and `IGameObject` instances are not
-     * null.
-     * If the validation fails, an error message is printed, and the program exits.
-     *
-     * @param engine The `GameEngine` instance managing game objects. Must not be
-     *               null.
-     */
-    private void invariante(GameEngine engine) {
-        if (engine != null)
+    
+    private void invariante(IGuiBridge gui) {
+        if (gui != null)
             return;
 
         System.out.println("GameManager:iv");
@@ -85,9 +84,11 @@ public class GameManager {
      *
      * @param engine The game engine to manage game objects.
      */
-    public GameManager(GameEngine engine) {
-        invariante(engine);
-        this.engine = engine;
+    public GameManager(IGuiBridge gui)
+    {
+        invariante(gui);
+        this.engine = new GameEngine(gui);
+
         createPlayer(new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 150));
         this.input = engine.getGui().getInputEvent();
 
@@ -114,7 +115,7 @@ public class GameManager {
         };
 
         this.generateEnemies(groupAttackStrategy.getNumberOfEnemies(), spawnIndexFunction);
-        this.groupAttackStrategy.onInit(this.gameObjects, player);
+        this.groupAttackStrategy.onInit(this.enemys, player);
 
         this.generateMenuObjects();
     }
@@ -160,7 +161,7 @@ public class GameManager {
             Shape shape;
 
             if (i > 7 && i < 12) // the first 4 enemys
-                shape = new Shape(ImagesLoader.loadAnimationFrames("player.gif"), 150);
+                shape = new Shape(ImagesLoader.loadAnimationFrames("inimigo3.gif"), 150);
             else if ((i >= 0 && i < 4) || (i >= 12 && i <= 23))
                 shape = new Shape(ImagesLoader.loadAnimationFrames("inimigo2.gif"), 150);
             else // final two lines
@@ -171,7 +172,7 @@ public class GameManager {
             enemy.behavior().subscribe(this.player);
             enemy.setSoundEffects(createSoundEffects());
             enemy.soundEffects().addSound("MOVE", AudioLoader.loadAudio("move1.wav"));
-            gameObjects.add(enemy);
+            enemys.add(enemy);
         }
 
     }
@@ -426,35 +427,35 @@ public class GameManager {
      * @return The list of enemies.
      */
     public CopyOnWriteArrayList<IGameObject> getEnemys() {
-        return gameObjects;
+        return enemys;
     }
 
     /**
      * Executes the group attack strategy to relocate enemies.
      */
     private void startRelocateEnemies() {
-        this.groupAttackStrategy.execute(this.gameObjects, this.player);
+        this.groupAttackStrategy.execute(this.enemys, this.player);
 
         // Verifica periodicamente se o movimento foi completado, mas só executa o
         // ataque uma vez
-        // this.scheduler.scheduleAtFixedRate(new Runnable() {
-        // private boolean attackStarted = false;
+        this.scheduler.scheduleAtFixedRate(new Runnable()
+        {
+            private boolean attackStarted = false;
 
-        // @Override
-        // public void run()
-        // {
-        // if (!attackStarted && groupAttackStrategy.isGroupAttackComplete())
-        // {
-        // attackStarted = true;
-        // ZigzagGroup zigzagGroup = new ZigzagGroup();
-        // zigzagGroup.setScheduler(scheduler);
-        // zigzagGroup.onInit(enemies, player);
-        // zigzagGroup.execute(enemies, player);
+            @Override
+            public void run()
+            {
+                if (!attackStarted && groupAttackStrategy.isGroupAttackComplete())
+                {
+                    attackStarted = true;
+                    ZigzagGroup zigzagGroup = new ZigzagGroup();
+                    zigzagGroup.onInit(enemys, player);
 
-        // groupAttackStrategy = zigzagGroup;
-        // }
-        // }
-        // }, 10000, 100, TimeUnit.MILLISECONDS);
+                    zigzagGroup.execute(enemys, player);
+                    groupAttackStrategy = zigzagGroup;
+                }
+            }
+        }, 15000, 100, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -463,18 +464,16 @@ public class GameManager {
      *
      * @return The count of active enemies.
      */
-    public int countActiveEnemies() {
+    public int countActiveEnemies()
+    {
         int count = 0;
-        ArrayList<IGameObject> remove = new ArrayList<>();
-        for (IGameObject enemy : gameObjects) {
+        for (IGameObject enemy : enemys)
+        {
             if (enemy.transform().layer() == this.player.transform().layer() + 1 && this.engine.isEnabled(enemy))
                 count++;
-            if (this.engine.isDisabled(enemy))
-                remove.add(enemy);
+
         }
 
-        for (IGameObject enemy : remove)
-            this.gameObjects.remove(enemy);
 
         return count;
     }
@@ -485,7 +484,8 @@ public class GameManager {
      * active enemies.
      * Schedules periodic checks to handle game over or victory conditions.
      */
-    private void monitorPlayer() {
+    private void monitorPlayer()
+    {
         this.generateInfoStat();
         ArrayList<IGameObject> lifeDisplays = new ArrayList<>();
         for (IGameObject obj : this.engine.get(0))
@@ -569,8 +569,8 @@ public class GameManager {
         this.engine.getGui().setMenu(false);
         this.engine.destroyAll();
 
-        for (int i = 0; i < this.gameObjects.size(); i++)
-            this.engine.addEnable(this.gameObjects.get(i));
+        for (int i = 0; i < this.enemys.size(); i++)
+            this.engine.addEnable(this.enemys.get(i));
 
         this.engine.addEnable(this.player);
         this.engine.setPlayer(player);
@@ -581,6 +581,11 @@ public class GameManager {
 
     }
 
+
+    public void setHitbox(boolean hitbox)
+    {
+        this.engine.getGui().setHitbox(hitbox);
+    }
     /**
      * Starts the game.
      * If the game is in the menu state, it initiates the player selection process.

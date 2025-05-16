@@ -1,4 +1,4 @@
-package core.behaviorItems;
+package core.EnemyGroupAttack;
 
 import java.util.List;
 import core.objectsInterface.IGameObject;
@@ -7,7 +7,14 @@ import java.util.ArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import core.GameObject;
+import core.behaviorItems.EnterOverTopMovement;
+import core.behaviorItems.EnterSideMovement;
+import core.behaviorItems.FlyCircleMovement;
+import core.behaviorItems.HomingShootAttack;
+import core.behaviorItems.IAttackStrategy;
+import core.behaviorItems.IEnemyMovement;
 import core.EnemyBehavior;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Strategy for managing the entry of enemy groups into the game.
@@ -39,6 +46,12 @@ import core.EnemyBehavior;
  *                  direction and target positions.
  *                  - The scheduler will manage the timing of enemy group
  *                  entries and shut down after all groups are processed.
+ * 
+ * @see EnemyGridMapper
+ * @see IGroupAttackStrategy
+ * @see IEnemyMovement
+ * @see IAttackStrategy
+ * @see EnemyBehavior
  *
  * @author Brandon Mejia
  * @version 2025-05-07
@@ -46,7 +59,6 @@ import core.EnemyBehavior;
 public class EnterGameGroup implements IGroupAttackStrategy
 {
 
-    private final double SPACING = 70; // Spacing between enemy positions
     private ArrayList<Ponto> positions; // Calculated positions for enemies
     private int currentGroup = 0; // Tracks the current group being processed
     private int[] groupSizes = { 8, 8, 8, 8, 8 }; // Number of enemies in each group
@@ -60,6 +72,7 @@ public class EnterGameGroup implements IGroupAttackStrategy
             { 5, 5, 4, 4, 1, 1, 4, 4, 5, 5 }
     };
     private boolean isGroupAttackComplete = false;
+    private EnemyGridMapper enemyGridMapper;
 
 
 
@@ -89,8 +102,8 @@ public class EnterGameGroup implements IGroupAttackStrategy
      * @param target  The target object to base enemy positions on.
      */
     @Override
-    public void execute(List<IGameObject> enemies, IGameObject target) {
-        
+    public void execute(List<IGameObject> enemies, IGameObject target)
+    {
         startRelocateEnemies(enemies);
     }
 
@@ -105,7 +118,8 @@ public class EnterGameGroup implements IGroupAttackStrategy
     public void onInit(List<IGameObject> enemies, IGameObject target)
     {
         invariante(enemies, target);
-        this.positions = calculateEnemyPositions(target.transform().position(), this.pattern, SPACING);
+        this.enemyGridMapper = new EnemyGridMapper(this.pattern);
+        this.positions = enemyGridMapper.calculateEnemyPositions(target.transform().position(),enemies);
     }
 
     /**
@@ -113,6 +127,8 @@ public class EnterGameGroup implements IGroupAttackStrategy
      *
      * @param enemies List of enemies to be relocated.
      */
+    private AtomicBoolean patternsAssigned = new AtomicBoolean(false);
+
     public synchronized void startRelocateEnemies(List<IGameObject> enemies)
     {
         scheduler.scheduleAtFixedRate(() ->
@@ -121,20 +137,23 @@ public class EnterGameGroup implements IGroupAttackStrategy
             {
                 relocateEnemies(enemies);
             }
+            if(this.isGroupAttackComplete())
+            {
+                return;
+            }
         }, 1500, groupDelayFrames * 100, TimeUnit.MILLISECONDS);
     }
 
-    
     private void relocateEnemies(List<IGameObject> enemies)
     {
         currentGroup++;
         if (currentGroup > 5)
         {
-            this.assignAttackPatterns(enemies);
-            this.assignMovementPatterns(enemies);
-
-            isGroupAttackComplete = true;
-
+            if (patternsAssigned.compareAndSet(false, true))
+            {
+                this.assignMovementPatterns(enemies);
+                this.assignAttackPatterns(enemies);
+            }
             return;
         }
         for (int i = 0; i < groupSizes[currentGroup - 1]; i++)
@@ -170,45 +189,6 @@ public class EnterGameGroup implements IGroupAttackStrategy
         }
     }
 
-    /**
-     * Calculates the positions for enemies based on the target's position and the
-     * defined pattern.
-     *
-     * @param playerPosition The position of the target object.
-     * @param pattern        The pattern defining enemy priorities.
-     * @param spacing        The spacing between enemy positions.
-     * @return A list of calculated positions for enemies.
-     */
-    private ArrayList<Ponto> calculateEnemyPositions(Ponto playerPosition, int[][] pattern, double spacing) {
-        @SuppressWarnings("unchecked")
-        ArrayList<Ponto>[] priorityGroups = new ArrayList[6];
-        for (int i = 1; i <= 5; i++)
-            priorityGroups[i] = new ArrayList<>();
-
-        double startX = playerPosition.x() - ((pattern[0].length - 1) * spacing) / 2.0;
-        double startY = playerPosition.y() + 660;
-
-        for (int row = 0; row < pattern.length; row++) {
-            for (int col = 0; col < pattern[0].length; col++)
-            {
-                int priority = pattern[row][col];
-                if (priority > 0)
-                {
-                    double x = startX + col * spacing;
-                    double y = startY - row * spacing;
-                    priorityGroups[priority].add(new Ponto(x, y));
-                }
-            }
-        }
-
-        ArrayList<Ponto> positions = new ArrayList<>();
-        for (int priority = 1; priority <= 5; priority++)
-        {
-            positions.addAll(priorityGroups[priority]);
-        }
-
-        return positions;
-    }
 
     /**
      * Gets the total number of enemies managed by this strategy.
@@ -230,127 +210,62 @@ public class EnterGameGroup implements IGroupAttackStrategy
         return this.isGroupAttackComplete;
     }
 
-
     /**
      * Assigns movement patterns to enemies based on a given pattern matrix.
      *
      * @param pattern          A 2D array representing the movement pattern.
      */
-    private void assignMovementPatterns(List<IGameObject> enemies) {
+    private void assignMovementPatterns(List<IGameObject> enemies)
+    {
         int[][] movementPattern = {
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 1, 0, 0, 1, 0, 0, 0 },
-            { 0, 1, 1, 0, 0, 0, 0, 0, 0, 1 }
+            { 0, 0, 1, 0, 0, 0, 0, 1, 0, 0 },
+            { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 }
         };
 
-        // Mapeia as posições do pattern para os índices dos inimigos
-        ArrayList<Integer> enemyIndices = new ArrayList<>();
-        for (int row = 0; row < movementPattern.length; row++)
+        ArrayList<IGameObject> enemiesToApply = this.enemyGridMapper.getEnemiesFromPattern(movementPattern); // Obtém os inimigos do pattern
+        synchronized(enemiesToApply)
         {
-            for (int col = 0; col < movementPattern[row].length; col++)
+            for (int i = 0; i < enemiesToApply.size(); i++)
             {
-                if (movementPattern[row][col] > 0)
-                {
-                    int realIndex = findEnemyIndexInOriginalPattern(row, col);
-                    if (realIndex >= 0 && realIndex < enemies.size())
-                    {
-                        enemyIndices.add(realIndex);
-                    }
-                }
+                GameObject enemy = (GameObject) enemiesToApply.get(i);
+                EnemyBehavior enemyBehavior = (EnemyBehavior) enemy.behavior();
+                FlyCircleMovement movement = new FlyCircleMovement();
+
+                if(enemy.transform().position().x() > 0)
+                    movement.setIsLeft(true);
+                else
+                    movement.setIsLeft(false);
+
+                enemyBehavior.setMovement(movement);
+                movement.setActive(true);
             }
-        }
-
-        for (int i = 0; i < enemyIndices.size(); i++)
-        {
-            final int currentIndex = enemyIndices.get(i);
-            scheduler.schedule(() ->
-            {
-                if (currentIndex < enemies.size())
-                {
-                    GameObject enemy = (GameObject) enemies.get(currentIndex);
-                    EnemyBehavior enemyBehavior = (EnemyBehavior) enemy.behavior();
-                    FlyCircleMovement movement = new FlyCircleMovement();
-
-                    if(enemy.transform().position().x() > 0)
-                        movement.setIsLeft(true);
-                    else
-                        movement.setIsLeft(false);
-
-                    enemyBehavior.setMovement(movement);
-
-                    
-
-                    movement.setActive(true);
-
-                }
-            }, i * 200, TimeUnit.MILLISECONDS);
         }
     }
 
-    private void assignAttackPatterns(List<IGameObject> enemies) {
+    private void assignAttackPatterns(List<IGameObject> enemies)
+    {
         int[][] attackPattern = {
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 },
-            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 1, 0, 0, 0, 0, 0, 0, 1, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
         };
 
-        // Mapeia as posições do pattern para os índices dos inimigos
-        ArrayList<Integer> enemyIndices = new ArrayList<>();
-        for (int row = 0; row < attackPattern.length; row++)
+        ArrayList<IGameObject> enemiesToApply = this.enemyGridMapper.getEnemiesFromPattern(attackPattern);
+        synchronized(enemiesToApply)
         {
-            for (int col = 0; col < attackPattern[row].length; col++)
+            for (int i = 0; i < enemiesToApply.size(); i++)
             {
-                if (attackPattern[row][col] > 0)
-                {
-                    // Calcula o índice real do inimigo baseado na sua posição no pattern original
-                    int realIndex = findEnemyIndexInOriginalPattern(row, col);
-                    if (realIndex >= 0 && realIndex < enemies.size())
-                    {
-                        enemyIndices.add(realIndex);
-                    }
-                }
+                GameObject enemy = (GameObject) enemiesToApply.get(i);
+                EnemyBehavior enemyBehavior = (EnemyBehavior) enemy.behavior();
+                IAttackStrategy attack = new HomingShootAttack();
+                enemyBehavior.setAttackStrategy(attack);
+                enemyBehavior.startAttack();
             }
         }
-
-        // Aplica os ataques aos inimigos encontrados
-        for (int i = 0; i < enemyIndices.size(); i++)
-        {
-            final int currentIndex = enemyIndices.get(i);
-            scheduler.schedule(() -> {
-                if (currentIndex < enemies.size())
-                {
-                    GameObject enemy = (GameObject) enemies.get(currentIndex);
-                    EnemyBehavior enemyBehavior = (EnemyBehavior) enemy.behavior();
-                    IAttackStrategy attack = new HomingShootAttack();
-                    enemyBehavior.setAttackStrategy(attack);
-                    enemyBehavior.startAttack();
-                
-                }
-            }, i * 200, TimeUnit.MILLISECONDS);
-        }
-    }
-
-    private int findEnemyIndexInOriginalPattern(int row, int col)
-    {
-        int count = 0;
-        for (int r = 0; r < pattern.length; r++)
-        {
-            for (int c = 0; c < pattern[r].length; c++)
-            {
-                if (pattern[r][c] > 0)
-                {
-                    if (r == row && c == col)
-                    {
-                        return count;
-                    }
-                    count++;
-                }
-            }
-        }
-        return -1;
     }
 }

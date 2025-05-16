@@ -36,7 +36,7 @@ import geometry.Ponto;
  *
  * @see core.Behavior
  * @see core.behaviorItems.IAttackStrategy
- * @see core.behaviorItems.IGroupAttackStrategy
+ * @see core.EnemyGroupAttack.IGroupAttackStrategy
  * @see core.behaviorItems.IEnemyMovement
  *
  * @Author Brandon Mejia

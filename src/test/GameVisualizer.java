@@ -2,7 +2,7 @@ package test;
 
 import core.*;
 import core.Shape;
-import core.behaviorItems.EnterGameGroup;
+import core.EnemyGroupAttack.EnterGameGroup;
 import core.objectsInterface.IGameObject;
 
 import javax.swing.*;

@@ -41,6 +41,7 @@ public class SoundEffects implements ISoundEffects
 {
     private Map<String, Clip> soundClips = new HashMap<>();
     private float globalVolume = 1.0f; // Default global volume (0.0 to 1.0)
+    private static boolean off = true;
 
     /**
      * Default constructor for SoundEffects.
@@ -99,6 +100,9 @@ public class SoundEffects implements ISoundEffects
     @Override
     public void playSound(String soundName)
     {
+        if(off)
+            return;
+
         Clip clip = soundClips.get(soundName);
         if (clip != null)
         {
@@ -123,6 +127,9 @@ public class SoundEffects implements ISoundEffects
     @Override
     public void loopSound(String soundName)
     {
+        if (off) 
+            return;
+            
         Clip clip = soundClips.get(soundName);
         if (clip != null)
         {
