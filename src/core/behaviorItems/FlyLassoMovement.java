@@ -61,8 +61,12 @@ public class FlyLassoMovement implements IEnemyMovement
     private double t = 0.0; // Time variable for movement progression
     private Ponto initialPosition; // The initial position of the GameObject
     private boolean goRightToLeft = false; // Direction of the circular loop
-    private final double scale = 0.2; // Scaling factor for movement parameters
+    private final double scale = 7; // Scaling factor for movement parameters
     private final double tIncrement = 0.018; // Time increment for each movement step
+    final private double t1 = 2.5; // Duration of vertical drop
+    final private double t2 = 2.0; // Duration of circular loop
+
+    private boolean initialRotationComplete = false; // Flag for initial rotation
 
     /**
      * Sets the direction of the circular loop.
@@ -72,6 +76,25 @@ public class FlyLassoMovement implements IEnemyMovement
      */
     public void setDirection(boolean goRightToLeft) {
         this.goRightToLeft = goRightToLeft;
+    }
+
+    /**
+     * Activates or deactivates the movement.
+     * Resets the time and initial position when deactivated.
+     * 
+     * @param active True to activate the movement, false to deactivate it.
+     */
+    @Override
+    public void setActive(boolean active) {
+        this.active = active;
+        if (!active) {
+            t = 0.0;
+            initialPosition = null;
+            initialRotationComplete = false; // Reset rotation flag
+        } else {
+            // Reset flag when activated to ensure rotation happens if re-enabled
+            initialRotationComplete = false;
+        }
     }
 
     /**
@@ -87,12 +110,10 @@ public class FlyLassoMovement implements IEnemyMovement
     /**
      * Moves the GameObject according to the lasso movement pattern.
      * The movement includes an initial drop, a circular loop, and a final descent.
+     * Will first rotate the enemy to 270 degrees smoothly.
      * 
      * @param enemy The GameObject to move.
      */
-    private double totalDistance = 0.0; // Distância total percorrida
-    private Ponto lastPosition = null; // Última posição para cálculo da distância
-
     @Override
     public void move(GameObject enemy) {
         if (!active)
@@ -100,71 +121,75 @@ public class FlyLassoMovement implements IEnemyMovement
 
         if (initialPosition == null) {
             initialPosition = enemy.transform().position();
-            lastPosition = initialPosition;
         }
 
-        double t1 = 0.6; // Duration of vertical drop
-        double t2 = 1.0; // Duration of circular loop
-
+        if (!initialRotationComplete) {
+            rotateToInitialAngle(enemy);
+            enemy.velocity(new Ponto(0, 0)); // Ensure no movement during initial rotation
+            // If rotation is not yet complete, skip path movement for this frame
+            if (!initialRotationComplete) {
+                return;
+            }
+        }
+        
+        // Original movement logic
         Ponto current = handlePosition(t, t1, t2);
         Ponto next = handlePosition(t + tIncrement, t1, t2);
 
-        // Calcula a distância percorrida
-        if (lastPosition != null) {
-            double dx = current.x() - lastPosition.x();
-            double dy = current.y() - lastPosition.y();
-            totalDistance += Math.sqrt(dx * dx + dy * dy);
-        }
-        lastPosition = current;
-
         Ponto velocity = new Ponto(next.x() - current.x(), next.y() - current.y());
         enemy.velocity(velocity);
+        // No continuous rotation during lasso path, only initial rotation.
+        // If continuous dynamic rotation based on path was needed, we'd add:
+        // enemy.rotateSpeed(calculateAngle(enemy, next)); 
 
         t += tIncrement;
 
-        // Se a distância total exceder um limite, retorna à posição original
-        if (totalDistance > 200 * scale) {
-            returnToInitialPosition(enemy);
-            return;
-        }
-
-        if (t > 4.5)
+        if (t > (t1 + t2)) {
+            // Optionally, ensure final angle is exactly 270 if needed, or another target angle
+            // For now, just deactivates.
             setActive(false);
+        }
     }
 
     /**
-     * Retorna o inimigo à sua posição original de forma suave.
+     * Rotates the enemy smoothly to the initial target angle (270 degrees).
+     * Sets initialRotationComplete to true when the angle is reached.
      * 
-     * @param enemy O GameObject representando o inimigo
+     * @param enemy The GameObject to rotate.
      */
-    private void returnToInitialPosition(GameObject enemy) {
-        Ponto currentPos = enemy.transform().position();
-        double dx = initialPosition.x() - currentPos.x();
-        double dy = initialPosition.y() - currentPos.y();
-        double distance = Math.sqrt(dx * dx + dy * dy);
+    private void rotateToInitialAngle(GameObject enemy) {
+        double currentAngle = enemy.transform().angle();
+        double targetAngle = 270.0;
 
-        if (distance < 0.1) {
-            enemy.velocity(new Ponto(0, 0));
-            setActive(false);
+        // Check if already at target angle (within a small tolerance)
+        if (Math.abs(currentAngle - targetAngle) < 0.5) {
+            enemy.rotateSpeed(0); // Stop rotation
+            initialRotationComplete = true;
             return;
         }
 
-        double speed = Math.min(5.0, distance * 0.1);
-        Ponto velocity = new Ponto(
-            dx * speed / distance,
-            dy * speed / distance
-        );
-        enemy.velocity(velocity);
-    }
+        double angleDiff = (targetAngle + 360) - currentAngle;
 
-    @Override
-    public void setActive(boolean active) {
-        this.active = active;
-        if (!active) {
-            t = 0.0;
-            initialPosition = null;
-            lastPosition = null;
-            totalDistance = 0.0;
+        // Normalize to the shortest path (-180 to 180)
+        while (angleDiff > 180) angleDiff -= 360;
+        while (angleDiff < -180) angleDiff += 360;
+
+        // Proportional control for smooth rotation
+        double rotationSpeed = angleDiff * 0.1;
+
+        // Limit maximum rotation speed
+        double maxRotationSpeed = 5.0; // Degrees per frame
+        if (Math.abs(rotationSpeed) > maxRotationSpeed) {
+            rotationSpeed = Math.signum(rotationSpeed) * maxRotationSpeed;
+        }
+        
+        enemy.rotateSpeed(rotationSpeed);
+
+        // Check again if target angle reached after applying rotation speed for this frame
+        // This helps to snap to the angle if the rotation speed makes it pass the threshold in one step
+        if (Math.abs(enemy.transform().angle() - targetAngle) < 0.5) {
+             enemy.rotateSpeed(0);
+             initialRotationComplete = true;
         }
     }
 
@@ -193,7 +218,7 @@ public class FlyLassoMovement implements IEnemyMovement
      * @return The position of the GameObject during the drop.
      */
     private Ponto handleInitialDrop(double t) {
-        double V1 = 35.0 * scale; // Vertical velocity
+        double V1 = 10.0 * scale; // Vertical velocity
         double x = initialPosition.x();
         double y = initialPosition.y() - V1 * t;
         return new Ponto(x, y);
@@ -208,8 +233,8 @@ public class FlyLassoMovement implements IEnemyMovement
      * @return The position of the GameObject during the loop.
      */
     private Ponto handleCircularPath(double t, double t1, double t2) {
-        double R = 5.0 * scale; // Radius of the circular path
-        double V1 = 35.0 * scale; // Vertical velocity during the drop
+        double R = 8.0 * scale; // Radius of the circular path
+        double V1 = 10.0 * scale; // Vertical velocity during the drop
 
         double angleT = (t - t1) / t2; // Normalized time for the circular path
 
@@ -239,7 +264,7 @@ public class FlyLassoMovement implements IEnemyMovement
     private Ponto handleFinalDescent(double t, double t1, double t2) {
         double t3 = t - t1 - t2; // Time during the final descent
 
-        double R = 5.0 * scale; // Radius of the circular path
+        double R = 8.0 * scale; // Radius of the circular path
         double V1 = 35.0 * scale; // Vertical velocity during the drop
         double V2 = 25.0 * scale; // Vertical velocity during the descent
         double offsetX = 5.0 * scale; // Horizontal offset during the descent

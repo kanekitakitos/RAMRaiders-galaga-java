@@ -127,7 +127,8 @@ public class FlyCircleMovement implements IEnemyMovement
      *
      * @param isLeft True if on the left side, false otherwise.
      */
-    public void setIsLeft(boolean isLeft) {
+    @Override
+    public void setDirection(boolean isLeft) {
         this.isLeft = isLeft;
     }
 

@@ -55,4 +55,6 @@ public interface IEnemyMovement {
      * @return true if the movement is active, false otherwise.
      */
     boolean isActive();
+
+    void setDirection(boolean direction);
 }

@@ -18,6 +18,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * The `GameManager` class is responsible for managing the game's enemies,
  * player, and their interactions.
@@ -58,6 +60,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @version 2025-04-20
  */
 public class GameManager {
+
     private CopyOnWriteArrayList<IGameObject> enemys = new CopyOnWriteArrayList<>(); // List of enemy game objects
     private IGameObject player = null; // The player game object
     private GameObject score = null;
@@ -199,6 +202,7 @@ public class GameManager {
         return count;
     }
 
+    private boolean alreadyAppliedToAllEnemies = false;
     /**
      * Monitors the player's status, including lives and score.
      * Updates the game state based on the player's life count and the number of
@@ -235,18 +239,20 @@ public class GameManager {
                     if (numberOfEnemies == 0)
                         this.generateWin();
 
-                    // Uncomment the following block to enable random attacks and movements
-                     if (numberOfEnemies <= 10)
-                     {
-                        if(areAllEnemiesStopped())
+                    // Executa apenas uma vez
+                    if (numberOfEnemies <= 20 && !alreadyAppliedToAllEnemies)
+                    {
+                        boolean passa = areAllEnemiesStopped();
+                        if(passa)
                         {
-                            applyToAllEnemies(null, null);
+                            System.out.println("ENTROOOO");
+                            applyToAllEnemies();
+                            alreadyAppliedToAllEnemies = true;
                         }
-
-                     }
+                    }
                     // this.randomAttacksAndMovements();
 
-                }, 100, 10, TimeUnit.MILLISECONDS);
+                }, 100, 100, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -315,39 +321,28 @@ public class GameManager {
 
     }
 
-    /**
-     * Aplica um movimento ou ataque específico a todos os inimigos ativos.
-     * Se o movimento ou ataque for null, o atual será desativado.
-     * 
-     * @param movement O movimento a ser aplicado (null para apenas desativar o atual)
-     * @param attack A estratégia de ataque a ser aplicada (null para apenas desativar o atual)
-     */
-    public void applyToAllEnemies(IEnemyMovement movement, IAttackStrategy attack)
+
+    public void applyToAllEnemies()
     {
+        FlyTopDownMovement movement = null;
         for (IGameObject enemy : enemys)
         {
+
             if (enemy != null && engine.isEnabled(enemy))
             {
                 EnemyBehavior behavior = (EnemyBehavior) enemy.behavior();
-                
                 // Sempre desativa o movimento atual se existir
                 if (behavior.getMovement() != null)
-                {
-                    behavior.getMovement().setActive(false);
-                }
-                
+                   behavior.setMovement(null);
                 // Aplica o novo movimento (mesmo que seja null)
+                movement = new FlyTopDownMovement();
+                movement.setDirection(enemy.transform().position().x()*-1 > 0);
                 behavior.setMovement(movement);
-                if (movement != null) {
-                    movement.setActive(true);
-                }
-                
-                // Aplica a nova estratégia de ataque (mesmo que seja null)
-                behavior.setAttackStrategy(attack);
-                if (attack != null)
-                {
-                    behavior.startAttack();
-                }
+                movement.setTarget(enemy.transform().position());
+
+                movement.setActive(true);
+
+                behavior.setAttackStrategy(null);
             }
         }
     }
@@ -363,15 +358,13 @@ public class GameManager {
         {
             if (enemy != null)
             {
-                if(this.engine.isDisabled(enemy))
+                if(!enemy.behavior().isEnabled())
                     continue;
 
-                EnemyBehavior behavior = (EnemyBehavior) enemy.behavior();
-                IEnemyMovement movement = behavior.getMovement();
-                if (movement != null && movement.isActive())
-                {
-                    return false;
-                }
+                GameObject enemyObj = (GameObject) enemy;
+                Ponto velocity = enemyObj.velocity();
+                    if(velocity.x() != 0 || velocity.y() != 0)
+                        return false; // Se um inimigo tiver velocidade, não está parado
             }
         }
         // Se chegou aqui, significa que todos os inimigos estão parados

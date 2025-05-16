@@ -83,7 +83,7 @@ public class TestEnemyBehavior
         assertFalse(flyCircleMovement.isActive(), "Movement should not be active");
 
         flyCircleMovement.setActive(true);
-        flyCircleMovement.setIsLeft(true);
+        flyCircleMovement.setDirection(true);
         Ponto initialPosition = enemy.transform().position();
 
         for (int i = 0; i < 80; i++)

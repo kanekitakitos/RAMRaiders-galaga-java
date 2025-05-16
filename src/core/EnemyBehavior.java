@@ -10,6 +10,8 @@ import java.util.concurrent.TimeUnit;
 import gui.IInputEvent;
 import assets.ImagesLoader;
 import geometry.Ponto;
+import java.util.List;
+import java.awt.image.BufferedImage;
 
 /**
  * The `EnemyBehavior` class defines the behavior of an enemy in the game.
@@ -47,7 +49,7 @@ public class EnemyBehavior extends Behavior
 
     private IEnemyMovement movement; // The movement strategy used by the enemy
     private static final ScheduledExecutorService localScheduler = Executors.newScheduledThreadPool(1);
-    
+    private static List<BufferedImage> explosion = ImagesLoader.loadAnimationFrames("explosion.gif");
 
     /**
      * Default constructor for `EnemyBehavior`.
@@ -72,7 +74,7 @@ public class EnemyBehavior extends Behavior
 
         // Troca o shape para explosão
         try{
-            this.go.shape().setFrames(ImagesLoader.loadAnimationFrames("explosion.gif"),100);
+            this.go.shape().setFrames(explosion,100);
         }
         catch(Exception e)
         {

@@ -253,9 +253,9 @@ public class EnterGameGroup implements IGroupAttackStrategy
                 FlyCircleMovement movement = new FlyCircleMovement();
 
                 if(enemy.transform().position().x() > 0)
-                    movement.setIsLeft(true);
+                    movement.setDirection(true);
                 else
-                    movement.setIsLeft(false);
+                    movement.setDirection(false);
 
                 enemyBehavior.setMovement(movement);
                 movement.setActive(true);
