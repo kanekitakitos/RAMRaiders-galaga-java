@@ -217,12 +217,33 @@ public class EnterGameGroup implements IGroupAttackStrategy
      */
     private void assignMovementPatterns(List<IGameObject> enemies)
     {
-        int[][] movementPattern = {
+        int[][] movementPattern1 = {
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 1, 0, 0, 0, 0, 1, 0, 0 },
-            { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 }
+            { 0, 0, 0, 0, 0, 0, 0, 1, 0, 1 },
+            { 1, 1, 0, 0, 0, 1, 0, 0, 1, 0 }
+        };
+        int[][] movementPattern2 = {
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 1, 0, 0, 0, 1, 0, 0 },
+            { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 1, 0, 1, 0, 0, 0, 0, 0 }
+        };
+        int[][] movementPattern3 = {
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 1, 0, 0, 0, 0, 0, 1, 0, 0 },
+            { 1, 0, 0, 0, 0, 1, 0, 0, 0, 1 }
+        };
+
+        int[][] movementPattern = switch ((int) (Math.random() * 3))
+        {
+            case 0 -> movementPattern1;
+            case 1 -> movementPattern2;
+            default -> movementPattern3;
         };
 
         ArrayList<IGameObject> enemiesToApply = this.enemyGridMapper.getEnemiesFromPattern(movementPattern); // Obtém os inimigos do pattern
@@ -247,12 +268,25 @@ public class EnterGameGroup implements IGroupAttackStrategy
 
     private void assignAttackPatterns(List<IGameObject> enemies)
     {
-        int[][] attackPattern = {
+        int[][] attackPattern1 = {
+            { 0, 0, 0, 1, 0, 0, 1, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+            { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 1, 0, 0, 0, 0, 0, 0, 1, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+        };
+        int[][] attackPattern2 = {
+            { 0, 0, 0, 0, 1, 1, 0, 0, 0, 0 },
+            { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+        };
+
+        int[][] attackPattern = switch ((int) (Math.random() * 2))
+        {
+            case 0 -> attackPattern1;
+            default -> attackPattern2;
         };
 
         ArrayList<IGameObject> enemiesToApply = this.enemyGridMapper.getEnemiesFromPattern(attackPattern);

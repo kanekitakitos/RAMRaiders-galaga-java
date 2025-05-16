@@ -5,11 +5,8 @@ import java.util.ArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import core.objectsInterface.IGameObject;
 import core.EnemyBehavior;
-import core.behaviorItems.IEnemyMovement;
 import core.behaviorItems.ZigzagMovement;
-import geometry.Ponto;
-import java.util.HashMap;
-import java.util.Map;
+
 
 public class ZigzagGroup implements IGroupAttackStrategy
 {
@@ -29,7 +26,6 @@ public class ZigzagGroup implements IGroupAttackStrategy
     {
         this.enemyGridMapper = new EnemyGridMapper(pattern);
         this.enemies = this.enemyGridMapper.getEnemiesFromPattern(pattern);
-        //enemyGridMapper.drawGrid();
     }
 
     private void applyZigzagMovement()

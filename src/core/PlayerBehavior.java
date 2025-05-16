@@ -50,7 +50,7 @@ public class PlayerBehavior extends Behavior
 {
     private int life = 3; // The player's remaining lives
     private boolean isInvincible = false; // Indicates whether the player is invincible
-    private final long invincibilityDuration = 200000000; // Duration of invincibility in milliseconds
+    private final long invincibilityDuration = 2000; // Duration of invincibility in milliseconds
 
     private final ScheduledExecutorService localScheduler; // Scheduler for handling timed tasks
 

@@ -10,12 +10,18 @@ import java.util.List;
  * Classe auxiliar para mapear inimigos em uma grade 2D.
  * Facilita o cálculo de posições e a associação de prioridades.
  */
-public class EnemyGridMapper 
+public class EnemyGridMapper
 {
 
     private int[][] pattern;
     private double spacing = 70; // Removido static, pois pode ser configurável por instância se necessário
     static private IGameObject[][] enemyGrid =new IGameObject[5][10]; // Substituindo o HashMap por uma matriz 2D
+
+
+    public EnemyGridMapper(int row, int col, int[][] pattern)
+    {
+        this.pattern = new int[row][col];
+    }
 
     public EnemyGridMapper(int[][] pattern)
     {
@@ -25,8 +31,8 @@ public class EnemyGridMapper
     // Método para associar um inimigo a uma posição (row, col) específica na grade
     public void associateEnemyAt(int row, int col, IGameObject enemy)
     {
-        if (this.enemyGrid != null && row >= 0 && row < this.enemyGrid.length && col >= 0 && col < this.enemyGrid[row].length) {
-            this.enemyGrid[row][col] = enemy;
+        if (EnemyGridMapper.enemyGrid != null && row >= 0 && row < EnemyGridMapper.enemyGrid.length && col >= 0 && col < EnemyGridMapper.enemyGrid[row].length) {
+            EnemyGridMapper.enemyGrid[row][col] = enemy;
         }
         // Caso contrário, está fora dos limites. Pode-se logar um erro ou lançar exceção.
     }
@@ -34,8 +40,8 @@ public class EnemyGridMapper
     // Método para obter um inimigo de uma posição (row, col) específica na grade
     public IGameObject getEnemyAt(int row, int col)
     {
-        if (this.enemyGrid != null && row >= 0 && row < this.enemyGrid.length && col >= 0 && col < this.enemyGrid[row].length) {
-            return this.enemyGrid[row][col];
+        if (EnemyGridMapper.enemyGrid != null && row >= 0 && row < EnemyGridMapper.enemyGrid.length && col >= 0 && col < EnemyGridMapper.enemyGrid[row].length) {
+            return EnemyGridMapper.enemyGrid[row][col];
         }
         return null; // Ou lançar exceção por estar fora dos limites
     }
