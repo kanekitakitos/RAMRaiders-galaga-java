@@ -194,9 +194,9 @@ See `CONTRIBUTING.md` for more details and best practices.
 
 ## License
 
-> **No license has been defined yet.**  
-> To enable usage, modification, and redistribution, add a `LICENSE` file (e.g., [MIT](https://choosealicense.com/licenses/mit/), [GPLv3](https://choosealicense.com/licenses/gpl-3.0/)).  
-> **Until a license is present, use and redistribution are NOT permitted.**
+> **This project is licensed under the "Educational Use Only License".**  
+> Use, copying, modification, and distribution are permitted for educational and non-commercial purposes only, as described in the [LICENSE](LICENSE) file.  
+> **Commercial use is prohibited without prior permission from the author.**
 
 ---
 
