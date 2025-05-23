@@ -3,7 +3,6 @@ package test;
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import gui.HandlerInputPlayer;
 import gui.InputEvent;
 
 import java.util.concurrent.Executors;
@@ -19,8 +18,8 @@ public class TestInputPlayer extends JFrame
         frame.setSize(300, 200);
         frame.setLocationRelativeTo(null);
 
-        HandlerInputPlayer inputEvent = new HandlerInputPlayer();
-        inputEvent.registerInputHandlers(frame);
+
+
         frame.setVisible(true);
 
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
@@ -34,7 +33,7 @@ public class TestInputPlayer extends JFrame
             System.out.println("LEFT "+ inputEvent.isActionActive("LEFT"));
             if(inputEvent.isActionActive("EVASIVE"))
             System.out.println("EVASIVE "+ inputEvent.isActionActive("EVASIVE"));
-           
+
         }, 0, 100, TimeUnit.MILLISECONDS);
 
         // Add shutdown hook to clean up executor
