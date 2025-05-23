@@ -11,6 +11,7 @@ POO_GALAGA is a modern, object-oriented Java project inspired by the classic Gal
 ## Table of Contents
 
 - [Description](#description)
+  
 - [Design Patterns](#design-patterns)
 - [Main Features](#main-features)
 - [Controls](#controls)
@@ -19,8 +20,11 @@ POO_GALAGA is a modern, object-oriented Java project inspired by the classic Gal
 - [Technologies Used](#technologies-used)
 - [Getting Started](#getting-started)
 - [Contribution Guide](#contribution-guide)
+  
+- [Try the Original Galaga](#try-the-original-galaga)
 - [License](#license)
 - [Credits](#credits)
+
 
 ---
 
@@ -189,6 +193,17 @@ java -cp bin Main
 5. Open a Pull Request.
 
 See `CONTRIBUTING.md` for more details and best practices.
+
+---
+
+
+## Try the Original Galaga
+
+Want to experience the classic before playing our modern version?  
+You can play the original Galaga (NES version) online here:  
+[https://www.retrogames.cz/play_018-NES.php](https://www.retrogames.cz/play_018-NES.php)
+
+
 
 ---
 
