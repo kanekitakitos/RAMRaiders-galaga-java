@@ -22,10 +22,16 @@ public class Main
      */
     public static void main(String[] args)
     {
-        Shape backGroundShape = new Shape(ImagesLoader.loadAnimationFrames("background.gif"), 5); // Background shape
-        SwingGui gui = new SwingGui(1100, 800, backGroundShape); // Initialize the GUI with dimensions and background
-        GameManager gameManager = new GameManager(gui); // Initialize the game manager with the engine and player
+        // Background shape
+        Shape backGroundShape = new Shape(ImagesLoader.loadAnimationFrames("background.gif"), 5);
+        // Initialize the GUI with dimensions and background
+        SwingGui gui = new SwingGui(1100, 800, backGroundShape);
+        // Initialize the game manager with the engine and player
+        // Create the game manager with the GUI and gameEngine
+        GameManager gameManager = new GameManager(gui);
+        // Create the hitbox shape
         gameManager.setHitbox(false);
+        // start the game engine
         gameManager.startGame();
     }
 }
