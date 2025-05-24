@@ -33,8 +33,7 @@ public class TestLinearShootAttack {
                 new Shape());
 
         shootAttack = new LinearShootAttack();
-        inputEvent = new InputEvent();
-        inputEvent.setPlayerMove("ATTACK", true);
+
     }
 
     @Test
