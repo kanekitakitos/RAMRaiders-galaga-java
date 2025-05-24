@@ -1,16 +1,25 @@
-# POO_GALAGA
+# RAMRaiders
 
 ![Java](https://img.shields.io/badge/language-Java-blue.svg)
 ![Status](https://img.shields.io/badge/status-in%20development-orange)
 <!-- Add a license badge once defined -->
 
-POO_GALAGA is a modern, object-oriented Java project inspired by the classic Galaga arcade game (originally released in 1981). The goal is to solidify OOP concepts through the development of a functional, modular, and maintainable game, featuring a graphical interface, advanced gameplay mechanics, and multiple design patterns.
+RAMRaiders-galaga-java is a modern, object-oriented Java project inspired by the classic Galaga arcade game (originally released in 1981) with a Star Wars theme.
 
----
+The main goal of this project is to solidify Object-Oriented Programming (OOP) concepts through the development of a functional, modular, and maintainable game, featuring:
+
+- Engaging graphical interface
+- Advanced gameplay mechanics
+- Use of multiple design patterns
+- Star Wars themed assets
+
+This repository is perfect for anyone who wants to learn or reinforce OOP concepts by applying them in a practical game development context.
+
 
 ## Table of Contents
 
 - [Description](#description)
+  
 - [Design Patterns](#design-patterns)
 - [Main Features](#main-features)
 - [Controls](#controls)
@@ -19,8 +28,11 @@ POO_GALAGA is a modern, object-oriented Java project inspired by the classic Gal
 - [Technologies Used](#technologies-used)
 - [Getting Started](#getting-started)
 - [Contribution Guide](#contribution-guide)
+  
+- [Try the Original Galaga](#try-the-original-galaga)
 - [License](#license)
 - [Credits](#credits)
+
 
 ---
 
@@ -191,6 +203,17 @@ java -cp bin Main
 5. Open a Pull Request.
 
 See `CONTRIBUTING.md` for more details and best practices.
+
+---
+
+
+## Try the Original Galaga
+
+Want to experience the classic before playing our modern version?  
+You can play the original Galaga (NES version) online here:  
+[https://www.retrogames.cz/play_018-NES.php](https://www.retrogames.cz/play_018-NES.php)
+
+
 
 ---
 
