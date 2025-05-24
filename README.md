@@ -1,4 +1,4 @@
-# POO_GALAGA
+# RAMRaiders
 
 ![Java](https://img.shields.io/badge/language-Java-blue.svg)
 ![Status](https://img.shields.io/badge/status-in%20development-orange)
