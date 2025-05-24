@@ -1,42 +1,53 @@
 package test;
 
-import javax.swing.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import gui.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.JFrame;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+public class TestInputPlayer {
 
-public class TestInputPlayer extends JFrame
-{
     public static void main(String[] args)
     {
-        JFrame frame = new JFrame("Keyboard Test");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(300, 200);
-        frame.setLocationRelativeTo(null);
+        // Create key and mouse mappings
+        Map<Integer, String> keyMap = new HashMap<>();
+        keyMap.put(KeyEvent.VK_RIGHT, "RIGHT");
+        keyMap.put(KeyEvent.VK_LEFT, "LEFT");
+        keyMap.put(KeyEvent.VK_SPACE, "EVASIVE");
 
+        Map<Integer, String> mouseMap = new HashMap<>();
+        mouseMap.put(MouseEvent.BUTTON1, "MOUSE_LEFT");
 
-
+        // Create input event and frame
+        InputEvent inputEvent = new InputEvent(keyMap, mouseMap);
+        JFrame frame = new JFrame("Input Test");
+        frame.setSize(400, 400);
         frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        inputEvent.registerInputHandlers(frame);
 
-        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-        executor.scheduleAtFixedRate(() ->
-        {
-            if(inputEvent.isActionActive("ATTACK"))
-            System.out.println("ATTACK "+ inputEvent.isActionActive("ATTACK"));
-            if(inputEvent.isActionActive("RIGHT"))
-            System.out.println("RIGHT "+ inputEvent.isActionActive("RIGHT"));
-            if(inputEvent.isActionActive("LEFT"))
-            System.out.println("LEFT "+ inputEvent.isActionActive("LEFT"));
-            if(inputEvent.isActionActive("EVASIVE"))
-            System.out.println("EVASIVE "+ inputEvent.isActionActive("EVASIVE"));
+        // Infinite loop to check inputs
+        while (true) {
+            if (inputEvent.isActionActive("RIGHT")) {
+                System.out.println("RIGHT key is pressed");
+            }
+            if (inputEvent.isActionActive("LEFT")) {
+                System.out.println("LEFT key is pressed");
+            }
+            if (inputEvent.isActionActive("EVASIVE")) {
+                System.out.println("SPACE key is pressed");
+            }
+            if (inputEvent.isActionActive("MOUSE_LEFT")) {
+                System.out.println("Left mouse button is pressed");
+            }
 
-        }, 0, 100, TimeUnit.MILLISECONDS);
-
-        // Add shutdown hook to clean up executor
-        Runtime.getRuntime().addShutdownHook(new Thread(executor::shutdown));
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

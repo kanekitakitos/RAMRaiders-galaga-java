@@ -18,7 +18,7 @@ public class TestEnemyBehavior
     void setUp()
     {
         Ponto[] pts = {new Ponto(2.0, 4), new Ponto(2.0, 0), new Ponto(0.0, 0.0), new Ponto(0.0, 4.0)};
-        Transform transform = new Transform(new Ponto(1.0, 2), 1, 90, 1);
+        Transform transform = new Transform(new Ponto(1.0, 2), 0, 270, 1);
         Poligono polygon = new Retangulo(pts, transform);
         enemyBehavior = new EnemyBehavior();
 

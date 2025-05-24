@@ -60,6 +60,26 @@ public class Shape implements IShape {
     }
 
     /**
+     * Default constructor for the `Shape` class.
+     * Initializes a `Shape` instance with an empty list of frames,
+     * sets the current frame index to 0, the frame delay to 0 milliseconds,
+     * and records the current system time as the last frame update time.
+     *
+     * @postConditions:
+     *                  - The `frames` list is initialized as an empty list.
+     *                  - The `currentFrameIndex` is set to 0.
+     *                  - The `frameDelayMillis` is set to 0.
+     *                  - The `lastFrameTime` is set to the current system time.
+     */
+    public Shape()
+    {
+        this.frames = new ArrayList<>();
+        this.currentFrameIndex = 0;
+        this.frameDelayMillis = 0;
+        this.lastFrameTime = System.currentTimeMillis();
+    }
+
+    /**
      * Constructs a `Shape` with a list of frames and a frame delay.
      *
      * @param other A `Shape` object to copy frames from.

@@ -125,25 +125,26 @@ public class GameVisualizer {
     public static List<IGameObject> createSampleObjects() {
         List<IGameObject> objects = new ArrayList<>();
 
-        // Create player at (2, 2)
-
-        Transform t1 = new Transform(new Ponto(5,0) ,0, 0.0, 1.0);
-        Ponto[] points1 = {new Ponto(-0.5, 0.5), new Ponto(0.5, 0.5), new Ponto(0.5, -0.5), new Ponto(-0.5, -0.5)};
-        Retangulo collider1 = new Retangulo(points1, t1);
-        Shape shape1 = new Shape();
-        Behavior behavior1 = new Behavior();
-        GameObject player = new GameObject("Player", t1, collider1, behavior1, shape1);
+        // Create player
+        Transform playerTransform = new Transform(new Ponto(5,0), 0, 90, 1.0);
+        Ponto[] playerPoints = {new Ponto(-0.5, 0.5), new Ponto(0.5, 0.5), 
+                              new Ponto(0.5, -0.5), new Ponto(-0.5, -0.5)};
+        Retangulo playerCollider = new Retangulo(playerPoints, playerTransform);
+        GameObject player = new GameObject("Player", playerTransform, playerCollider, 
+                                        new PlayerBehavior(), new Shape());
+        player.onInit();
         objects.add(player);
 
-        // Create 40 enemies (minimum required for the Galaga pattern)
+        // Create enemies
         List<IGameObject> enemies = new ArrayList<>();
         for (int i = 0; i < 40; i++) {
-            Transform t = new Transform(new Ponto(0, 0), 0, 0.0, 1.0);
-            Ponto[] points = {new Ponto(-0.3, 0.3), new Ponto(0.3, 0.3), new Ponto(0.3, -0.3), new Ponto(-0.3, -0.3)};
+            Transform t = new Transform(new Ponto(0, 0), 0, 270, 1.0);
+            Ponto[] points = {new Ponto(-0.3, 0.3), new Ponto(0.3, 0.3),
+                            new Ponto(0.3, -0.3), new Ponto(-0.3, -0.3)};
             Retangulo collider = new Retangulo(points, t);
-            Shape shape = new Shape();
-            Behavior behavior = new EnemyBehavior(); // Using EnemyBehavior instead of basic Behavior
-            GameObject enemy = new GameObject("Enemy " + i, t, collider, behavior, shape);
+            GameObject enemy = new GameObject("Enemy " + i, t, collider,
+                                           new EnemyBehavior(), new Shape());
+            enemy.onInit();
             enemies.add(enemy);
         }
 
@@ -154,12 +155,9 @@ public class GameVisualizer {
 
         objects.addAll(enemies);
 
-
-        for (int i = 0; i < objects.size() ; i++)
-        {
+        for (int i = 0; i < objects.size(); i++) {
             System.out.println(objects.get(i));
             System.out.println();
-
         }
 
         return objects;

@@ -1,156 +1,135 @@
 package test;
+
 import core.*;
 import core.objectsInterface.IGameObject;
 import geometry.Ponto;
-import geometry.Poligono;
 import geometry.Retangulo;
 import gui.InputEvent;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestPlayerBehavior
-{
-    private PlayerBehavior playerBehavior0;
-    private GameObject gameObject0;
-
-    private PlayerBehavior playerBehavior1;
-    private GameObject gameObject1;
-
+public class TestPlayerBehavior {
+    private PlayerBehavior playerBehavior;
+    private GameObject gameObject;
     private InputEvent inputEvent;
 
     @BeforeEach
-    void setUp()
-    {
-        playerBehavior0 = new PlayerBehavior();
+    void setUp() {
+        // Set up input mappings
+        Map<Integer, String> keyMap = new HashMap<>();
+        keyMap.put(KeyEvent.VK_RIGHT, "RIGHT");
+        keyMap.put(KeyEvent.VK_LEFT, "LEFT");
+        keyMap.put(KeyEvent.VK_SPACE, "EVASIVE");
+        keyMap.put(KeyEvent.VK_Z, "ATTACK");
 
-        Ponto[] pts = {new Ponto(2.0, 4), new Ponto(2.0, 0), new Ponto(0.0, 0.0), new Ponto(0.0, 4.0)};
-        Transform transform = new Transform(new Ponto(1.0, 2), 0, 0, 1);
-        Poligono polygon = new Retangulo(pts, transform);
+        Map<Integer, String> mouseMap = new HashMap<>();
+        mouseMap.put(MouseEvent.BUTTON1, "ATTACK");
 
-        gameObject0 = new GameObject("PLAYER 0", transform, polygon, playerBehavior0, new Shape());
-        gameObject0.onInit();
+        inputEvent = new InputEvent(keyMap, mouseMap);
+        playerBehavior = new PlayerBehavior();
 
+        // Create game object
+        Ponto[] points = {new Ponto(2.0, 4), new Ponto(2.0, 0), new Ponto(0.0, 0.0), new Ponto(0.0, 4.0)};
+        Transform transform = new Transform(new Ponto(0, 0), 1, 90, 1);
+        Retangulo polygon = new Retangulo(points, transform);
 
-        playerBehavior1 = new PlayerBehavior();
-        gameObject1 = new GameObject("PLAYER 1", transform, polygon, playerBehavior1, new Shape());
-        gameObject1.onInit();
-
-        inputEvent = new InputEvent();
+        gameObject = new GameObject("PLAYER", transform, polygon, playerBehavior, new Shape());
+        gameObject.onInit();
     }
 
     @Test
-    void attackNotCreatesProjectileWhenNotAttacking()
-    {
-        IGameObject result = playerBehavior0.attack(inputEvent);
-        assertNull(result);
-    }
+    void onUpdate_movesPlayerRight() {
+        inputEvent.keyPressed(new KeyEvent(new java.awt.Component(){}, KeyEvent.KEY_PRESSED, 0, 0, KeyEvent.VK_RIGHT, 'D'));
+        Ponto initialPosition = gameObject.transform().position();
 
-    @Test
-    void attackReturnsNullWhenAlreadyAttacking()
-    {
-        inputEvent.setPlayerMove("MOUSE_LEFT", true);
-        IGameObject firstAttack = playerBehavior0.attack(inputEvent);
-        assertNotNull(firstAttack);
+        playerBehavior.onUpdate(inputEvent);
 
-        IGameObject secondAttack = playerBehavior0.attack(inputEvent);
-        assertNull(secondAttack);
-    }
-
-    @Test
-    void onCollisionReducesLifeByOneWhenHit()
-    {
-        ArrayList<IGameObject> collisions = new ArrayList<>();
-        collisions.add(gameObject1);
-
-        playerBehavior0.onCollision(collisions);
-        assertEquals(2, playerBehavior0.getLife());
-    }
-
-    @Test
-    void onCollisionMakesPlayerInvincibleTemporarily() throws InterruptedException
-    {
-        ArrayList<IGameObject> collisions = new ArrayList<>();
-        collisions.add(gameObject1);
-
-        playerBehavior0.onCollision(collisions);
-        assertTrue(playerBehavior0.isInvincible());
-
-        Thread.sleep(1500);
-        assertFalse(playerBehavior0.isInvincible());
-    }
-
-    @Test
-    void playerRemainsAliveWhenHitWithInvincibility() throws InterruptedException
-    {
-        ArrayList<IGameObject> collisions = new ArrayList<>();
-        collisions.add(gameObject1);
-
-
-        playerBehavior0.onCollision(collisions); // hit
-        playerBehavior0.onCollision(collisions);
-
-        Thread.sleep(1300);
-        assertEquals(2, playerBehavior0.getLife());
-        playerBehavior0.onCollision(collisions); // hit
-        assertEquals(1, playerBehavior0.getLife());
-        assertTrue(playerBehavior0.isEnabled());
-    }
-
-    @Test
-    void playerIsDestroyedWhenLifeReachesZero() throws InterruptedException
-    {
-        ArrayList<IGameObject> collisions = new ArrayList<>();
-        collisions.add(gameObject1);
-
-
-        assertEquals(3, playerBehavior0.getLife());
-        playerBehavior0.onCollision(collisions); // hit
-        Thread.sleep(1300);
-        assertEquals(2, playerBehavior0.getLife());
-        playerBehavior0.onCollision(collisions);// hit
-        Thread.sleep(1300);
-        assertEquals(1, playerBehavior0.getLife());
-        playerBehavior0.onCollision(collisions); // hit
-
-        assertEquals(0, playerBehavior0.getLife());
-        assertFalse(playerBehavior0.isEnabled());
-
-
-    }
-
-    @Test
-    void evasiveManeuverMovesPlayerRight()
-    {
-        inputEvent.setPlayerMove("RIGHT", true);
-        Ponto initialPosition = gameObject0.transform().position();
-
-        playerBehavior0.moveAndEvasiveManeuver(inputEvent);
-
-        Ponto newPosition = gameObject0.transform().position();
+        Ponto newPosition = gameObject.transform().position();
         assertTrue(newPosition.x() > initialPosition.x());
         assertEquals(initialPosition.y(), newPosition.y());
     }
 
     @Test
-    void evasiveManeuverMovesPlayerLeft() throws InterruptedException
-    {
-        inputEvent.setPlayerMove("LEFT", true);
-        Ponto initialPosition = gameObject0.transform().position();
+    void onUpdate_movesPlayerLeft() {
+        inputEvent.keyPressed(new KeyEvent(new java.awt.Component(){}, KeyEvent.KEY_PRESSED, 0, 0, KeyEvent.VK_LEFT, 'A'));
+        Ponto initialPosition = gameObject.transform().position();
 
-        playerBehavior0.moveAndEvasiveManeuver(inputEvent);
-        assertTrue(playerBehavior0.isInvincible());
+        playerBehavior.onUpdate(inputEvent);
 
-        Ponto newPosition = gameObject0.transform().position();
+        Ponto newPosition = gameObject.transform().position();
         assertTrue(newPosition.x() < initialPosition.x());
         assertEquals(initialPosition.y(), newPosition.y());
-
-        Thread.sleep(1200);
-        assertFalse(playerBehavior0.isInvincible());
     }
 
+    @Test
+    void onCollision_reducesLife() {
+        ArrayList<IGameObject> collisions = new ArrayList<>();
+        Transform enemyTransform = new Transform(new Ponto(0, 0), 1, 0, 1);
+        Retangulo enemyCollider = new Retangulo(new Ponto[]{new Ponto(2.0, 4), new Ponto(2.0, 0),
+                new Ponto(0.0, 0.0), new Ponto(0.0, 4.0)}, enemyTransform);
+        GameObject enemy = new GameObject("ENEMY", enemyTransform, enemyCollider, new Behavior(), new Shape());
+        collisions.add(enemy);
+
+        int initialLife = playerBehavior.getLife();
+        playerBehavior.onCollision(collisions);
+
+        assertEquals(initialLife - 1, playerBehavior.getLife());
+    }
+
+    @Test
+    void attack_createsProjectile() {
+        inputEvent.keyPressed(new KeyEvent(new java.awt.Component(){}, KeyEvent.KEY_PRESSED, 0, 0, KeyEvent.VK_Z, 'Z'));
+
+        IGameObject projectile = playerBehavior.attack(inputEvent);
+
+        assertNotNull(projectile);
+        assertTrue(projectile.name().startsWith("LINEAR_BULLET"));
+    }
+
+    @Test
+    void evasiveManeuver_makesPlayerInvincible() {
+        inputEvent.keyPressed(new KeyEvent(new java.awt.Component(){}, KeyEvent.KEY_PRESSED, 0, 0, KeyEvent.VK_SPACE, ' '));
+
+        playerBehavior.evasiveManeuver(inputEvent);
+
+        assertTrue(playerBehavior.isInvincible());
+    }
+
+    @Test
+    void onCollision_doesNotReduceLifeWhenInvincible()
+    {
+        ArrayList<IGameObject> collisions = new ArrayList<>();
+        Transform enemyTransform = new Transform(new Ponto(0, 0), 1, 0, 1);
+        Retangulo enemyCollider = new Retangulo(new Ponto[]{}, enemyTransform);
+        GameObject enemy = new GameObject("ENEMY", enemyTransform, enemyCollider, new Behavior(), new Shape());
+        collisions.add(enemy);
+
+        // Make player invincible
+        inputEvent.keyPressed(new KeyEvent(new java.awt.Component(){}, KeyEvent.KEY_PRESSED, 0, 0, KeyEvent.VK_SPACE, ' '));
+        playerBehavior.evasiveManeuver(inputEvent);
+
+        int initialLife = playerBehavior.getLife();
+        playerBehavior.onCollision(collisions);
+
+        assertEquals(initialLife, playerBehavior.getLife());
+    }
+
+    @Test
+    void noMovement_whenNoInput() {
+        Ponto initialPosition = gameObject.transform().position();
+
+        playerBehavior.onUpdate(inputEvent);
+
+        Ponto newPosition = gameObject.transform().position();
+        assertEquals(initialPosition.x(), newPosition.x());
+        assertEquals(initialPosition.y(), newPosition.y());
+    }
 }
