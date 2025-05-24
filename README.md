@@ -180,7 +180,10 @@ java -cp bin Main
 
 ---
 
+
 > **Note:** If the game does not work properly after compiling (for example, if images or sounds are missing), you may need to manually copy the image and audio files from the `assets/` folder to the output directory (`bin/assets` or the equivalent folder used by your IDE). Make sure the resources are accessible at the path expected by the application.
+---
+
 
 ## Contribution Guide
 
